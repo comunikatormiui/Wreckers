@@ -27,7 +27,7 @@ public class RenderingSystem extends IterableZSortedRenderSystem {
     @Override
     protected void renderStarted() {
         cam.update();
-        batch.setTransformMatrix(cam.combined);
+        batch.setProjectionMatrix(cam.combined);
     }
 
     @Override

@@ -24,6 +24,8 @@ import ru.maklas.wreckers.game.FixtureBuilder;
 import ru.maklas.wreckers.game.ShapeBuilder;
 import ru.maklas.wreckers.libs.gsm_lib.State;
 
+import java.awt.*;
+
 public class MainMenuState extends State {
 
     Engine engine;
@@ -38,7 +40,6 @@ public class MainMenuState extends State {
 
         cam = new OrthographicCamera(720, 1280);
         System.out.println(cam.position);
-        cam.position.set(0, 640, 0);
         engine = new Engine();
         world = new World(new Vector2(0, -9.8f), true);
         engine.add(new PhysicsSystem(world));
