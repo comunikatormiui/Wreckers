@@ -27,22 +27,20 @@ public class RenderingSystem extends IterableZSortedRenderSystem {
     @Override
     protected void renderStarted() {
         cam.update();
+        batch.setTransformMatrix(cam.combined);
     }
 
     @Override
     protected void renderEntity(Entity entity, IRenderComponent iRenderComponent) {
-
         Vector2 tempVec = Utils.vec1;
+        RenderComponent rc = (RenderComponent) iRenderComponent;
 
-        RenderComponent renderComponent = (RenderComponent) iRenderComponent;
+        batch.setColor(1, 1, 1, rc.opacity);
 
-        batch.setColor(1, 1, 1, renderComponent.opacity);
-
-        for (RenderUnit ru : renderComponent.renderUnits) {
+        for (RenderUnit ru : rc.renderUnits) {
 
             float originX = ru.width * ru.pivotX;
             float originY = ru.height * ru.pivotY;
-
 
             tempVec.set(ru.localX, ru.localY);
             tempVec.rotate(entity.getAngle());

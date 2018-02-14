@@ -48,16 +48,4 @@ public class ShapeBuilder {
         circle.setPosition(Utils.vec1.set(x/scale, y/scale));
         return circle;
     }
-
-    public PolygonShape buildPlaneShape(){
-
-        squareVerts[0].set(-0.6f, 0);
-        squareVerts[1].set(-0.3f, -0.2f);
-        squareVerts[2].set(0.6f, 0);
-        squareVerts[3].set(-0.3f, 0.25f);
-
-        PolygonShape shape = new PolygonShape();
-        shape.set(squareVerts);
-        return shape;
-    }
 }
