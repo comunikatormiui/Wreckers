@@ -6,13 +6,14 @@ import com.badlogic.gdx.physics.box2d.World;
 import ru.maklas.mengine.ComponentMapper;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
+import ru.maklas.mengine.EntityListener;
 import ru.maklas.mengine.systems.CollisionEntitySystem;
 import ru.maklas.mengine.utils.ImmutableArray;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.CollisionComponent;
 
-public class PhysicsSystem extends CollisionEntitySystem {
+public class PhysicsSystem extends CollisionEntitySystem implements EntityListener {
 
     private final World world;
     private ImmutableArray<Entity> entities;
@@ -22,9 +23,14 @@ public class PhysicsSystem extends CollisionEntitySystem {
     }
 
     @Override
-    public void onAddedToEngine(Engine engine) {
+    public void onAddedToEngine(final Engine engine) {
         entities = engine.entitiesFor(CollisionComponent.class);
+        for (Entity entity : entities) {
+            entity.get(Mappers.collisionM).body.setUserData(entity);
+        }
+        engine.addListener(this);
     }
+
 
     @Override
     public void update(float dt) {
@@ -44,5 +50,22 @@ public class PhysicsSystem extends CollisionEntitySystem {
 
         }
 
+    }
+
+    @Override
+    public void entityAdded(Entity entity) {
+        CollisionComponent cc = entity.get(Mappers.collisionM);
+        if (cc != null) {
+            cc.body.setUserData(entity);
+            System.out.println("adding " + entity);
+        }
+    }
+
+    @Override
+    public void entityRemoved(Entity entity) {
+        CollisionComponent cc = entity.get(Mappers.collisionM);
+        if (cc != null) {
+            world.destroyBody(cc.body);
+        }
     }
 }

@@ -24,7 +24,6 @@ public class ShapeBuilder {
         }
     }
 
-
     public PolygonShape buildRectangle(float x, float y, float width, float height){
         x /= scale;
         y /= scale;
@@ -48,4 +47,5 @@ public class ShapeBuilder {
         circle.setPosition(Utils.vec1.set(x/scale, y/scale));
         return circle;
     }
+
 }
