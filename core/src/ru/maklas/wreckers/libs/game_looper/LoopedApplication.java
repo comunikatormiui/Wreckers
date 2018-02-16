@@ -6,7 +6,7 @@ package ru.maklas.wreckers.libs.game_looper;
 
 public interface LoopedApplication {
 
-    void onStart(LooperAccessor fps);
+    void onStart(LooperAccessor looper);
 
     void update(float dt);
 

@@ -1,20 +1,29 @@
 package ru.maklas.wreckers.engine.events;
 
+import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Entity;
 
 public class DeathEvent {
 
-    private final Entity damageDealer;
+    @Nullable
+    private final Entity instigator;
+    private final DamageSource bulletHit;
     private final Entity target;
 
-    public DeathEvent(Entity damageDealer, Entity target) {
+    public DeathEvent(@Nullable Entity instigator, DamageSource bulletHit, Entity target) {
 
-        this.damageDealer = damageDealer;
+        this.instigator = instigator;
+        this.bulletHit = bulletHit;
         this.target = target;
     }
 
-    public Entity getDamageDealer() {
-        return damageDealer;
+    @Nullable
+    public Entity getInstigator() {
+        return instigator;
+    }
+
+    public DamageSource getBulletHit() {
+        return bulletHit;
     }
 
     public Entity getTarget() {

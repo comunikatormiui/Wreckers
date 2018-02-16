@@ -1,18 +1,28 @@
 package ru.maklas.wreckers.engine.events;
 
+import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Entity;
 
 public class DamageEvent {
 
-    private final Entity damageDealer;
+
+
+    private final DamageSource source;
+    private final Entity instigator;
     private final Entity target;
     private float damage;
 
 
-    public DamageEvent(Entity damageDealer, Entity target, float damage) {
-        this.damageDealer = damageDealer;
+    public DamageEvent(@Nullable Entity instigator, DamageSource damageSource, Entity target, float damage) {
+        this.instigator = instigator;
+        this.source = damageSource;
         this.target = target;
         this.damage = damage;
+    }
+
+    @Nullable
+    public Entity getInstigator() {
+        return instigator;
     }
 
     public float getDamage() {
@@ -23,7 +33,7 @@ public class DamageEvent {
         return target;
     }
 
-    public Entity getDamageDealer() {
-        return damageDealer;
+    public DamageSource getDamageSource() {
+        return source;
     }
 }

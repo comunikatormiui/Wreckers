@@ -11,7 +11,7 @@ import ru.maklas.mengine.systems.CollisionEntitySystem;
 import ru.maklas.mengine.utils.ImmutableArray;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.engine.Mappers;
-import ru.maklas.wreckers.engine.components.CollisionComponent;
+import ru.maklas.wreckers.engine.components.PhysicsComponent;
 
 public class PhysicsSystem extends CollisionEntitySystem implements EntityListener {
 
@@ -24,9 +24,9 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
 
     @Override
     public void onAddedToEngine(final Engine engine) {
-        entities = engine.entitiesFor(CollisionComponent.class);
+        entities = engine.entitiesFor(PhysicsComponent.class);
         for (Entity entity : entities) {
-            entity.get(Mappers.collisionM).body.setUserData(entity);
+            entity.get(Mappers.physicsM).body.setUserData(entity);
         }
         engine.addListener(this);
     }
@@ -39,9 +39,9 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
 
         world.step(0.016666667f, 6, 2);
 
-        ComponentMapper<CollisionComponent> collisionM = Mappers.collisionM;
+        ComponentMapper<PhysicsComponent> collisionM = Mappers.physicsM;
         for (Entity entity : entities) {
-            CollisionComponent cc = entity.get(collisionM);
+            PhysicsComponent cc = entity.get(collisionM);
 
             Vector2 bodyPos = cc.body.getPosition();
             entity.x = bodyPos.x * scale;
@@ -54,16 +54,15 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
 
     @Override
     public void entityAdded(Entity entity) {
-        CollisionComponent cc = entity.get(Mappers.collisionM);
+        PhysicsComponent cc = entity.get(Mappers.physicsM);
         if (cc != null) {
             cc.body.setUserData(entity);
-            System.out.println("adding " + entity);
         }
     }
 
     @Override
     public void entityRemoved(Entity entity) {
-        CollisionComponent cc = entity.get(Mappers.collisionM);
+        PhysicsComponent cc = entity.get(Mappers.physicsM);
         if (cc != null) {
             world.destroyBody(cc.body);
         }

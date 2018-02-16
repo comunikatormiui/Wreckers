@@ -1,6 +1,6 @@
 package ru.maklas.wreckers.assets;
 
-public class Masks {
+public class EntityType {
 
     private static final int player = 0x1;
     private static final int zombie = 0x2;
@@ -17,47 +17,47 @@ public class Masks {
     private static final int maskFriendlyObstacle = zombie | zombieBullet;
 
 
-    public static final Masks PLAYER = new Masks(
+    public static final EntityType PLAYER = new EntityType(
             1,
             player,
             maskPlayer
     );
 
-    public static final Masks ZOMBIE = new Masks(
+    public static final EntityType ZOMBIE = new EntityType(
             2,
             zombie,
             maskZombie
     );
 
-    public static final Masks PLAYER_BULLET = new Masks(
+    public static final EntityType PLAYER_BULLET = new EntityType(
             3,
             playerBullet,
             maskPlayerBullet
     );
 
-    public static final Masks ZOMBIE_BULLET = new Masks(
+    public static final EntityType ZOMBIE_BULLET = new EntityType(
             4,
             zombieBullet,
             maskZombieBullet
     );
 
-    public static final Masks FRIENDLY_OBSTACLE = new Masks(
+    public static final EntityType FRIENDLY_OBSTACLE = new EntityType(
             5,
             friendlyObstacle,
             maskFriendlyObstacle
     );
 
-    public static final Masks OBSTACLE = new Masks(
+    public static final EntityType OBSTACLE = new EntityType(
             6,
             obstacle,
             maskObstacle
     );
 
-    public static Masks fromType(int type){
+    public static EntityType fromType(int type){
         return values[type];
     }
 
-    public static final Masks[] values = new Masks[]{
+    public static final EntityType[] values = new EntityType[]{
             PLAYER,
             ZOMBIE,
             PLAYER_BULLET,
@@ -71,7 +71,7 @@ public class Masks {
     public final short category;
     public final short mask;
 
-    public Masks(int type, int category, int mask) {
+    public EntityType(int type, int category, int mask) {
         this.type = type;
         this.category = (short) category;
         this.mask = (short) mask;

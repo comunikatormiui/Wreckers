@@ -1,7 +1,7 @@
 package ru.maklas.wreckers.game;
 
 import com.badlogic.gdx.physics.box2d.*;
-import ru.maklas.wreckers.assets.Masks;
+import ru.maklas.wreckers.assets.EntityType;
 
 public class FDefBuilder {
 
@@ -27,7 +27,7 @@ public class FDefBuilder {
         return this;
     }
 
-    public FDefBuilder mask(Masks masks){
+    public FDefBuilder mask(EntityType masks){
         fDef.filter.categoryBits = masks.category;
         fDef.filter.maskBits = masks.mask;
         return this;

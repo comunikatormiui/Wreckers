@@ -14,6 +14,9 @@ public abstract class EntityDamageListener implements Listener<DamageEvent>{
 
     @Override
     public void receive(Signal<DamageEvent> signal, DamageEvent damageEvent) {
+        if (!entity.isInEngine()){
+            signal.remove(this);
+        }
         if (damageEvent.getTarget() == entity){
             process(signal, damageEvent);
         }

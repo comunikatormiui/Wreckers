@@ -14,7 +14,6 @@ public class Test {
 
     public static void main(String[] args){
 
-
         ClassUtils.StringCountResult stringCountResult =
                 ClassUtils.countStrings(
                         "ru.maklas.wreckers",

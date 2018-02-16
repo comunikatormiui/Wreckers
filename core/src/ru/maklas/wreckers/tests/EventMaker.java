@@ -35,6 +35,31 @@ public class EventMaker {
         return this;
     }
 
+    public EventMaker float_(String varName){
+        FieldData data = new FieldData(float.class, varName);
+        fields.add(data);
+        return this;
+    }
+
+    public EventMaker int_(String varName){
+        FieldData data = new FieldData(int.class, varName);
+        fields.add(data);
+        return this;
+    }
+
+    public EventMaker bool(String varName){
+        FieldData data = new FieldData(boolean.class, varName);
+        fields.add(data);
+        return this;
+    }
+
+    public EventMaker string(String varName){
+        FieldData data = new FieldData(String.class, varName);
+        fields.add(data);
+        return this;
+    }
+
+
     public void build() {
         SimpleProfiler.start();
         checkName();
@@ -68,7 +93,7 @@ public class EventMaker {
     }
 
     private File checkFileNameIsNotTaken() {
-        File file = new File(".\\core\\src\\ru\\mnw\\bird\\events\\" + className + ".java");
+        File file = new File(".\\core\\src\\ru\\maklas\\wreckers\\server\\events\\" + className + ".java");
         if (file.exists()){
             className = className + "1";
             return checkFileNameIsNotTaken();
@@ -90,11 +115,11 @@ public class EventMaker {
     }
 
     private void doPackage(){
-        writer.println("package ru.mnw.bird.events" + ';');
+        writer.println("package ru.maklas.wreckers.server.events" + ';');
     }
 
     private void doImports() {
-        writer.println("import ru.mnw.bird.local_libs.Copyable;");
+        writer.println("import ru.maklas.wreckers.libs.Copyable;");
         if (containsArrays()) writer.println("import java.util.Arrays;");
 
         Set<FieldData> fieldSet = new HashSet<FieldData>();

@@ -16,16 +16,14 @@ public class GameAssets {
 
 
 
-    //************//
-
-    //************//
     public static final int playerZ = 10;
-    //* Z-Orders *//
-    public static int bulletZ = 8;
+    public static final int zombieZ = 9;
+    public static final int bulletZ = 8;
 
-    //*********//
-    //* TYPES *//
-    //*********//
+    public static void getEntityDirection(float angle, Vector2 direction) {
+        direction.set(1, 0).setAngle(angle);
+    }
+
 
 
 

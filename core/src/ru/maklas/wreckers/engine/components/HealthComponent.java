@@ -10,4 +10,5 @@ public class HealthComponent implements Component{
     public HealthComponent(float health) {
         this.health = health;
     }
+
 }

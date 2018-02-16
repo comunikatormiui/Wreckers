@@ -12,8 +12,8 @@ public class RenderUnit {
     public float localY;
     public float width;
     public float height;
-    public float pivotX = 0;
-    public float pivotY = 0;
+    public float pivotX = 0.5f;
+    public float pivotY = 0.5f;
     public float angle;
     public TextureRegion region;
     public float scaleX = 1f;

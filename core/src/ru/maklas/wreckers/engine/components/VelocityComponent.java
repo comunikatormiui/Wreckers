@@ -8,33 +8,29 @@ import ru.maklas.mengine.Component;
 
 public class VelocityComponent implements Component {
 
-    public float x, y;
+    public float velocity;
 
     public VelocityComponent() {
 
     }
 
-    public VelocityComponent(float x, float y) {
-        this.x = x;
-        this.y = y;
+    public VelocityComponent(float velocity) {
+        this.velocity = velocity;
     }
 
     @Override
     public String toString() {
         return "VelocityC{" +
-                "x=" + x +
-                ", y=" + y +
+                "vel=" + velocity +
                 '}';
     }
 
-    public void set(float vx, float vy) {
-        this.x = vx;
-        this.y = vy;
+    public void set(float velocity) {
+        this.velocity = velocity;
     }
 
-    public VelocityComponent setUp(float x, float y) {
-        this.x = x;
-        this.y = y;
+    public VelocityComponent setUp(float velocity) {
+        this.velocity = velocity;
         return this;
     }
 }

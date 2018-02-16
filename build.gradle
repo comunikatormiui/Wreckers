@@ -25,7 +25,7 @@ allprojects {
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
         mnetVersion  = '53ca6c63960f8044cff1ad8957fc7c54aace74c2'
-        mengineVersion = '8b1bdd2fbb8dd67d390a01623a70fc026543b99d'
+        mengineVersion = '98da733b9e16a1ee35cf78e08a96e8adca3f1bd1'
     }
 
     repositories {

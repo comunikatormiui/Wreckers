@@ -13,8 +13,16 @@ public class Images {
     private static boolean isLoaded = false;
 
 
-
+    /**
+     * Green point
+     */
     public static TextureRegion point;
+
+    /**
+     * Yellow line. Width = 100; Height = 6;
+     */
+    public static TextureRegion line;
+
     private static Array<Disposable> disposables = new Array<Disposable>();
 
     public static void load(){
@@ -29,6 +37,15 @@ public class Images {
         Texture pointTexture = new Texture(pixmap);
         disposables.add(pointTexture);
         point = new TextureRegion(pointTexture);
+        pixmap.dispose();
+
+
+        pixmap = new Pixmap(104, 10, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.YELLOW);
+        pixmap.fillRectangle(2, 2, 100, 6);
+        Texture lineTexture = new Texture(pixmap);
+        disposables.add(lineTexture);
+        line = new TextureRegion(lineTexture);
         pixmap.dispose();
 
     }

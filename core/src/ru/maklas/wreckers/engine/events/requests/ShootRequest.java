@@ -1,12 +1,12 @@
-package ru.maklas.wreckers.engine.events;
+package ru.maklas.wreckers.engine.events.requests;
 
 import ru.maklas.mengine.Entity;
 
-public class ShootEvent {
+public class ShootRequest {
 
     Entity shooter;
 
-    public ShootEvent(Entity shooter) {
+    public ShootRequest(Entity shooter) {
         this.shooter = shooter;
     }
 

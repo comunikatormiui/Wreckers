@@ -14,6 +14,9 @@ public abstract class EntityCollisionEvent implements Listener<CollisionEvent>{
 
     @Override
     public void receive(Signal<CollisionEvent> signal, CollisionEvent collisionEvent) {
+        if (!entity.isInEngine()){
+            signal.remove(this);
+        }
         if (collisionEvent.a == entity){
             process(signal, collisionEvent);
         }
