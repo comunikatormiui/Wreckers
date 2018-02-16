@@ -63,8 +63,7 @@ public class ClientEntityPlayer extends Entity {
         Weapon noWeapon = WeaponAssets.createNew(WeaponType.NONE, 1, 0);
         Set<Weapon> weapons = new HashSet<Weapon>();
         weapons.add(noWeapon);
-        add(new PlayerInventoryComponent(new Bag(weapons), noWeapon));
-        add(new PlayerComponent());
+        add(new PlayerComponent(0, new Bag(weapons), noWeapon));
         add(new VelocityComponent(20));
         body.getMassData().mass = 80f;
     }

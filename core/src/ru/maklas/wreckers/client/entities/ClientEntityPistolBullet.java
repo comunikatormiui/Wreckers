@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
+import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
@@ -44,7 +45,29 @@ public class ClientEntityPistolBullet extends Entity implements RayCastCallback 
     protected void addedToEngine(Engine engine) {
         add(new TTLComponent(0.03f));
         world.rayCast(this, x / GameAssets.box2dScale, y / GameAssets.box2dScale, destination.x, destination.y);
-        if (!hit){
+
+        if (closestFraction < 1){
+            RenderUnit ru = new RenderUnit(Images.line);
+            float distanceToPoint = Utils.vec1.set(closestPoint).scl(GameAssets.box2dScale).sub(x, y).len();
+            ru.width = distanceToPoint < ru.width ? distanceToPoint : ru.width;
+            ru.pivotX = 0;
+            ru.pivotY = 0.5f;
+            add(new RenderComponent(ru));
+
+            Entity e = (Entity) closestFixture.getBody().getUserData();
+            HealthComponent hc = e.get(Mappers.healthM);
+
+            if ( hc == null){
+                return;
+            }
+            if (closestFixture.getBody().getType() == BodyDef.BodyType.DynamicBody){
+                closestFixture.getBody().applyLinearImpulse(force, closestPoint, true);
+            }
+            if (!hc.dead){
+                getEngine().dispatch(new ShotEvent(shooter, this, e, damage, new Vector2(closestPoint).scl(GameAssets.box2dScale), closestNormal.angle()));
+            }
+
+        } else {
             RenderUnit ru = new RenderUnit(Images.line);
             ru.pivotX = 0;
             ru.pivotY = 0.5f;
@@ -52,27 +75,21 @@ public class ClientEntityPistolBullet extends Entity implements RayCastCallback 
         }
     }
 
+    private Vector2 closestPoint = new Vector2();
+    private Vector2 closestNormal = new Vector2();
+    private Fixture closestFixture;
+    private float closestFraction = 1.1f;
+
     @Override
     public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-        RenderUnit ru = new RenderUnit(Images.line);
-        float distanceToPoint = Utils.vec1.set(point).scl(GameAssets.box2dScale).sub(x, y).len();
-        ru.width = distanceToPoint < ru.width ? distanceToPoint : ru.width;
-        ru.pivotX = 0;
-        ru.pivotY = 0.5f;
-        add(new RenderComponent(ru));
-        hit = true;
 
-        Entity e = (Entity) fixture.getBody().getUserData();
-        HealthComponent hc = e.get(Mappers.healthM);
-        if ( hc == null){
-            return 0;
+        if (fraction < closestFraction){
+            closestFraction = fraction;
+            closestFixture = fixture;
+            closestPoint.set(point);
+            closestNormal.set(normal);
         }
-        if (fixture.getBody().getType() == BodyDef.BodyType.DynamicBody){
-            fixture.getBody().applyLinearImpulse(force, point, true);
-        }
-        if (!hc.dead){
-            getEngine().dispatch(new ShotEvent(shooter, this, e, damage, new Vector2(point).scl(GameAssets.box2dScale), normal.angle()));
-        }
-        return 0;
+
+        return 1;
     }
 }

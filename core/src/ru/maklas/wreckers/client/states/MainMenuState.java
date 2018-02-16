@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
+import ru.maklas.mengine.utils.Listener;
+import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
 import ru.maklas.wreckers.assets.EntityType;
@@ -18,13 +20,13 @@ import ru.maklas.wreckers.client.entities.ClientEntityPlayer;
 import ru.maklas.wreckers.client.entities.ClientEntityZombie;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
-import ru.maklas.wreckers.engine.components.PlayerInventoryComponent;
+import ru.maklas.wreckers.engine.components.PlayerComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
+import ru.maklas.wreckers.engine.events.DeathEvent;
 import ru.maklas.wreckers.engine.events.requests.ShootRequest;
 import ru.maklas.wreckers.engine.events.requests.WeaponChangeRequest;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
-import ru.maklas.wreckers.libs.SimpleProfiler;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
 
@@ -107,19 +109,33 @@ public class MainMenuState extends State {
                 .linearDamp(0)
                 .build();
 
-        Entity player = new ClientEntityPlayer(1, 0, 300, 100, model);
+        final Entity player = new ClientEntityPlayer(1, 0, 300, 100, model);
         model.setPlayer(player);
 
         Weapon pistol = WeaponAssets.createNew(WeaponType.PISTOL, 5, 50);
-        PlayerInventoryComponent inventory = player.get(Mappers.inventoryM);
-        inventory.bag.weapons.add(pistol);
-        inventory.currentWeapon = pistol;
+        PlayerComponent playerC = player.get(Mappers.playerM);
+        playerC.bag.weapons.add(pistol);
+        playerC.currentWeapon = pistol;
 
         Entity platform = new Entity();
         platform.add(new PhysicsComponent(platformBody));
         engine.add(player);
         engine.add(platform);
         engine.add(new ClientEntityZombie(2, 200, 500, 100, model));
+        engine.subscribe(DeathEvent.class, new Listener<DeathEvent>() {
+
+            int idCounter = 3;
+
+            @Override
+            public void receive(Signal<DeathEvent> signal, DeathEvent deathEvent) {
+                if (deathEvent.getTarget().type == EntityType.ZOMBIE.type){
+                    engine.add(new ClientEntityZombie(idCounter++, Utils.rand.nextFloat() * 1000 - 500, Utils.rand.nextFloat() * 1000 - 500, 100, model));
+                    Weapon currentWeapon = player.get(Mappers.playerM).currentWeapon;
+                    currentWeapon.incAmmo(15);
+                    gsm.print("Ammo: " + currentWeapon.getAmmo());
+                }
+            }
+        });
     }
 
     @Override
@@ -175,16 +191,41 @@ public class MainMenuState extends State {
 
     @Override
     protected void update(float dt) {
+        Entity player = model.getPlayer();
+        Body body = player.get(Mappers.physicsM).body;
+        Vector2 orientation = Utils.vec1.set(body.getTransform().getOrientation()).scl(25);
+
+        Vector2 directionVec = Utils.vec2.set(0, 0);
+        boolean triggered = false;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)){
+            triggered = true;
+            directionVec.add(0, 1);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)){
+            triggered = true;
+            directionVec.add(0, -1);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)){
+            triggered = true;
+            directionVec.add(-1, 0);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)){
+            triggered = true;
+            directionVec.add(1, 0);
+        }
+
+        if (triggered){
+            float velocity = player.get(Mappers.velocityM).velocity;
+            directionVec.scl(velocity);
+            body.applyForceToCenter(directionVec, true);
+        }
+
+
+        cam.position.set(player.x + orientation.x, player.y + orientation.y, cam.position.z);
         engine.update(dt);
         Vector2 realMouse = Utils.toScreen(Gdx.input.getX(), Gdx.input.getY(), cam);
-        Body body = model.getPlayer().get(Mappers.physicsM).body;
         GameAssets.rotateBody(body, realMouse.x, realMouse.y);
 
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-            float velocity = model.getPlayer().get(Mappers.velocityM).velocity;
-            Utils.vec1.set(body.getTransform().getOrientation()).scl(velocity);
-            body.applyForceToCenter(Utils.vec1, true);
-        }
     }
 
     @Override

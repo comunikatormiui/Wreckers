@@ -12,11 +12,10 @@ import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.client.entities.ClientEntityPistolBullet;
 import ru.maklas.wreckers.engine.Mappers;
-import ru.maklas.wreckers.engine.components.PlayerInventoryComponent;
+import ru.maklas.wreckers.engine.components.PlayerComponent;
 import ru.maklas.wreckers.engine.components.ShooterComponent;
-import ru.maklas.wreckers.engine.events.ShotEvent;
-import ru.maklas.wreckers.engine.events.requests.ShootRequest;
 import ru.maklas.wreckers.engine.events.WeaponChangeEvent;
+import ru.maklas.wreckers.engine.events.requests.ShootRequest;
 import ru.maklas.wreckers.engine.events.requests.WeaponChangeRequest;
 import ru.maklas.wreckers.game.Weapon;
 import ru.maklas.wreckers.game.WeaponType;
@@ -25,7 +24,7 @@ public class ClientShooterSystem extends EntitySystem {
 
     private final World world;
     private ImmutableArray<Entity> shooters;
-    private ImmutableArray<Entity> entitiesWithWeapon;
+    private ImmutableArray<Entity> players;
     private Listener<ShootRequest> listener;
     private Listener<WeaponChangeRequest> listener2;
 
@@ -36,7 +35,7 @@ public class ClientShooterSystem extends EntitySystem {
     @Override
     public void onAddedToEngine(final Engine engine) {
         shooters = engine.entitiesFor(ShooterComponent.class);
-        entitiesWithWeapon = engine.entitiesFor(PlayerInventoryComponent.class);
+        players = engine.entitiesFor(PlayerComponent.class);
         listener = new Listener<ShootRequest>() {
             @Override
             public void receive(Signal<ShootRequest> signal, ShootRequest shootEvent) {
@@ -45,7 +44,7 @@ public class ClientShooterSystem extends EntitySystem {
                 if (sc == null) {
                     return;
                 }
-                PlayerInventoryComponent bc = shooter.get(Mappers.inventoryM);
+                PlayerComponent bc = shooter.get(Mappers.playerM);
                 if (bc == null) {
                     return;
                 }
@@ -56,7 +55,7 @@ public class ClientShooterSystem extends EntitySystem {
         listener2 = new Listener<WeaponChangeRequest>() {
             @Override
             public void receive(Signal<WeaponChangeRequest> signal, WeaponChangeRequest weaponChangeRequest) {
-                PlayerInventoryComponent inv = weaponChangeRequest.getEntity().get(Mappers.inventoryM);
+                PlayerComponent inv = weaponChangeRequest.getEntity().get(Mappers.playerM);
                 if (inv == null){
                     return;
                 }
@@ -81,13 +80,13 @@ public class ClientShooterSystem extends EntitySystem {
         engine.subscribe(WeaponChangeRequest.class, listener2);
     }
 
-    private void shoot(@NotNull Entity shooter, @NotNull ShooterComponent sc, @NotNull PlayerInventoryComponent bc) {
+    private void shoot(@NotNull Entity shooter, @NotNull ShooterComponent sc, @NotNull PlayerComponent bc) {
         if (shooter.type == EntityType.PLAYER.type){
             shootAsPlayer(shooter, sc, bc);
         }
     }
 
-    private void shootAsPlayer(Entity shooter, ShooterComponent sc, PlayerInventoryComponent bc) {
+    private void shootAsPlayer(Entity shooter, ShooterComponent sc, PlayerComponent bc) {
         if (bc.currentWeapon.type == WeaponType.PISTOL){
             shootPlayerPistol(shooter, sc, bc.currentWeapon);
         }
@@ -112,14 +111,14 @@ public class ClientShooterSystem extends EntitySystem {
     @Override
     public void update(float dt) {
         ComponentMapper<ShooterComponent> shooterM = Mappers.shooterM;
-        ComponentMapper<PlayerInventoryComponent> inventoryM = Mappers.inventoryM;
+        ComponentMapper<PlayerComponent> inventoryM = Mappers.playerM;
         for (Entity entity : shooters) {
             ShooterComponent sc = entity.get(shooterM);
             updateShootingPoint(entity, sc);
             sc.shootingDirection.setAngle(entity.getAngle());
         }
 
-        for (Entity entity : entitiesWithWeapon) {
+        for (Entity entity : players) {
             Weapon currentWeapon = entity.get(inventoryM).currentWeapon;
             if (currentWeapon.isOnCooldown()){
                 currentWeapon.decCurrentCooldown(dt);
