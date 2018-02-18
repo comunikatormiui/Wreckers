@@ -2,20 +2,28 @@ package ru.maklas.wreckers.client.entities;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
+import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
 import ru.maklas.wreckers.client.ClientGameModel;
+import ru.maklas.wreckers.engine.Mappers;
+import ru.maklas.wreckers.engine.components.AttachAction;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
+import ru.maklas.wreckers.engine.components.WSocket;
+import ru.maklas.wreckers.engine.components.WeaponPickUpComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
 
-public class EntitySword extends WeaponEntity {
+public class EntitySword extends WeaponEntity implements AttachAction {
 
+    Body body;
+    World world;
 
     public EntitySword(int id, EntityType eType, float x, float y, int zOrder, ClientGameModel model) {
         super(id, eType, x, y, zOrder, model);
-
+        this.world = model.getWorld();
         final float scale = 0.15f;
 
         PolygonShape polygonShape = new PolygonShape();
@@ -67,7 +75,7 @@ public class EntitySword extends WeaponEntity {
                 .build();
 
 
-        Body build = model.getBuilder().newBody()
+        body = model.getBuilder().newBody()
                 .pos(x, y)
                 .type(BodyDef.BodyType.DynamicBody)
                 .linearDamp(0.1f)
@@ -77,16 +85,35 @@ public class EntitySword extends WeaponEntity {
                 .angularDamp(0.1f)
                 .build();
 
-        MassData massData = build.getMassData();
+        MassData massData = body.getMassData();
         System.out.println(massData.I);
-        build.setMassData(massData);
+        body.setMassData(massData);
 
         RenderUnit unit = new RenderUnit(Images.sword);
         unit.scaleX = unit.scaleY = scale;
         unit.pivotX = unit.pivotY = 0;
 
 
-        add(new PhysicsComponent(build));
+        add(new PhysicsComponent(body));
         add(new RenderComponent(unit));
+        WeaponPickUpComponent wpu = new WeaponPickUpComponent(model.getShaper().buildCircle(0, 0, 35), this);
+        add(wpu);
+        Fixture fixture = body.createFixture(wpu.def);
+        fixture.setUserData(wpu);
+    }
+
+    @Override
+    public void attach(Entity e, WSocket socket, Body body) {
+        RopeJointDef rjd = new RopeJointDef();
+        rjd.bodyA = body;
+        rjd.bodyB = this.body;
+        rjd.localAnchorA.set(socket.localX, socket.localY);
+        rjd.localAnchorB.set(300, 178).scl(0.15f / GameAssets.box2dScale);
+        world.createJoint(rjd);
+    }
+
+    @Override
+    public void detach() {
+        
     }
 }

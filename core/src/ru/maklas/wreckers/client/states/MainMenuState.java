@@ -8,9 +8,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
-import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
-import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
@@ -23,7 +20,11 @@ import ru.maklas.wreckers.client.entities.EntitySword;
 import ru.maklas.wreckers.client.entities.WeaponEntity;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
+import ru.maklas.wreckers.engine.components.PlayerPickUpComponent;
+import ru.maklas.wreckers.engine.components.WeaponPickUpComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
+import ru.maklas.wreckers.engine.events.requests.PlayerPickUpZoneChangeRequest;
+import ru.maklas.wreckers.engine.events.requests.WeaponPickUpRequest;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.BodyBuilder;
 import ru.maklas.wreckers.game.FDefBuilder;
@@ -52,6 +53,8 @@ public class MainMenuState extends State {
         engine.add(new HealthSystem());
         engine.add(new TTLSystem());
         engine.add(new PlayerSystem());
+        engine.add(new AntiGravSystem());
+        engine.add(new PickUpSystem());
 
 
         model = new ClientGameModel();
@@ -65,6 +68,13 @@ public class MainMenuState extends State {
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
+
+                Fixture fixtureA = contact.getFixtureA();
+                Fixture fixtureB = contact.getFixtureB();
+                if (fixtureA.isSensor() && fixtureB.isSensor()){
+                    handleBothSensors(contact, fixtureA, fixtureB);
+                }
+
                 Entity a = (Entity) contact.getFixtureA().getBody().getUserData();
                 Entity b = (Entity) contact.getFixtureB().getBody().getUserData();
                 CollisionEvent event = new CollisionEvent(a, b, contact, true);
@@ -88,12 +98,43 @@ public class MainMenuState extends State {
 
             @Override
             public void postSolve(Contact contact, ContactImpulse impulse) {
+
+
                 float v = impulse.getNormalImpulses()[0];
                 if (v > 2){
                     WorldManifold worldManifold = contact.getWorldManifold();
                     engine.add(new EntityNumber(-(int) v, 1, worldManifold.getPoints()[0].x * GameAssets.box2dScale, worldManifold.getPoints()[0].y * GameAssets.box2dScale));
                     System.out.println(-(int) v);
                 }
+            }
+
+            private void handleBothSensors(Contact contact, Fixture fixtureA, Fixture fixtureB) {
+                Object udA = fixtureA.getUserData();
+                Object udB = fixtureB.getUserData();
+
+                if (udA instanceof WeaponPickUpComponent && udB instanceof PlayerPickUpComponent){
+                    WeaponPickUpComponent wPick = (WeaponPickUpComponent) udA;
+                    PlayerPickUpComponent pPick = (PlayerPickUpComponent) udB;
+                    if (!wPick.enabled() && !pPick.enabled()){
+                        System.out.println("1");
+                        //TODO TRACE
+                        engine.dispatch(new WeaponPickUpRequest((Entity) fixtureB.getBody().getUserData(), pPick, (Entity) fixtureA.getBody().getUserData(), wPick));
+                    }
+                } else if (udA instanceof PlayerPickUpComponent && udB instanceof WeaponPickUpComponent){
+                    WeaponPickUpComponent wPick = (WeaponPickUpComponent) udB;
+                    PlayerPickUpComponent pPick = (PlayerPickUpComponent) udA;
+                    if (!wPick.enabled() && !pPick.enabled()){
+                        System.out.println("2");
+                        //TODO TRACE
+                        engine.dispatch(new WeaponPickUpRequest((Entity) fixtureA.getBody().getUserData(), pPick, (Entity) fixtureB.getBody().getUserData(), wPick));
+                    }
+                } else {
+                    System.out.println("3");
+                }
+            }
+
+            private void handlePickUp(){
+
             }
         });
         debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale);
@@ -123,12 +164,8 @@ public class MainMenuState extends State {
         engine.add(new EntityPlayer(1341, 200, 500, 100, model, EntityType.ZOMBIE));
         WeaponEntity sword = new EntitySword(123412, EntityType.PLAYER, -200, 700, 10, model);
         Body body = sword.get(Mappers.physicsM).body;
-        RopeJointDef rjd = new RopeJointDef();
-        rjd.bodyA = player.get(Mappers.physicsM).body;
-        rjd.bodyB = body;
-        rjd.localAnchorA.set(0, 0);
-        rjd.localAnchorB.set(300, 178).scl(0.15f / GameAssets.box2dScale);
-        world.createJoint(rjd);
+        //sword.attach(player, player.get(Mappers.socketM).firstEmpty(), player.get(Mappers.physicsM).body);
+        //player.get(Mappers.antiGravM).mass = body.getMass() + player.get(Mappers.physicsM).body.getMass();
         engine.add(sword);
     }
 
@@ -154,6 +191,17 @@ public class MainMenuState extends State {
 
             @Override
             public boolean keyDown(int keycode) {
+                if (Input.Keys.P == keycode){
+                    engine.dispatch(new PlayerPickUpZoneChangeRequest(true, model.getPlayer()));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean keyUp(int keycode) {
+                if (Input.Keys.P == keycode){
+                    engine.dispatch(new PlayerPickUpZoneChangeRequest(false, model.getPlayer()));
+                }
                 return true;
             }
         };

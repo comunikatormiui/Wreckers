@@ -20,26 +20,7 @@ public class PlayerSystem extends EntitySystem {
 
     @Override
     public void update(float dt) {
-        for (Entity player : players) {
-            PlayerComponent playerComponent = player.get(Mappers.playerM);
 
-            if (playerComponent.directionUp){
-                playerComponent.deltaY += playerComponent.speed * dt;
-                if (playerComponent.deltaY > playerComponent.maxY){
-                    playerComponent.directionUp = false;
-                }
-            } else {
-                playerComponent.deltaY -= playerComponent.speed * dt;
-                if (playerComponent.deltaY < -playerComponent.maxY){
-                    playerComponent.directionUp = true;
-                }
-            }
-
-            PhysicsComponent pc = player.get(Mappers.physicsM);
-            if (pc != null){
-                pc.body.applyForceToCenter(Utils.vec1.set(0, 9.8f + playerComponent.deltaY), true);
-            }
-        }
 
     }
 
