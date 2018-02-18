@@ -8,25 +8,26 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
+import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
+import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.utils.Listener;
-import ru.maklas.mengine.utils.Signal;
+import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
-import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.client.ClientGameModel;
-import ru.maklas.wreckers.client.entities.ClientEntityPlayer;
-import ru.maklas.wreckers.client.entities.ClientEntityZombie;
+import ru.maklas.wreckers.client.entities.EntityNumber;
+import ru.maklas.wreckers.client.entities.EntityPlayer;
+import ru.maklas.wreckers.client.entities.EntitySword;
+import ru.maklas.wreckers.client.entities.WeaponEntity;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
-import ru.maklas.wreckers.engine.components.PlayerComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
-import ru.maklas.wreckers.engine.events.DeathEvent;
-import ru.maklas.wreckers.engine.events.requests.ShootRequest;
-import ru.maklas.wreckers.engine.events.requests.WeaponChangeRequest;
 import ru.maklas.wreckers.engine.systems.*;
-import ru.maklas.wreckers.game.*;
+import ru.maklas.wreckers.game.BodyBuilder;
+import ru.maklas.wreckers.game.FDefBuilder;
+import ru.maklas.wreckers.game.ShapeBuilder;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
 
@@ -36,7 +37,6 @@ public class MainMenuState extends State {
     World world;
     PhysicsDebugSystem debugSystem;
     OrthographicCamera cam;
-
     ClientGameModel model;
 
     @Override
@@ -44,9 +44,24 @@ public class MainMenuState extends State {
         Images.load();
 
         cam = new OrthographicCamera(720, 1280);
-        System.out.println(cam.position);
         engine = new Engine();
-        world = new World(new Vector2(0, 0), true);
+        world = new World(new Vector2(0, -9.8f), true);
+
+        engine.add(new PhysicsSystem(world));
+        engine.add(new RenderingSystem(batch, cam));
+        engine.add(new HealthSystem());
+        engine.add(new TTLSystem());
+        engine.add(new PlayerSystem());
+
+
+        model = new ClientGameModel();
+        model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
+        model.setEngine(engine);
+        model.setFixturer(new FDefBuilder());
+        model.setShaper(new ShapeBuilder(GameAssets.box2dScale));
+        model.setWorld(world);
+
+
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
@@ -73,26 +88,15 @@ public class MainMenuState extends State {
 
             @Override
             public void postSolve(Contact contact, ContactImpulse impulse) {
-
+                float v = impulse.getNormalImpulses()[0];
+                if (v > 2){
+                    WorldManifold worldManifold = contact.getWorldManifold();
+                    engine.add(new EntityNumber(-(int) v, 1, worldManifold.getPoints()[0].x * GameAssets.box2dScale, worldManifold.getPoints()[0].y * GameAssets.box2dScale));
+                    System.out.println(-(int) v);
+                }
             }
         });
         debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale);
-
-
-        engine.add(new PhysicsSystem(world));
-        engine.add(new RenderingSystem(batch, cam));
-        engine.add(new HealthSystem());
-        engine.add(new ClientShooterSystem(world));
-        engine.add(new TTLSystem());
-        engine.add(new ZombieSystem());
-
-        model = new ClientGameModel();
-        model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
-        model.setEngine(engine);
-        model.setFixturer(new FDefBuilder());
-        model.setShaper(new ShapeBuilder(GameAssets.box2dScale));
-        model.setWorld(world);
-
 
 
         Body platformBody = model.getBuilder()
@@ -101,7 +105,7 @@ public class MainMenuState extends State {
                         .shape(model.getShaper().buildRectangle(0, 0, 720, 100))
                         .friction(0)
                         .density(10)
-                        .bounciness(1)
+                        .bounciness(0.2f)
                         .mask(EntityType.OBSTACLE)
                         .build())
                 .pos(-360, 200)
@@ -109,33 +113,23 @@ public class MainMenuState extends State {
                 .linearDamp(0)
                 .build();
 
-        final Entity player = new ClientEntityPlayer(1, 0, 300, 100, model);
+        final Entity player = new EntityPlayer(1, 0, 500, 100, model, EntityType.PLAYER);
         model.setPlayer(player);
-
-        Weapon pistol = WeaponAssets.createNew(WeaponType.PISTOL, 5, 50);
-        PlayerComponent playerC = player.get(Mappers.playerM);
-        playerC.bag.weapons.add(pistol);
-        playerC.currentWeapon = pistol;
 
         Entity platform = new Entity();
         platform.add(new PhysicsComponent(platformBody));
         engine.add(player);
         engine.add(platform);
-        engine.add(new ClientEntityZombie(2, 200, 500, 100, model));
-        engine.subscribe(DeathEvent.class, new Listener<DeathEvent>() {
-
-            int idCounter = 3;
-
-            @Override
-            public void receive(Signal<DeathEvent> signal, DeathEvent deathEvent) {
-                if (deathEvent.getTarget().type == EntityType.ZOMBIE.type){
-                    engine.add(new ClientEntityZombie(idCounter++, Utils.rand.nextFloat() * 1000 - 500, Utils.rand.nextFloat() * 1000 - 500, 100, model));
-                    Weapon currentWeapon = player.get(Mappers.playerM).currentWeapon;
-                    currentWeapon.incAmmo(15);
-                    gsm.print("Ammo: " + currentWeapon.getAmmo());
-                }
-            }
-        });
+        engine.add(new EntityPlayer(1341, 200, 500, 100, model, EntityType.ZOMBIE));
+        WeaponEntity sword = new EntitySword(123412, EntityType.PLAYER, -200, 700, 10, model);
+        Body body = sword.get(Mappers.physicsM).body;
+        RopeJointDef rjd = new RopeJointDef();
+        rjd.bodyA = player.get(Mappers.physicsM).body;
+        rjd.bodyB = body;
+        rjd.localAnchorA.set(0, 0);
+        rjd.localAnchorB.set(300, 178).scl(0.15f / GameAssets.box2dScale);
+        world.createJoint(rjd);
+        engine.add(sword);
     }
 
     @Override
@@ -144,46 +138,22 @@ public class MainMenuState extends State {
             @Override
             public boolean mouseMoved(int screenX, int screenY) {
                 Vector2 realMouse = Utils.toScreen(screenX, screenY, cam);
-                GameAssets.rotateBody(model.getPlayer().get(Mappers.physicsM).body, realMouse.x, realMouse.y);
                 return true;
             }
 
             @Override
             public boolean touchDragged(int screenX, int screenY, int pointer) {
                 Vector2 realMouse = Utils.toScreen(screenX, screenY, cam);
-                GameAssets.rotateBody(model.getPlayer().get(Mappers.physicsM).body, realMouse.x, realMouse.y);
                 return true;
             }
 
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                if (button != Input.Buttons.RIGHT){
-                    return false;
-                }
-
-                engine.dispatch(new ShootRequest(model.getPlayer()));
-
-                if (true){
-                    return true;
-                }
                 return true;
             }
 
             @Override
             public boolean keyDown(int keycode) {
-                if (keycode == Input.Keys.NUM_1){
-
-                }
-
-                switch (keycode){
-
-                    case Input.Keys.NUM_1:
-                        engine.dispatch(new WeaponChangeRequest(model.getPlayer(), WeaponType.NONE));
-                        break;
-                    case Input.Keys.NUM_2:
-                        engine.dispatch(new WeaponChangeRequest(model.getPlayer(), WeaponType.PISTOL));
-                        break;
-                }
                 return true;
             }
         };
@@ -191,9 +161,9 @@ public class MainMenuState extends State {
 
     @Override
     protected void update(float dt) {
-        Entity player = model.getPlayer();
-        Body body = player.get(Mappers.physicsM).body;
-        Vector2 orientation = Utils.vec1.set(body.getTransform().getOrientation()).scl(25);
+        model.getEngine().update(dt);
+        cam.position.set(model.getPlayer().x, model.getPlayer().y, 0);
+
 
         Vector2 directionVec = Utils.vec2.set(0, 0);
         boolean triggered = false;
@@ -215,17 +185,10 @@ public class MainMenuState extends State {
         }
 
         if (triggered){
-            float velocity = player.get(Mappers.velocityM).velocity;
+            float velocity = model.getPlayer().get(Mappers.velocityM).velocity;
             directionVec.scl(velocity);
-            body.applyForceToCenter(directionVec, true);
+            model.getPlayer().get(Mappers.physicsM).body.applyForceToCenter(directionVec, true);
         }
-
-
-        cam.position.set(player.x + orientation.x, player.y + orientation.y, cam.position.z);
-        engine.update(dt);
-        Vector2 realMouse = Utils.toScreen(Gdx.input.getX(), Gdx.input.getY(), cam);
-        GameAssets.rotateBody(body, realMouse.x, realMouse.y);
-
     }
 
     @Override

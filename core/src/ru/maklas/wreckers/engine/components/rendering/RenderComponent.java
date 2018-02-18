@@ -1,5 +1,6 @@
 package ru.maklas.wreckers.engine.components.rendering;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -12,7 +13,7 @@ import ru.maklas.mengine.components.IRenderComponent;
 public class RenderComponent implements IRenderComponent, Pool.Poolable{
 
     public Array<RenderUnit> renderUnits = new Array<RenderUnit>(2);
-    public float opacity = 1;
+    public Color color = Color.WHITE;
 
     public RenderComponent(TextureRegion textureRegion) {
         renderUnits.add(new RenderUnit(textureRegion));
@@ -45,6 +46,6 @@ public class RenderComponent implements IRenderComponent, Pool.Poolable{
     @Override
     public void reset() {
         renderUnits.clear();
-        opacity = 1;
+        color = Color.WHITE;
     }
 }

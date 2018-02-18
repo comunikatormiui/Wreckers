@@ -117,11 +117,14 @@ public class BodyBuilder {
     private void restoreDefs(){
         bDef.linearVelocity.set(0, 0);
         bDef.fixedRotation = false;
-        bDef.angularVelocity = 0.0f;
+        bDef.angularVelocity = 0.0001f;
         bDef.angularDamping = 0;
         bDef.angle = 0;
         bDef.bullet = false;
         bDef.gravityScale = 1;
+        bDef.awake = true;
+        bDef.fixedRotation = false;
+        bDef.active = true;
         bDef.position.set(0, 0);
         bDef.type = BodyDef.BodyType.StaticBody;
         bDef.linearDamping = 0;

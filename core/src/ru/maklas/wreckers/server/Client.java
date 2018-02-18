@@ -1,13 +1,9 @@
 package ru.maklas.wreckers.server;
 
 import ru.maklas.mnet.Socket;
-import ru.maklas.wreckers.game.ClientState;
-import ru.maklas.wreckers.game.GameState;
 
 public class Client {
 
-    ClientState state;
-    GameState gameState;
     Socket socket;
     String name;
     int health;
@@ -16,22 +12,6 @@ public class Client {
 
     public Client() {
 
-    }
-
-    public ClientState getState() {
-        return state;
-    }
-
-    public void setState(ClientState state) {
-        this.state = state;
-    }
-
-    public GameState getGameState() {
-        return gameState;
-    }
-
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
     }
 
     public Socket getSocket() {
@@ -73,9 +53,7 @@ public class Client {
     @Override
     public String toString() {
         return "Client{" +
-                "state=" + state +
-                ", gameState=" + gameState +
-                ", socket=" + socket +
+                "socket=" + socket +
                 ", name='" + name + '\'' +
                 ", health=" + health +
                 ", roomAdmin=" + roomAdmin +

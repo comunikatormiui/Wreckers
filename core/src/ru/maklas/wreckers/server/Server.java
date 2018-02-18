@@ -1,15 +1,10 @@
 package ru.maklas.wreckers.server;
 
-import ru.maklas.mengine.utils.EventDispatcher;
 import ru.maklas.mnet.ServerAuthenticator;
 import ru.maklas.mnet.ServerSocket;
 import ru.maklas.mnet.Socket;
-import ru.maklas.mnet.SocketProcessor;
 import ru.maklas.mrudp.ConnectionResponsePackage;
-import ru.maklas.mrudp.SocketIterator;
 import ru.maklas.wreckers.assets.DCAssets;
-import ru.maklas.wreckers.game.ClientState;
-import ru.maklas.wreckers.game.GameState;
 import ru.maklas.wreckers.libs.Log;
 import ru.maklas.wreckers.libs.game_looper.LoopedApplication;
 import ru.maklas.wreckers.libs.game_looper.LooperAccessor;
@@ -95,9 +90,7 @@ public class Server implements LoopedApplication, ServerAuthenticator {
 
         client.setSocket(socket);
         client.setHealth(100);
-        client.setState(ClientState.SERVER);
         client.setName(req.getName());
-        client.setGameState(GameState.LOADING);
         client.setAdmin(false);
         FutureTask<Boolean> additionTask = new FutureTask<Boolean>(new Callable<Boolean>() {
             @Override

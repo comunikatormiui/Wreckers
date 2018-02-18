@@ -1,18 +1,17 @@
 package ru.maklas.wreckers.engine.components;
 
 import ru.maklas.mengine.Component;
-import ru.maklas.wreckers.game.Bag;
-import ru.maklas.wreckers.game.Weapon;
 
-public class PlayerComponent implements Component {
+public class PlayerComponent implements Component{
 
-    public float experience;
-    public final Bag bag;
-    public Weapon currentWeapon;
+    public float deltaY;
+    public float maxY;
+    public float speed;
+    public boolean directionUp = true;
 
-    public PlayerComponent(float experience, Bag bag, Weapon currentWeapon) {
-        this.experience = experience;
-        this.bag = bag;
-        this.currentWeapon = currentWeapon;
+
+    public PlayerComponent(float maxY, float speed) {
+        this.maxY = maxY;
+        this.speed = speed;
     }
 }

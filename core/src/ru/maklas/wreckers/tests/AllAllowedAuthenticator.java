@@ -3,8 +3,6 @@ package ru.maklas.wreckers.tests;
 import ru.maklas.mnet.ServerAuthenticator;
 import ru.maklas.mnet.Socket;
 import ru.maklas.mrudp.ConnectionResponsePackage;
-import ru.maklas.wreckers.game.ClientState;
-import ru.maklas.wreckers.game.GameState;
 import ru.maklas.wreckers.libs.game_looper.LooperAccessor;
 import ru.maklas.wreckers.server.Client;
 import ru.maklas.wreckers.server.ClientBase;
@@ -32,9 +30,7 @@ public class AllAllowedAuthenticator implements ServerAuthenticator{
     public void registerNewConnection(Socket socket, ConnectionResponsePackage<?> sentResponsePackage, Object request) {
         final Client client = new Client();
         socket.setUserData(client);
-        client.setState(ClientState.SERVER);
         client.setAdmin(true);
-        client.setGameState(GameState.LOADING);
         client.setHealth(100);
         client.setName("Player " + counter++);
         client.setSocket(socket);

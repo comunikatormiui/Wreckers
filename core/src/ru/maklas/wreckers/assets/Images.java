@@ -3,6 +3,7 @@ package ru.maklas.wreckers.assets;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -22,6 +23,10 @@ public class Images {
      * Yellow line. Width = 100; Height = 6;
      */
     public static TextureRegion line;
+
+
+    public static TextureRegion sword;
+    public static BitmapFont font;
 
     private static Array<Disposable> disposables = new Array<Disposable>();
 
@@ -48,6 +53,12 @@ public class Images {
         line = new TextureRegion(lineTexture);
         pixmap.dispose();
 
+        Texture swordT = new Texture("sword.png");
+        disposables.add(swordT);
+        sword = new TextureRegion(swordT);
+
+        font = new BitmapFont();
+        disposables.add(font);
     }
 
     public static void dispose(){

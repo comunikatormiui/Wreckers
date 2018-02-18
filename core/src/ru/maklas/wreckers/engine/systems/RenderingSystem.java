@@ -35,7 +35,7 @@ public class RenderingSystem extends IterableZSortedRenderSystem {
         Vector2 tempVec = Utils.vec1;
         RenderComponent rc = (RenderComponent) iRenderComponent;
 
-        batch.setColor(1, 1, 1, rc.opacity);
+        batch.setColor(rc.color);
 
         for (RenderUnit ru : rc.renderUnits) {
 

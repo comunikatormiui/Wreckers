@@ -19,10 +19,8 @@ public class Mappers {
     public static final ComponentMapper<AnimationComponent>         animationM = ComponentMapper.of(AnimationComponent.class);
     public static final ComponentMapper<PhysicsComponent>           physicsM = ComponentMapper.of(PhysicsComponent.class);
     public static final ComponentMapper<HealthComponent>            healthM = ComponentMapper.of(HealthComponent.class);
-    public static final ComponentMapper<ShooterComponent>           shooterM = ComponentMapper.of(ShooterComponent.class);
     public static final ComponentMapper<TTLComponent>               ttlM = ComponentMapper.of(TTLComponent.class);
     public static final ComponentMapper<PlayerComponent>            playerM = ComponentMapper.of(PlayerComponent.class);
-    public static final ComponentMapper<ZombieComponent>            zombieM = ComponentMapper.of(ZombieComponent.class);
 
 
     public static void init(){
