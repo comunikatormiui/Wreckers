@@ -53,6 +53,7 @@ public class MainMenuState extends State {
         engine.add(new PlayerSystem());
         engine.add(new AntiGravSystem());
         engine.add(new PickUpSystem());
+        engine.add(new MotorSystem());
 
 
         model = new ClientGameModel();
@@ -158,15 +159,18 @@ public class MainMenuState extends State {
                 .build();
 
         final Entity player = new EntityPlayer(1, 0, 500, 100, model, EntityType.PLAYER);
+        final EntityPlayer opponent = new EntityPlayer(1341, 200, 500, 100, model, EntityType.OPPONENT);
+        final EntitySword sword = new EntitySword(123412, EntityType.PLAYER, -200, 700, 10, model);
+        final Entity platform = new GameEntity(-1, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
         model.setPlayer(player);
+        model.setOpponent(opponent);
 
-        Entity platform = new GameEntity(-1, EntityType.OBSTACLE, 0, 0, 0);
-        platform.add(new PhysicsComponent(platformBody));
         engine.add(player);
-        engine.add(platform);
-        engine.add(new EntityPlayer(1341, 200, 500, 100, model, EntityType.OPPONENT));
-        WeaponEntity sword = new EntitySword(123412, EntityType.PLAYER, -200, 700, 10, model);
+        engine.add(opponent);
         engine.add(sword);
+        engine.add(platform);
+
+        engine.dispatch(new PlayerPickUpZoneChangeRequest(true, opponent));
     }
 
     @Override
@@ -216,29 +220,20 @@ public class MainMenuState extends State {
 
 
         Vector2 directionVec = Utils.vec2.set(0, 0);
-        boolean triggered = false;
         if (Gdx.input.isKeyPressed(Input.Keys.W)){
-            triggered = true;
             directionVec.add(0, 1);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)){
-            triggered = true;
             directionVec.add(0, -1);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A)){
-            triggered = true;
             directionVec.add(-1, 0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)){
-            triggered = true;
             directionVec.add(1, 0);
         }
 
-        if (triggered){
-            float velocity = model.getPlayer().get(Mappers.velocityM).velocity;
-            directionVec.scl(velocity);
-            model.getPlayer().get(Mappers.physicsM).body.applyForceToCenter(directionVec, true);
-        }
+        model.getPlayer().get(Mappers.motorM).direction.set(directionVec);
     }
 
     @Override

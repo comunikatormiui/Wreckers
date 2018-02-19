@@ -4,6 +4,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mnet.Socket;
+import ru.maklas.wreckers.client.entities.EntityPlayer;
 import ru.maklas.wreckers.game.BodyBuilder;
 import ru.maklas.wreckers.game.FDefBuilder;
 import ru.maklas.wreckers.game.ShapeBuilder;
@@ -18,6 +19,7 @@ public class ClientGameModel {
     ShapeBuilder shaper;
     FDefBuilder fixturer;
     BodyBuilder builder;
+    private EntityPlayer opponent;
 
     public ClientGameModel() {
 
@@ -46,6 +48,14 @@ public class ClientGameModel {
 
     public void setPlayer(Entity player) {
         this.player = player;
+    }
+
+    public EntityPlayer getOpponent() {
+        return opponent;
+    }
+
+    public void setOpponent(EntityPlayer opponent) {
+        this.opponent = opponent;
     }
 
     public Socket getSocket() {

@@ -37,8 +37,8 @@ public class EntityPlayer extends GameEntity {
 
         add(new PhysicsComponent(body));
         add(new HealthComponent(health));
-        add(new VelocityComponent(50));
-        add(new AntiGravComponent(body.getMassData().mass,7, 10));
+        add(new MotorComponent(50));
+        add(new AntiGravComponent(body.getMassData().mass,5, 8));
         add(new SocketComponent(1, EntityType.weaponTypeFor(eType)));
         add(new WielderPickUpZoneComponent(model.getShaper().buildCircle(0, 0, pickUpRadius)));
     }
