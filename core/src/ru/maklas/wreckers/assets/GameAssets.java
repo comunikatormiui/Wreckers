@@ -3,6 +3,9 @@ package ru.maklas.wreckers.assets;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.NotNull;
 
 public class GameAssets {
@@ -25,7 +28,16 @@ public class GameAssets {
     }
 
 
-
-
-
+    public static void setFilterData(@NotNull Body body, boolean includingSensors, EntityType type) {
+        Array<Fixture> fixtureList = body.getFixtureList();
+        for (Fixture fixture : fixtureList) {
+            if (fixture.isSensor() && includingSensors) {
+                continue;
+            }
+            Filter filterData = fixture.getFilterData();
+            filterData.categoryBits = type.category;
+            filterData.maskBits     = type.mask;
+            fixture.setFilterData(filterData);
+        }
+    }
 }

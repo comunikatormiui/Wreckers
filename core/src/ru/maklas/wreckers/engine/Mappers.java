@@ -22,8 +22,8 @@ public class Mappers {
     public static final ComponentMapper<TTLComponent>                   ttlM = ComponentMapper.of(TTLComponent.class);
     public static final ComponentMapper<PlayerComponent>                playerM = ComponentMapper.of(PlayerComponent.class);
     public static final ComponentMapper<AntiGravComponent>              antiGravM = ComponentMapper.of(AntiGravComponent.class);
-    public static final ComponentMapper<WeaponSocketComponent>          socketM = ComponentMapper.of(WeaponSocketComponent.class);
-    public static final ComponentMapper<PlayerPickUpComponent>          playerPickUpM = ComponentMapper.of(PlayerPickUpComponent.class);
+    public static final ComponentMapper<SocketComponent>          socketM = ComponentMapper.of(SocketComponent.class);
+    public static final ComponentMapper<WielderPickUpZoneComponent>          playerPickUpM = ComponentMapper.of(WielderPickUpZoneComponent.class);
     public static final ComponentMapper<WeaponPickUpComponent>          weaponPickUpM = ComponentMapper.of(WeaponPickUpComponent.class);
 
 

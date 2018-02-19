@@ -6,16 +6,16 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import ru.maklas.mengine.Component;
 import ru.maklas.wreckers.assets.EntityType;
 
-public class PlayerPickUpComponent implements Component{
+public class WielderPickUpZoneComponent implements Component{
 
     public final FixtureDef def;
     public Fixture fixture;
 
-    public PlayerPickUpComponent(FixtureDef def) {
+    public WielderPickUpZoneComponent(FixtureDef def) {
         this.def = def;
     }
 
-    public PlayerPickUpComponent(Shape shape) {
+    public WielderPickUpZoneComponent(Shape shape) {
         def = new FixtureDef();
         def.isSensor = true;
         def.shape = shape;

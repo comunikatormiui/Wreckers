@@ -1,12 +1,12 @@
 package ru.maklas.wreckers.engine.systems;
 
-import ru.maklas.mengine.Engine;
-import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.EntitySystem;
+import ru.maklas.mengine.*;
 import ru.maklas.mengine.utils.ImmutableArray;
+import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.AntiGravComponent;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
+import ru.maklas.wreckers.engine.events.AttachEvent;
 import ru.maklas.wreckers.libs.Utils;
 
 public class AntiGravSystem extends EntitySystem {
@@ -16,6 +16,25 @@ public class AntiGravSystem extends EntitySystem {
     @Override
     public void onAddedToEngine(Engine engine) {
         entities = engine.entitiesFor(AntiGravComponent.class);
+
+        subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
+            @Override
+            public void receive(Signal<AttachEvent> signal, AttachEvent e) {
+                AntiGravComponent antiGrav = Mappers.antiGravM.get(e.getWielder());
+                ComponentMapper<PhysicsComponent> physicsM = Mappers.physicsM;
+                PhysicsComponent weaponPC = e.getWeapon().get(physicsM);
+
+                if (antiGrav == null || weaponPC == null){
+                    return;
+                }
+
+                if (e.isAttached()){
+                    antiGrav.mass += weaponPC.body.getMass();
+                } else {
+                    antiGrav.mass -= weaponPC.body.getMass();
+                }
+            }
+        });
     }
 
     @Override
@@ -46,7 +65,7 @@ public class AntiGravSystem extends EntitySystem {
     }
 
     @Override
-    public void removeFromEngine() {
-        super.removeFromEngine();
+    public void onRemovedFromEngine(Engine e) {
+        super.onRemovedFromEngine(e);
     }
 }

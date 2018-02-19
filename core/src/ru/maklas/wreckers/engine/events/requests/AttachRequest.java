@@ -1,18 +1,17 @@
 package ru.maklas.wreckers.engine.events.requests;
 
 import ru.maklas.mengine.Entity;
-import ru.maklas.wreckers.engine.components.PlayerPickUpComponent;
+import ru.maklas.wreckers.engine.components.WielderPickUpZoneComponent;
 import ru.maklas.wreckers.engine.components.WeaponPickUpComponent;
 
-public class WeaponPickUpRequest {
+public class AttachRequest {
 
     Entity wielder;
-    PlayerPickUpComponent playerPickUp;
+    WielderPickUpZoneComponent playerPickUp;
     Entity weapon;
     WeaponPickUpComponent weaponPickUp;
 
-
-    public WeaponPickUpRequest(Entity wielder, PlayerPickUpComponent playerPickUp, Entity weapon, WeaponPickUpComponent weaponPickUp) {
+    public AttachRequest(Entity wielder, WielderPickUpZoneComponent playerPickUp, Entity weapon, WeaponPickUpComponent weaponPickUp) {
         this.wielder = wielder;
         this.playerPickUp = playerPickUp;
         this.weapon = weapon;
@@ -23,7 +22,7 @@ public class WeaponPickUpRequest {
         return wielder;
     }
 
-    public PlayerPickUpComponent getPlayerPickUp() {
+    public WielderPickUpZoneComponent getPlayerPickUp() {
         return playerPickUp;
     }
 
@@ -34,4 +33,5 @@ public class WeaponPickUpRequest {
     public WeaponPickUpComponent getWeaponPickUp() {
         return weaponPickUp;
     }
+
 }

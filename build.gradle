@@ -25,7 +25,7 @@ allprojects {
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
         mnetVersion  = '53ca6c63960f8044cff1ad8957fc7c54aace74c2'
-        mengineVersion = '98da733b9e16a1ee35cf78e08a96e8adca3f1bd1'
+        mengineVersion = 'e34fa6ed4eb41efed076a6e2065f6eeb099b6593'
     }
 
     repositories {
@@ -35,6 +35,7 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
     }
+
 }
 
 project(":desktop") {

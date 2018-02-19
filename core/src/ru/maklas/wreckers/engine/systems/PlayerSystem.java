@@ -23,9 +23,4 @@ public class PlayerSystem extends EntitySystem {
 
 
     }
-
-    @Override
-    public void removeFromEngine() {
-        super.removeFromEngine();
-    }
 }

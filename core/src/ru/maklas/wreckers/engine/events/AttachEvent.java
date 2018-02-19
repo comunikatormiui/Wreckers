@@ -2,16 +2,19 @@ package ru.maklas.wreckers.engine.events;
 
 import ru.maklas.mengine.Entity;
 
-public class WeaponPickUpEvent {
+/**
+ * Ивент об удачной смене состояния оружия (Прикрепилось / Открепилось)
+ */
+public class AttachEvent {
 
     private Entity wielder;
     private Entity weapon;
-    private boolean pickedUp;
+    private boolean attached;
 
-    public WeaponPickUpEvent(Entity wielder, Entity weapon, boolean pickedUp) {
+    public AttachEvent(Entity wielder, Entity weapon, boolean attached) {
         this.wielder = wielder;
         this.weapon = weapon;
-        this.pickedUp = pickedUp;
+        this.attached = attached;
     }
 
     public Entity getWielder() {
@@ -22,7 +25,7 @@ public class WeaponPickUpEvent {
         return weapon;
     }
 
-    public boolean isPickedUp() {
-        return pickedUp;
+    public boolean isAttached() {
+        return attached;
     }
 }

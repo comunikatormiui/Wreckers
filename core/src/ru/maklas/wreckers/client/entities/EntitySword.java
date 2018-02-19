@@ -20,6 +20,8 @@ public class EntitySword extends WeaponEntity implements AttachAction {
 
     Body body;
     World world;
+    WeaponPickUpComponent pickUpC;
+    Joint lastJoint;
 
     public EntitySword(int id, EntityType eType, float x, float y, int zOrder, ClientGameModel model) {
         super(id, eType, x, y, zOrder, model);
@@ -96,24 +98,28 @@ public class EntitySword extends WeaponEntity implements AttachAction {
 
         add(new PhysicsComponent(body));
         add(new RenderComponent(unit));
-        WeaponPickUpComponent wpu = new WeaponPickUpComponent(model.getShaper().buildCircle(0, 0, 35), this);
-        add(wpu);
-        Fixture fixture = body.createFixture(wpu.def);
-        fixture.setUserData(wpu);
+        pickUpC = new WeaponPickUpComponent(model.getShaper().buildCircle(400 * scale, 178 * scale, 35), this);
+        add(pickUpC);
     }
 
     @Override
-    public void attach(Entity e, WSocket socket, Body body) {
+    public boolean attach(Entity e, WSocket socket, Body body) {
         RopeJointDef rjd = new RopeJointDef();
         rjd.bodyA = body;
         rjd.bodyB = this.body;
         rjd.localAnchorA.set(socket.localX, socket.localY);
         rjd.localAnchorB.set(300, 178).scl(0.15f / GameAssets.box2dScale);
-        world.createJoint(rjd);
+        lastJoint = world.createJoint(rjd);
+        return true;
     }
 
     @Override
-    public void detach() {
-        
+    public boolean detach() {
+        if (lastJoint == null){
+            return false;
+        }
+        world.destroyJoint(lastJoint);
+        lastJoint = null;
+        return true;
     }
 }

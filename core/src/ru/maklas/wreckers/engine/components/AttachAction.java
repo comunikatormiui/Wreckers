@@ -5,7 +5,7 @@ import ru.maklas.mengine.Entity;
 
 public interface AttachAction {
 
-    void attach(Entity e, WSocket socket, Body body);
-    void detach();
+    boolean attach(Entity e, WSocket socket, Body body);
+    boolean detach();
 
 }
