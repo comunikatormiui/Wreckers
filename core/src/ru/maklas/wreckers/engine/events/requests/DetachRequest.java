@@ -1,6 +1,5 @@
 package ru.maklas.wreckers.engine.events.requests;
 
-import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Entity;
 
 public class DetachRequest {
@@ -12,15 +11,21 @@ public class DetachRequest {
          */
         FIRST,
         /**
-         * Удаляем таргетное оружие. В таком случае weapon != null
+         * Удаляем таргетное оружие из таргетного Entity. В таком случае weapon != null и wielder != null
          */
-        TARGET}
+        TARGET_ENTITY_AND_WEAPON,
+        /**
+         * Отсоеденияем указанное Оружие. wielder может быть null.
+         */
+        TARGET_WEAPON
+
+    }
 
     Entity wielder;
-    @Nullable Entity weapon;
+    Entity weapon;
     Type type;
 
-    public DetachRequest(Entity wielder, Type type, @Nullable Entity weapon) {
+    public DetachRequest(Entity wielder, Type type, Entity weapon) {
         this.wielder = wielder;
         this.weapon = weapon;
         this.type = type;
@@ -30,7 +35,6 @@ public class DetachRequest {
         return wielder;
     }
 
-    @Nullable
     public Entity getWeapon() {
         return weapon;
     }

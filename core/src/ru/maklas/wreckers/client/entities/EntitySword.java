@@ -23,10 +23,11 @@ public class EntitySword extends WeaponEntity implements AttachAction {
     WeaponPickUpComponent pickUpC;
     Joint lastJoint;
 
-    public EntitySword(int id, EntityType eType, float x, float y, int zOrder, ClientGameModel model) {
-        super(id, eType, x, y, zOrder, model);
+    public EntitySword(int id, float x, float y, int zOrder, ClientGameModel model) {
+        super(id, x, y, zOrder, model);
         this.world = model.getWorld();
         final float scale = 0.15f;
+        final EntityType eType = EntityType.NEUTRAL_WEAPON;
 
         PolygonShape polygonShape = new PolygonShape();
         PolygonShape polygonShape1 = new PolygonShape();
@@ -83,12 +84,10 @@ public class EntitySword extends WeaponEntity implements AttachAction {
                 .linearDamp(0.1f)
                 .addFixture(fix)
                 .addFixture(fix2)
-                .angVel(1f)
                 .angularDamp(0.1f)
                 .build();
 
         MassData massData = body.getMassData();
-        System.out.println(massData.I);
         body.setMassData(massData);
 
         RenderUnit unit = new RenderUnit(Images.sword);

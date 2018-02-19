@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -12,6 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 public class Images {
 
     private static boolean isLoaded = false;
+    private static Array<Disposable> disposables = new Array<Disposable>();
 
 
     /**
@@ -23,12 +26,15 @@ public class Images {
      * Yellow line. Width = 100; Height = 6;
      */
     public static TextureRegion line;
-
+    public static TextureRegion arrow;
 
     public static TextureRegion sword;
     public static BitmapFont font;
 
-    private static Array<Disposable> disposables = new Array<Disposable>();
+    public static TextureRegion touchBlock;
+    public static TextureRegion touchBg;
+    public static TextureRegion touchKnob;
+    public static Touchpad.TouchpadStyle touchStyle;
 
     public static void load(){
         if (isLoaded){
@@ -59,6 +65,18 @@ public class Images {
 
         font = new BitmapFont();
         disposables.add(font);
+
+
+        Texture arrowT = new Texture("arrow.png");
+        disposables.add(arrowT);
+        arrow = new TextureRegion(arrowT);
+
+
+
+        touchBlock = new TextureRegion(new Texture("ui/block.png"));
+        touchBg    = new TextureRegion(new Texture("ui/touchBackground.png"));
+        touchKnob  = new TextureRegion(new Texture("ui/touchKnob.png"));
+        touchStyle = new Touchpad.TouchpadStyle(new TextureRegionDrawable(touchBg), new TextureRegionDrawable(touchKnob));
     }
 
     public static void dispose(){

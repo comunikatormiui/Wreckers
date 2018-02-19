@@ -27,7 +27,7 @@ public class MotorSystem extends EntitySystem {
             if (!mc.enabled){
                 continue;
             }
-            tempVec.set(mc.direction).nor().scl(mc.maxVelocity);
+            tempVec.set(mc.direction).clamp(0, 1).scl(mc.maxVelocity);
             PhysicsComponent pc = entity.get(Mappers.physicsM);
             if (pc != null){
                 pc.body.applyForceToCenter(tempVec, true);

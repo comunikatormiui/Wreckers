@@ -1,11 +1,6 @@
 package ru.maklas.wreckers.engine.systems;
 
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Filter;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.utils.Array;
 import ru.maklas.mengine.*;
-import ru.maklas.mengine.utils.Listener;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
@@ -90,17 +85,16 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         subscribe(new Subscription<DetachRequest>(DetachRequest.class) {
             @Override
             public void receive(Signal<DetachRequest> signal, DetachRequest req) {
-                Entity wielder = req.getWielder();
-                SocketComponent socketC = wielder.get(Mappers.socketM);
-                if (socketC == null) {
-                    return;
-                }
 
+                final Entity wielderDetachFrom;
                 final Entity weaponToDetach;
+                final SocketComponent socketC;
 
                 switch (req.getType()){
                     case FIRST:
 
+                        wielderDetachFrom = req.getWielder();
+                        socketC = wielderDetachFrom.get(Mappers.socketM);
                         WSocket sock = socketC.firstAttached();
                         if (sock != null){
                             weaponToDetach = sock.attachedEntity;
@@ -109,12 +103,18 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
                         }
 
                         break;
-                    case TARGET:
-                        if (req.getWeapon() == null){
-                            throw new RuntimeException("Weapon must not be null at this point");
-                        } else {
-                            weaponToDetach = req.getWeapon();
+                    case TARGET_ENTITY_AND_WEAPON:
+                        wielderDetachFrom = req.getWielder();
+                        socketC = wielderDetachFrom.get(Mappers.socketM);
+                        weaponToDetach = req.getWeapon();
+                        break;
+                    case TARGET_WEAPON:
+                        weaponToDetach = req.getWeapon();
+                        wielderDetachFrom = weaponToDetach.get(Mappers.weaponPickUpM).wielder;
+                        if (wielderDetachFrom == null){
+                            return;
                         }
+                        socketC = wielderDetachFrom.get(Mappers.socketM);
                         break;
                     default:
                         throw new RuntimeException("Unknown type: " + req.getType().name());
@@ -125,7 +125,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
                 if (wpu != null && wph != null){
                     boolean success = detachWeaponLogic(weaponToDetach, wph, wpu, socketC);
                     if (success){
-                        engine.dispatch(new AttachEvent(wielder, weaponToDetach, false));
+                        engine.dispatch(new AttachEvent(wielderDetachFrom, weaponToDetach, false));
                     }
                 }
             }
@@ -174,6 +174,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
             wpu.wielder = player;
             wSocket.attachedEntity = weapon;
             GameAssets.setFilterData(weaponPC.body, false, psc.weaponType);
+            weapon.type = psc.weaponType.type;
         }
         return attach;
     }
@@ -195,6 +196,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
             socket.attachedEntity = null;
 
             GameAssets.setFilterData(wph.body, false, EntityType.NEUTRAL_WEAPON);
+            weapon.type = EntityType.NEUTRAL_WEAPON.type;
         }
         return success;
     }

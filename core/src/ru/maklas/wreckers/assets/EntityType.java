@@ -19,7 +19,7 @@ public class EntityType {
     private static final int maskOpponentWeapon = player | playerWeapon | obstacle | neutralWeapon;
     private static final int maskNeutralWeapon  = player | opponent | playerWeapon | opponentWeapon | neutralWeapon | obstacle;
 
-    private static final int maskObstacle = opponent | player | playerWeapon | opponentWeapon;
+    private static final int maskObstacle = opponent | player | playerWeapon | opponentWeapon | neutralWeapon;
 
     private static final int maskWielderPickUp = weaponPickUp;
     private static final int maskWeaponPickUp = wielderPickUp;
@@ -52,7 +52,7 @@ public class EntityType {
     public static final EntityType NEUTRAL_WEAPON = new EntityType(
             5,
             neutralWeapon,
-            maskOpponentWeapon
+            maskNeutralWeapon
     );
 
     public static final EntityType OBSTACLE = new EntityType(
@@ -74,6 +74,7 @@ public class EntityType {
     );
 
     public static final EntityType[] values = new EntityType[]{
+            null,
             PLAYER,
             OPPONENT,
             PLAYER_WEAPON,
