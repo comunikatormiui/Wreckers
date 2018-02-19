@@ -154,6 +154,7 @@ public class MainMenuState extends State {
         final EntityPlayer opponent = new EntityPlayer(2, 200, 500, 100, model, EntityType.OPPONENT);
         final EntitySword sword = new EntitySword(3, -200, 700, 10, model);
         final EntitySword sword2 = new EntitySword(4, 0, 300, 10, model);
+        final EntityHammer hammer = new EntityHammer(5, -200, 300, 10, model);
         final Entity platform = new GameEntity(-2, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
 
         model.setPlayer(player);
@@ -163,13 +164,14 @@ public class MainMenuState extends State {
         engine.add(opponent);
         engine.add(sword);
         engine.add(sword2);
+        engine.add(hammer);
         engine.add(platform);
 
 
         engine.dispatch(new PlayerPickUpZoneChangeRequest(true, opponent));
     }
 
-    private static boolean enableStage = true;
+    private static boolean enableStage = false;
     private void setUpStage() {
         stage = new Stage();
 
@@ -264,8 +266,20 @@ public class MainMenuState extends State {
         model.getEngine().update(dt);
         cam.position.set(model.getPlayer().x, model.getPlayer().y, 0);
 
+        Vector2 directionVec = Utils.vec2.set(0, 0);
+        if (Gdx.input.isKeyPressed(Input.Keys.W)){
+            directionVec.add(0, 1);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)){
+            directionVec.add(0, -1);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)){
+            directionVec.add(-1, 0);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)){
+            directionVec.add(1, 0);
+        }
 
-        Vector2 directionVec = Utils.vec2.set(touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
         model.getPlayer().get(Mappers.motorM).direction.set(directionVec);
     }
 

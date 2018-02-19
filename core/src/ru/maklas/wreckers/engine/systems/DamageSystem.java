@@ -50,7 +50,7 @@ public class DamageSystem extends EntitySystem{
     }
 
     private void handleWeaponToWeapon(Entity weaponA, EntityType typeA, Entity weaponB, EntityType typeB, Contact contact, ContactImpulse impulse){
-        if (impulse.getNormalImpulses()[0] > 5){
+        if (impulse.getNormalImpulses()[0] > 8){
             getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponA));
             getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponB));
         }

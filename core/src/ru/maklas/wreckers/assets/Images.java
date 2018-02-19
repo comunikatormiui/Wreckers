@@ -29,6 +29,7 @@ public class Images {
     public static TextureRegion arrow;
 
     public static TextureRegion sword;
+    public static TextureRegion hammer;
     public static BitmapFont font;
 
     public static TextureRegion touchBlock;
@@ -62,6 +63,9 @@ public class Images {
         Texture swordT = new Texture("sword.png");
         disposables.add(swordT);
         sword = new TextureRegion(swordT);
+        Texture hammerT = new Texture("hammer.png");
+        disposables.add(hammerT);
+        hammer = new TextureRegion(hammerT);
 
         font = new BitmapFont();
         disposables.add(font);
