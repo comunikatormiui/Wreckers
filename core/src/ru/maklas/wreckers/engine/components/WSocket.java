@@ -1,5 +1,6 @@
 package ru.maklas.wreckers.engine.components;
 
+import com.badlogic.gdx.physics.box2d.Joint;
 import ru.maklas.mengine.Entity;
 
 /**
@@ -8,6 +9,7 @@ import ru.maklas.mengine.Entity;
 public class WSocket {
 
     public Entity attachedEntity;
+    public Joint joint; //joint соеденяющий с прикрепленным предметом
     public float localX;
     public float localY;
 

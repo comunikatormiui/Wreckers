@@ -1,9 +1,6 @@
 package ru.maklas.wreckers.engine.components;
 
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.JointDef;
-import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.*;
 import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Component;
 import ru.maklas.mengine.Entity;
@@ -15,17 +12,14 @@ import ru.maklas.wreckers.assets.EntityType;
  */
 public class PickUpComponent implements Component {
 
-    @Nullable public Fixture fixture;
-    public final FixtureDef def;
-    public final AttachAction attachAction;
-    /**
-     * If current entity is attached to socket
-     */
-    public boolean attached = false;
-    /**
-     * Current owner of the entity
-     */
-    @Nullable public Entity wielder;
+
+    public final FixtureDef def; // definition для зоны подбирания
+    @Nullable public Fixture fixture; // зона подбирания предмета. Если != null, то она активна в данный момент
+
+    public boolean isAttached = false; // Присоеденён ли в данный момент. если True, то верно: owner != null && joint != null
+    public final AttachAction attachAction; // Действие для прикрепления
+    public Entity owner; //Текущий владелец
+    public Joint joint;  //Joint который соеденяет с владельцем в данный момент
 
     public PickUpComponent(FixtureDef def, AttachAction attachAction) {
         this.def = def;
@@ -44,7 +38,7 @@ public class PickUpComponent implements Component {
     /**
      * means that this entity has PickUp fixture enabled, != null and can be grabbed
      */
-    public boolean enabled(){
+    public boolean pickUpZoneEnabled(){
         return fixture != null;
     }
 

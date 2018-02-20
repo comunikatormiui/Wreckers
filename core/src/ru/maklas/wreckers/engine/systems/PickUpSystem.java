@@ -1,5 +1,8 @@
 package ru.maklas.wreckers.engine.systems;
 
+import com.badlogic.gdx.physics.box2d.Joint;
+import com.badlogic.gdx.physics.box2d.JointDef;
+import com.badlogic.gdx.physics.box2d.World;
 import ru.maklas.mengine.*;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
@@ -12,6 +15,12 @@ import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 
 public class PickUpSystem extends EntitySystem implements EntityListener {
+
+    private final World world;
+
+    public PickUpSystem(World world) {
+        this.world = world;
+    }
 
     @Override
     public void onAddedToEngine(final Engine engine) {
@@ -110,7 +119,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
                         break;
                     case TARGET_WEAPON:
                         entityToDetach = req.getWeapon();
-                        wielderDetachFrom = entityToDetach.get(Mappers.pickUpM).wielder;
+                        wielderDetachFrom = entityToDetach.get(Mappers.pickUpM).owner;
                         if (wielderDetachFrom == null){
                             return;
                         }
@@ -165,22 +174,26 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
 
         WSocket wSocket = ownerSocketC.firstEmpty();
 
-        if (pickUpC.attached || wSocket == null){
+        if (pickUpC.isAttached || wSocket == null){
             return false;
         }
-        boolean attach = pickUpC.attachAction.attach(owner, wSocket, ownerPC.body);
-        if (attach){
-            pickUpC.attached = true;
-            pickUpC.wielder = owner;
-            wSocket.attachedEntity = attachable;
-            GameAssets.setFilterData(attachablePC.body, false, ownerSocketC.weaponType);
-            attachable.type = ownerSocketC.weaponType.type;
-        }
-        return attach;
+        JointDef def = pickUpC.attachAction.attach(owner, wSocket, ownerPC.body);
+        Joint joint = world.createJoint(def);
+
+        pickUpC.isAttached = true;
+        pickUpC.owner = owner;
+        pickUpC.joint = joint;
+
+        wSocket.attachedEntity = attachable;
+        wSocket.joint = joint;
+
+        GameAssets.setFilterData(attachablePC.body, false, ownerSocketC.weaponType); //TODO Больше не оружие. Фиксим
+        attachable.type = ownerSocketC.weaponType.type;
+        return true;
     }
 
     private boolean detachLogic(Entity attachable, PhysicsComponent attachablePC, PickUpComponent pickUpC, SocketComponent ownerSocketC){
-        if (!pickUpC.attached) {
+        if (!pickUpC.isAttached) {
             return false;
         }
 
@@ -189,16 +202,18 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
             return false;
         }
 
-        boolean success = pickUpC.attachAction.detach();
-        if (success) {
-            pickUpC.attached = false;
-            pickUpC.wielder = null;
-            socket.attachedEntity = null;
+        world.destroyJoint(pickUpC.joint);
+        pickUpC.isAttached = false;
+        pickUpC.owner = null;
+        pickUpC.joint = null;
 
-            GameAssets.setFilterData(attachablePC.body, false, EntityType.NEUTRAL_WEAPON); //TODO Больше не оружие. Фиксим
-            attachable.type = EntityType.NEUTRAL_WEAPON.type;
-        }
-        return success;
+        socket.attachedEntity = null;
+        socket.joint = null;
+
+        GameAssets.setFilterData(attachablePC.body, false, EntityType.NEUTRAL_WEAPON); //TODO Больше не оружие. Фиксим
+        attachable.type = EntityType.NEUTRAL_WEAPON.type;
+
+        return true;
     }
 
 
@@ -207,7 +222,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
     public void entityAdded(Entity entity) {
         // Если было заспавнено оружие без владельца, ему нужно придать зону для подбирания
         PickUpComponent pickUpC = entity.get(Mappers.pickUpM);
-        if (pickUpC != null && !pickUpC.attached && !pickUpC.enabled()){
+        if (pickUpC != null && !pickUpC.isAttached && !pickUpC.pickUpZoneEnabled()){
             enablePickUpZone(entity, pickUpC);
         }
     }

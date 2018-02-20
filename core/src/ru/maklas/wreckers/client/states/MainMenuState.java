@@ -61,7 +61,7 @@ public class MainMenuState extends State {
         engine.add(new DamageSystem());
         engine.add(new TTLSystem());
         engine.add(new AntiGravSystem());
-        engine.add(new PickUpSystem());
+        engine.add(new PickUpSystem(world));
         engine.add(new MotorSystem());
 
 
@@ -119,13 +119,13 @@ public class MainMenuState extends State {
                 if (udA instanceof PickUpComponent && udB instanceof GrabZoneComponent){
                     final PickUpComponent wPick = (PickUpComponent) udA;
                     final GrabZoneComponent pPick = (GrabZoneComponent) udB;
-                    if (wPick.enabled() && pPick.enabled()){
+                    if (wPick.pickUpZoneEnabled() && pPick.enabled()){
                         engine.dispatchLater(new AttachRequest((Entity) fixtureB.getBody().getUserData(), pPick, (Entity) fixtureA.getBody().getUserData(), wPick));
                     }
                 } else if (udA instanceof GrabZoneComponent && udB instanceof PickUpComponent){
                     final PickUpComponent wPick = (PickUpComponent) udB;
                     final GrabZoneComponent pPick = (GrabZoneComponent) udA;
-                    if (wPick.enabled() && pPick.enabled()){
+                    if (wPick.pickUpZoneEnabled() && pPick.enabled()){
                         engine.dispatchLater(new AttachRequest((Entity) fixtureA.getBody().getUserData(), pPick, (Entity) fixtureB.getBody().getUserData(), wPick));
                     }
                 }

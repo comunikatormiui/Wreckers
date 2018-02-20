@@ -20,7 +20,6 @@ public class EntitySword extends WeaponEntity implements AttachAction {
     Body body;
     World world;
     PickUpComponent pickUpC;
-    Joint lastJoint;
 
     public EntitySword(int id, float x, float y, int zOrder, ClientGameModel model) {
         super(id, x, y, zOrder, model);
@@ -100,23 +99,12 @@ public class EntitySword extends WeaponEntity implements AttachAction {
     }
 
     @Override
-    public boolean attach(Entity e, WSocket socket, Body body) {
+    public JointDef attach(Entity owner, WSocket socket, Body ownerBody) {
         RevoluteJointDef rjd = new RevoluteJointDef();
-        rjd.bodyA = body;
+        rjd.bodyA = ownerBody;
         rjd.bodyB = this.body;
         rjd.localAnchorA.set(socket.localX, socket.localY);
         rjd.localAnchorB.set(300, 178).scl(0.15f / GameAssets.box2dScale);
-        lastJoint = world.createJoint(rjd);
-        return true;
-    }
-
-    @Override
-    public boolean detach() {
-        if (lastJoint == null){
-            return false;
-        }
-        world.destroyJoint(lastJoint);
-        lastJoint = null;
-        return true;
+        return rjd;
     }
 }
