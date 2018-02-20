@@ -10,7 +10,7 @@ public class EntityType {
 
     private static final int obstacle = 0x20;
 
-    private static final int wielderPickUp = 0x40;
+    private static final int grabber = 0x40;
     private static final int weaponPickUp = 0x80;
 
     private static final int maskPlayer         = opponent | opponentWeapon | obstacle | neutralWeapon;
@@ -21,8 +21,8 @@ public class EntityType {
 
     private static final int maskObstacle = opponent | player | playerWeapon | opponentWeapon | neutralWeapon;
 
-    private static final int maskWielderPickUp = weaponPickUp;
-    private static final int maskWeaponPickUp = wielderPickUp;
+    private static final int maskGrabber = weaponPickUp;
+    private static final int maskWeaponPickUp = grabber;
 
 
     public static final EntityType PLAYER = new EntityType(
@@ -61,10 +61,10 @@ public class EntityType {
             maskObstacle
     );
 
-    public static final EntityType PLAYER_PICKUP = new EntityType(
+    public static final EntityType GRABBER = new EntityType(
             7,
-            wielderPickUp,
-            maskWielderPickUp
+            grabber,
+            maskGrabber
     );
 
     public static final EntityType WEAPON_PICKUP = new EntityType(
@@ -81,7 +81,7 @@ public class EntityType {
             OPPONENT_WEAPON,
             NEUTRAL_WEAPON,
             OBSTACLE,
-            PLAYER_PICKUP,
+            GRABBER,
             WEAPON_PICKUP
     };
 

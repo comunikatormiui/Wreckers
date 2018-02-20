@@ -3,7 +3,7 @@ package ru.maklas.wreckers.engine.components;
 import ru.maklas.mengine.Entity;
 
 /**
- * Сокет с оружием
+ * РЎРѕРєРµС‚ СЃ РѕСЂСѓР¶РёРµРј
  */
 public class WSocket {
 

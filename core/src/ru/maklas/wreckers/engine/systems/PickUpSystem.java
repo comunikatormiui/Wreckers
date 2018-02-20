@@ -9,7 +9,7 @@ import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.events.AttachEvent;
 import ru.maklas.wreckers.engine.events.requests.AttachRequest;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
-import ru.maklas.wreckers.engine.events.requests.PlayerPickUpZoneChangeRequest;
+import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 
 public class PickUpSystem extends EntitySystem implements EntityListener {
 
@@ -19,46 +19,46 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
 
 
         // Включаем/выключаем зону подбора для игрока
-        subscribe(new Subscription<PlayerPickUpZoneChangeRequest>(PlayerPickUpZoneChangeRequest.class) {
+        subscribe(new Subscription<GrabZoneChangeRequest>(GrabZoneChangeRequest.class) {
             @Override
-            public void receive(Signal<PlayerPickUpZoneChangeRequest> signal, PlayerPickUpZoneChangeRequest e) {
+            public void receive(Signal<GrabZoneChangeRequest> signal, GrabZoneChangeRequest e) {
                 Entity target = e.getEntity();
-                WielderPickUpZoneComponent pickUp = target.get(Mappers.playerPickUpM);
-                if (pickUp == null){
+                GrabZoneComponent grabber = target.get(Mappers.grabM);
+                if (grabber == null){
                     return;
                 }
-                if (e.state() && !pickUp.enabled()){
+                if (e.state() && !grabber.enabled()){
                     PhysicsComponent pc = target.get(Mappers.physicsM);
                     if (pc == null){
                         return;
                     }
-                    pickUp.fixture = pc.body.createFixture(pickUp.def);
-                    pickUp.fixture.setUserData(pickUp);
-                } else if (!e.state() && pickUp.enabled()){
+                    grabber.fixture = pc.body.createFixture(grabber.def);
+                    grabber.fixture.setUserData(grabber);
+                } else if (!e.state() && grabber.enabled()){
                     PhysicsComponent pc = target.get(Mappers.physicsM);
                     if (pc == null){
                         return;
                     }
-                    pc.body.destroyFixture(pickUp.fixture);
-                    pickUp.fixture = null;
+                    pc.body.destroyFixture(grabber.fixture);
+                    grabber.fixture = null;
                 }
             }
         });
 
-        // После того как оружие было установленно или наобарот изъято, нужно включить у оружия ранжу для подбирания
+        // После того как оружие было установленно или наоборот изъято, нужно включить у оружия ранжу для подбирания
         subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
             @Override
             public void receive(Signal<AttachEvent> signal, AttachEvent e) {
-                Entity weapon = e.getWeapon();
-                WeaponPickUpComponent pickUpC = weapon.get(Mappers.weaponPickUpM);
+                Entity attachable = e.getAttachable();
+                PickUpComponent pickUpC = attachable.get(Mappers.pickUpM);
                 if (pickUpC == null){
                     return;
                 }
 
                 if (e.isAttached()){
-                    disablePickUpZone(weapon, pickUpC);
+                    disablePickUpZone(attachable, pickUpC);
                 } else {
-                    enablePickUpZone(weapon, pickUpC);
+                    enablePickUpZone(attachable, pickUpC);
                 }
             }
         });
@@ -74,7 +74,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
                     return;
                 }
 
-                boolean attached = attachWeaponLogic(req.getWeapon(), weaponPC, req.getWeaponPickUp(), req.getWielder(), sockC);
+                boolean attached = attachLogic(req.getWeapon(), weaponPC, req.getPickUp(), req.getWielder(), sockC);
                 if (attached){
                     engine.dispatch(new AttachEvent(req.getWielder(), req.getWeapon(), true));
                 }
@@ -87,7 +87,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
             public void receive(Signal<DetachRequest> signal, DetachRequest req) {
 
                 final Entity wielderDetachFrom;
-                final Entity weaponToDetach;
+                final Entity entityToDetach;
                 final SocketComponent socketC;
 
                 switch (req.getType()){
@@ -97,7 +97,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
                         socketC = wielderDetachFrom.get(Mappers.socketM);
                         WSocket sock = socketC.firstAttached();
                         if (sock != null){
-                            weaponToDetach = sock.attachedEntity;
+                            entityToDetach = sock.attachedEntity;
                         } else {
                             return;
                         }
@@ -106,11 +106,11 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
                     case TARGET_ENTITY_AND_WEAPON:
                         wielderDetachFrom = req.getWielder();
                         socketC = wielderDetachFrom.get(Mappers.socketM);
-                        weaponToDetach = req.getWeapon();
+                        entityToDetach = req.getWeapon();
                         break;
                     case TARGET_WEAPON:
-                        weaponToDetach = req.getWeapon();
-                        wielderDetachFrom = weaponToDetach.get(Mappers.weaponPickUpM).wielder;
+                        entityToDetach = req.getWeapon();
+                        wielderDetachFrom = entityToDetach.get(Mappers.pickUpM).wielder;
                         if (wielderDetachFrom == null){
                             return;
                         }
@@ -120,12 +120,12 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
                         throw new RuntimeException("Unknown type: " + req.getType().name());
                 }
 
-                WeaponPickUpComponent wpu = weaponToDetach.get(Mappers.weaponPickUpM);
-                PhysicsComponent wph = weaponToDetach.get(Mappers.physicsM);
-                if (wpu != null && wph != null){
-                    boolean success = detachWeaponLogic(weaponToDetach, wph, wpu, socketC);
+                PickUpComponent pickUpC = entityToDetach.get(Mappers.pickUpM);
+                PhysicsComponent wph = entityToDetach.get(Mappers.physicsM);
+                if (pickUpC != null && wph != null){
+                    boolean success = detachLogic(entityToDetach, wph, pickUpC, socketC);
                     if (success){
-                        engine.dispatch(new AttachEvent(wielderDetachFrom, weaponToDetach, false));
+                        engine.dispatch(new AttachEvent(wielderDetachFrom, entityToDetach, false));
                     }
                 }
             }
@@ -137,17 +137,17 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         super.update(dt);
     }
 
-    private void enablePickUpZone(Entity weapon, WeaponPickUpComponent wpu) {
-        PhysicsComponent pc = weapon.get(Mappers.physicsM);
+    private void enablePickUpZone(Entity attachable, PickUpComponent pickUpC) {
+        PhysicsComponent pc = attachable.get(Mappers.physicsM);
         if (pc == null){
             return;
         }
-        wpu.fixture = pc.body.createFixture(wpu.def);
-        wpu.fixture.setUserData(wpu);
+        pickUpC.fixture = pc.body.createFixture(pickUpC.def);
+        pickUpC.fixture.setUserData(pickUpC);
     }
 
-    private void disablePickUpZone(Entity weapon, WeaponPickUpComponent wpu){
-        PhysicsComponent pc = weapon.get(Mappers.physicsM);
+    private void disablePickUpZone(Entity attachable, PickUpComponent wpu){
+        PhysicsComponent pc = attachable.get(Mappers.physicsM);
         if (pc == null){
             return;
         }
@@ -157,46 +157,46 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         }
     }
 
-    private boolean attachWeaponLogic(Entity weapon, PhysicsComponent weaponPC, WeaponPickUpComponent wpu, Entity player, SocketComponent psc){
-        PhysicsComponent ppc = player.get(Mappers.physicsM);
-        if (ppc == null){
+    private boolean attachLogic(Entity attachable, PhysicsComponent attachablePC, PickUpComponent pickUpC, Entity owner, SocketComponent ownerSocketC){
+        PhysicsComponent ownerPC = owner.get(Mappers.physicsM);
+        if (ownerPC == null){
             return false;
         }
 
-        WSocket wSocket = psc.firstEmpty();
+        WSocket wSocket = ownerSocketC.firstEmpty();
 
-        if (wpu.attached || wSocket == null){
+        if (pickUpC.attached || wSocket == null){
             return false;
         }
-        boolean attach = wpu.attachAction.attach(player, wSocket, ppc.body);
+        boolean attach = pickUpC.attachAction.attach(owner, wSocket, ownerPC.body);
         if (attach){
-            wpu.attached = true;
-            wpu.wielder = player;
-            wSocket.attachedEntity = weapon;
-            GameAssets.setFilterData(weaponPC.body, false, psc.weaponType);
-            weapon.type = psc.weaponType.type;
+            pickUpC.attached = true;
+            pickUpC.wielder = owner;
+            wSocket.attachedEntity = attachable;
+            GameAssets.setFilterData(attachablePC.body, false, ownerSocketC.weaponType);
+            attachable.type = ownerSocketC.weaponType.type;
         }
         return attach;
     }
 
-    private boolean detachWeaponLogic(Entity weapon, PhysicsComponent wph, WeaponPickUpComponent wpu, SocketComponent psc){
-        if (!wpu.attached) {
+    private boolean detachLogic(Entity attachable, PhysicsComponent attachablePC, PickUpComponent pickUpC, SocketComponent ownerSocketC){
+        if (!pickUpC.attached) {
             return false;
         }
 
-        WSocket socket = psc.find(weapon);
+        WSocket socket = ownerSocketC.find(attachable);
         if (socket == null){
             return false;
         }
 
-        boolean success = wpu.attachAction.detach();
+        boolean success = pickUpC.attachAction.detach();
         if (success) {
-            wpu.attached = false;
-            wpu.wielder = null;
+            pickUpC.attached = false;
+            pickUpC.wielder = null;
             socket.attachedEntity = null;
 
-            GameAssets.setFilterData(wph.body, false, EntityType.NEUTRAL_WEAPON);
-            weapon.type = EntityType.NEUTRAL_WEAPON.type;
+            GameAssets.setFilterData(attachablePC.body, false, EntityType.NEUTRAL_WEAPON); //TODO Больше не оружие. Фиксим
+            attachable.type = EntityType.NEUTRAL_WEAPON.type;
         }
         return success;
     }
@@ -206,9 +206,9 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
     @Override
     public void entityAdded(Entity entity) {
         // Если было заспавнено оружие без владельца, ему нужно придать зону для подбирания
-        WeaponPickUpComponent wpu = entity.get(Mappers.weaponPickUpM);
-        if (wpu != null && !wpu.attached && !wpu.enabled()){
-            enablePickUpZone(entity, wpu);
+        PickUpComponent pickUpC = entity.get(Mappers.pickUpM);
+        if (pickUpC != null && !pickUpC.attached && !pickUpC.enabled()){
+            enablePickUpZone(entity, pickUpC);
         }
     }
 

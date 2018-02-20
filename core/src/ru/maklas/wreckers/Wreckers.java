@@ -23,7 +23,11 @@ public class Wreckers extends ApplicationAdapter {
     public void render () {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        gsm.update(Gdx.graphics.getDeltaTime());
+        float dt = Gdx.graphics.getDeltaTime();
+        if (dt > 0.05f){
+            dt = 0.016666667f;
+        }
+        gsm.update(dt);
     }
     
     @Override

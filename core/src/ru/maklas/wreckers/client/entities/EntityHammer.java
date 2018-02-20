@@ -2,7 +2,7 @@ package ru.maklas.wreckers.client.entities;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
@@ -11,7 +11,7 @@ import ru.maklas.wreckers.client.ClientGameModel;
 import ru.maklas.wreckers.engine.components.AttachAction;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.engine.components.WSocket;
-import ru.maklas.wreckers.engine.components.WeaponPickUpComponent;
+import ru.maklas.wreckers.engine.components.PickUpComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
 
@@ -19,7 +19,7 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
 
     Body body;
     World world;
-    WeaponPickUpComponent pickUpC;
+    PickUpComponent pickUpC;
     Joint lastJoint;
 
     public EntityHammer(int id, float x, float y, int zOrder, ClientGameModel model) {
@@ -62,9 +62,9 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
         FixtureDef fix = model.getFixturer().newFixture()
                 .bounciness(0.1f)
                 .mask(eType)
-                .friction(0.2f)
+                .friction(1f)
                 .shape(polygonShape)
-                .density(0.1f)
+                .density(8.770995f) //0.60928726
                 .build();
 
         FixtureDef fix2 = model.getFixturer().newFixture()
@@ -72,9 +72,14 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
                 .shape(polygonShape1)
                 .friction(0.2f)
                 .bounciness(0.1f)
-                .density(0.01f)
+                .density(8.770995f) //1.6709557
                 .build();
 
+        final float f1 = 0.60928726f;
+        final float f2 = 1.6709557f;
+        final float sum = f1 + f2;
+        final float targetMass = 20;
+        final float density = 8.770995f;
 
         body = model.getBuilder().newBody()
                 .pos(x, y)
@@ -85,8 +90,7 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
                 .angularDamp(0.1f)
                 .build();
 
-        MassData massData = body.getMassData();
-        body.setMassData(massData);
+        System.out.println(id + ": Hammer mass " + body.getMass());
 
         RenderUnit unit = new RenderUnit(Images.hammer);
         unit.scaleX = unit.scaleY = scale;
@@ -95,13 +99,13 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
 
         add(new PhysicsComponent(body));
         add(new RenderComponent(unit));
-        pickUpC = new WeaponPickUpComponent(model.getShaper().buildCircle(8 * scale, 287 * scale, 35), this);
+        pickUpC = new PickUpComponent(model.getShaper().buildCircle(8 * scale, 287 * scale, 35), this);
         add(pickUpC);
     }
 
     @Override
     public boolean attach(Entity e, WSocket socket, Body body) {
-        RopeJointDef rjd = new RopeJointDef();
+        RevoluteJointDef rjd = new RevoluteJointDef();
         rjd.bodyA = body;
         rjd.bodyB = this.body;
         rjd.localAnchorA.set(socket.localX, socket.localY);

@@ -2,17 +2,16 @@ package ru.maklas.wreckers.client.entities;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
 import ru.maklas.wreckers.client.ClientGameModel;
-import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.AttachAction;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.engine.components.WSocket;
-import ru.maklas.wreckers.engine.components.WeaponPickUpComponent;
+import ru.maklas.wreckers.engine.components.PickUpComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
 
@@ -20,7 +19,7 @@ public class EntitySword extends WeaponEntity implements AttachAction {
 
     Body body;
     World world;
-    WeaponPickUpComponent pickUpC;
+    PickUpComponent pickUpC;
     Joint lastJoint;
 
     public EntitySword(int id, float x, float y, int zOrder, ClientGameModel model) {
@@ -29,8 +28,8 @@ public class EntitySword extends WeaponEntity implements AttachAction {
         final float scale = 0.15f;
         final EntityType eType = EntityType.NEUTRAL_WEAPON;
 
-        PolygonShape polygonShape = new PolygonShape();
-        PolygonShape polygonShape1 = new PolygonShape();
+        PolygonShape handleShape = new PolygonShape();
+        PolygonShape bladeShape = new PolygonShape();
 
         Vector2[] pointsHandle = new Vector2[]{
                 new Vector2(400, 350),
@@ -58,23 +57,23 @@ public class EntitySword extends WeaponEntity implements AttachAction {
             point.scl(scale / (GameAssets.box2dScale));
         }
 
-        polygonShape.set(pointsHandle);
-        polygonShape1.set(pointsSharp);
+        handleShape.set(pointsHandle);
+        bladeShape.set(pointsSharp);
 
-        FixtureDef fix = model.getFixturer().newFixture()
-                .bounciness(0.1f)
+        FixtureDef handle = model.getFixturer().newFixture()
+                .bounciness(0.3f)
                 .mask(eType)
                 .friction(0.2f)
-                .shape(polygonShape)
-                .density(0.1f)
+                .shape(handleShape)
+                .density(9.187957f) //0.3768188
                 .build();
 
-        FixtureDef fix2 = model.getFixturer().newFixture()
+        FixtureDef blade = model.getFixturer().newFixture()
                 .mask(eType)
-                .shape(polygonShape1)
+                .shape(bladeShape)
                 .friction(0.2f)
-                .bounciness(0.1f)
-                .density(0.1f)
+                .bounciness(0.3f)
+                .density(9.187957f) //1.2557532
                 .build();
 
 
@@ -82,13 +81,12 @@ public class EntitySword extends WeaponEntity implements AttachAction {
                 .pos(x, y)
                 .type(BodyDef.BodyType.DynamicBody)
                 .linearDamp(0.1f)
-                .addFixture(fix)
-                .addFixture(fix2)
+                .addFixture(handle)
+                .addFixture(blade)
                 .angularDamp(0.1f)
                 .build();
 
-        MassData massData = body.getMassData();
-        body.setMassData(massData);
+        System.out.println(id + ": Sword mass " + body.getMass());
 
         RenderUnit unit = new RenderUnit(Images.sword);
         unit.scaleX = unit.scaleY = scale;
@@ -97,13 +95,13 @@ public class EntitySword extends WeaponEntity implements AttachAction {
 
         add(new PhysicsComponent(body));
         add(new RenderComponent(unit));
-        pickUpC = new WeaponPickUpComponent(model.getShaper().buildCircle(400 * scale, 178 * scale, 35), this);
+        pickUpC = new PickUpComponent(model.getShaper().buildCircle(400 * scale, 178 * scale, 35), this);
         add(pickUpC);
     }
 
     @Override
     public boolean attach(Entity e, WSocket socket, Body body) {
-        RopeJointDef rjd = new RopeJointDef();
+        RevoluteJointDef rjd = new RevoluteJointDef();
         rjd.bodyA = body;
         rjd.bodyB = this.body;
         rjd.localAnchorA.set(socket.localX, socket.localY);

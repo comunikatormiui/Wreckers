@@ -20,9 +20,9 @@ public class AntiGravSystem extends EntitySystem {
         subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
             @Override
             public void receive(Signal<AttachEvent> signal, AttachEvent e) {
-                AntiGravComponent antiGrav = Mappers.antiGravM.get(e.getWielder());
+                AntiGravComponent antiGrav = Mappers.antiGravM.get(e.getOwner());
                 ComponentMapper<PhysicsComponent> physicsM = Mappers.physicsM;
-                PhysicsComponent weaponPC = e.getWeapon().get(physicsM);
+                PhysicsComponent weaponPC = e.getAttachable().get(physicsM);
 
                 if (antiGrav == null || weaponPC == null){
                     return;
@@ -45,27 +45,44 @@ public class AntiGravSystem extends EntitySystem {
                 continue;
             }
 
-            if (antiGrav.directionUp){
-                antiGrav.deltaY += antiGrav.speed * dt;
-                if (antiGrav.deltaY > antiGrav.maxY){
-                    antiGrav.directionUp = false;
-                }
-            } else {
-                antiGrav.deltaY -= antiGrav.speed * dt;
-                if (antiGrav.deltaY < -antiGrav.maxY){
-                    antiGrav.directionUp = true;
-                }
-            }
+            apply(antiGrav, dt);
 
             PhysicsComponent pc = player.get(Mappers.physicsM);
             if (pc != null){
-                pc.body.applyForceToCenter(Utils.vec1.set(0, (9.8f * antiGrav.mass) + antiGrav.deltaY), true);
+                pc.body.applyForceToCenter(Utils.vec1.set(antiGrav.dX, (9.8f * antiGrav.mass) + antiGrav.dY), true);
             }
         }
     }
 
-    @Override
-    public void onRemovedFromEngine(Engine e) {
-        super.onRemovedFromEngine(e);
+
+    void apply(AntiGravComponent antiGrav, float dt){
+        //TODO doesn't work as expected
+        if (antiGrav.directionUp){
+            antiGrav.dY += antiGrav.changeSpeed * dt;
+
+            if (antiGrav.dY > antiGrav.maxY){
+                antiGrav.directionUp = false;
+            }
+        } else {
+            antiGrav.dY -= antiGrav.changeSpeed * dt;
+
+            if (antiGrav.dY < -antiGrav.maxY){
+                antiGrav.directionUp = true;
+            }
+        }
+
+        if (antiGrav.directionRight){
+            antiGrav.dX += antiGrav.changeSpeed * dt;
+
+            if (antiGrav.dX > antiGrav.maxX){
+                antiGrav.directionRight = false;
+            }
+        } else {
+            antiGrav.dX -= antiGrav.changeSpeed * dt;
+
+            if (antiGrav.dX < -antiGrav.maxX){
+                antiGrav.directionRight = true;
+            }
+        }
     }
 }

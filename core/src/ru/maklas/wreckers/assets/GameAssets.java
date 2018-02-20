@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class GameAssets {
 
-    public static final float box2dScale = 20;
+    public static final float box2dScale = 40;
     private static final Vector2 vec = new Vector2();
     public static void rotateBody(@NotNull Body body, float targetX, float targetY){
         float angle = vec.set(body.getPosition()).scl(box2dScale).sub(targetX, targetY).angle();

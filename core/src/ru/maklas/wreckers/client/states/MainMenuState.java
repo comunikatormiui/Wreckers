@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
@@ -24,11 +23,11 @@ import ru.maklas.wreckers.client.ClientGameModel;
 import ru.maklas.wreckers.client.entities.*;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
-import ru.maklas.wreckers.engine.components.WielderPickUpZoneComponent;
-import ru.maklas.wreckers.engine.components.WeaponPickUpComponent;
+import ru.maklas.wreckers.engine.components.GrabZoneComponent;
+import ru.maklas.wreckers.engine.components.PickUpComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
-import ru.maklas.wreckers.engine.events.requests.PlayerPickUpZoneChangeRequest;
+import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 import ru.maklas.wreckers.engine.events.requests.AttachRequest;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.BodyBuilder;
@@ -51,7 +50,7 @@ public class MainMenuState extends State {
     protected void onCreate() {
         Images.load();
 
-        cam = new OrthographicCamera(720, 1280);
+        cam = new OrthographicCamera(1280, 720);
         engine = new Engine();
         world = new World(new Vector2(0, -9.8f), true);
 
@@ -61,7 +60,6 @@ public class MainMenuState extends State {
         engine.add(new RenderingSystem(batch, cam));
         engine.add(new DamageSystem());
         engine.add(new TTLSystem());
-        engine.add(new PlayerSystem());
         engine.add(new AntiGravSystem());
         engine.add(new PickUpSystem());
         engine.add(new MotorSystem());
@@ -118,15 +116,15 @@ public class MainMenuState extends State {
                 Object udA = fixtureA.getUserData();
                 Object udB = fixtureB.getUserData();
 
-                if (udA instanceof WeaponPickUpComponent && udB instanceof WielderPickUpZoneComponent){
-                    final WeaponPickUpComponent wPick = (WeaponPickUpComponent) udA;
-                    final WielderPickUpZoneComponent pPick = (WielderPickUpZoneComponent) udB;
+                if (udA instanceof PickUpComponent && udB instanceof GrabZoneComponent){
+                    final PickUpComponent wPick = (PickUpComponent) udA;
+                    final GrabZoneComponent pPick = (GrabZoneComponent) udB;
                     if (wPick.enabled() && pPick.enabled()){
                         engine.dispatchLater(new AttachRequest((Entity) fixtureB.getBody().getUserData(), pPick, (Entity) fixtureA.getBody().getUserData(), wPick));
                     }
-                } else if (udA instanceof WielderPickUpZoneComponent && udB instanceof WeaponPickUpComponent){
-                    final WeaponPickUpComponent wPick = (WeaponPickUpComponent) udB;
-                    final WielderPickUpZoneComponent pPick = (WielderPickUpZoneComponent) udA;
+                } else if (udA instanceof GrabZoneComponent && udB instanceof PickUpComponent){
+                    final PickUpComponent wPick = (PickUpComponent) udB;
+                    final GrabZoneComponent pPick = (GrabZoneComponent) udA;
                     if (wPick.enabled() && pPick.enabled()){
                         engine.dispatchLater(new AttachRequest((Entity) fixtureA.getBody().getUserData(), pPick, (Entity) fixtureB.getBody().getUserData(), wPick));
                     }
@@ -168,7 +166,7 @@ public class MainMenuState extends State {
         engine.add(platform);
 
 
-        engine.dispatch(new PlayerPickUpZoneChangeRequest(true, opponent));
+        engine.dispatch(new GrabZoneChangeRequest(true, opponent));
     }
 
     private static boolean enableStage = false;
@@ -205,13 +203,13 @@ public class MainMenuState extends State {
             pickUpButton.addListener(new ClickListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    engine.dispatch(new PlayerPickUpZoneChangeRequest(true, model.getPlayer()));
+                    engine.dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
                     return true;
                 }
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                    engine.dispatch(new PlayerPickUpZoneChangeRequest(false, model.getPlayer()));
+                    engine.dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
                 }
             });
         }
@@ -241,7 +239,7 @@ public class MainMenuState extends State {
             @Override
             public boolean keyDown(int keycode) {
                 if (Input.Keys.P == keycode) {
-                    engine.dispatch(new PlayerPickUpZoneChangeRequest(true, model.getPlayer()));
+                    engine.dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
                 } else if (Input.Keys.O == keycode) {
                     engine.dispatch(new DetachRequest(model.getPlayer(), DetachRequest.Type.FIRST, null));
                 }
@@ -251,7 +249,7 @@ public class MainMenuState extends State {
             @Override
             public boolean keyUp(int keycode) {
                 if (Input.Keys.P == keycode) {
-                    engine.dispatch(new PlayerPickUpZoneChangeRequest(false, model.getPlayer()));
+                    engine.dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
                 }
                 return true;
             }

@@ -13,10 +13,7 @@ import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.client.entities.EntityArrow;
-import ru.maklas.wreckers.engine.Mappers;
-import ru.maklas.wreckers.engine.components.WeaponPickUpComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
-import ru.maklas.wreckers.engine.events.requests.AttachRequest;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.libs.Utils;
 

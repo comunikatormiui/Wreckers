@@ -2,12 +2,12 @@ package ru.maklas.wreckers.engine.events.requests;
 
 import ru.maklas.mengine.Entity;
 
-public class PlayerPickUpZoneChangeRequest {
+public class GrabZoneChangeRequest {
 
     private boolean enable;
     private Entity entity;
 
-    public PlayerPickUpZoneChangeRequest(boolean enable, Entity entity) {
+    public GrabZoneChangeRequest(boolean enable, Entity entity) {
         this.enable = enable;
         this.entity = entity;
     }

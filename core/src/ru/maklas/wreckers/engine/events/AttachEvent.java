@@ -3,26 +3,26 @@ package ru.maklas.wreckers.engine.events;
 import ru.maklas.mengine.Entity;
 
 /**
- * Ивент об удачной смене состояния оружия (Прикрепилось / Открепилось)
+ * РРІРµРЅС‚ РѕР± СѓРґР°С‡РЅРѕР№ СЃРјРµРЅРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕСЂСѓР¶РёСЏ (РџСЂРёРєСЂРµРїРёР»РѕСЃСЊ / РћС‚РєСЂРµРїРёР»РѕСЃСЊ)
  */
 public class AttachEvent {
 
-    private Entity wielder;
-    private Entity weapon;
+    private Entity owner;
+    private Entity attachable;
     private boolean attached;
 
-    public AttachEvent(Entity wielder, Entity weapon, boolean attached) {
-        this.wielder = wielder;
-        this.weapon = weapon;
+    public AttachEvent(Entity owner, Entity attachable, boolean attached) {
+        this.owner = owner;
+        this.attachable = attachable;
         this.attached = attached;
     }
 
-    public Entity getWielder() {
-        return wielder;
+    public Entity getOwner() {
+        return owner;
     }
 
-    public Entity getWeapon() {
-        return weapon;
+    public Entity getAttachable() {
+        return attachable;
     }
 
     public boolean isAttached() {

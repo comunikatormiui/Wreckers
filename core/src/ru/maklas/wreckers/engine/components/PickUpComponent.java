@@ -9,23 +9,30 @@ import ru.maklas.mengine.Component;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
 
+
 /**
- *  омпонент отвечает за зону в которой можно подн€ть оружие, а так же за текущее соединение с носителем
+ * Component for grabbing this entity.
  */
-public class WeaponPickUpComponent implements Component {
+public class PickUpComponent implements Component {
 
     @Nullable public Fixture fixture;
     public final FixtureDef def;
     public final AttachAction attachAction;
+    /**
+     * If current entity is attached to socket
+     */
     public boolean attached = false;
+    /**
+     * Current owner of the entity
+     */
     @Nullable public Entity wielder;
 
-    public WeaponPickUpComponent(FixtureDef def, AttachAction attachAction) {
+    public PickUpComponent(FixtureDef def, AttachAction attachAction) {
         this.def = def;
         this.attachAction = attachAction;
     }
 
-    public WeaponPickUpComponent(Shape shape, AttachAction attachAction) {
+    public PickUpComponent(Shape shape, AttachAction attachAction) {
         def = new FixtureDef();
         def.shape = shape;
         def.isSensor = true;
@@ -35,8 +42,7 @@ public class WeaponPickUpComponent implements Component {
     }
 
     /**
-     * ќзначает что компонент активен и оружие готово быть подобранным
-     * @return
+     * means that this entity has PickUp fixture enabled, != null and can be grabbed
      */
     public boolean enabled(){
         return fixture != null;
