@@ -13,6 +13,8 @@ import ru.maklas.wreckers.engine.events.AttachEvent;
 import ru.maklas.wreckers.engine.events.requests.AttachRequest;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
+import ru.maklas.wreckers.game.FixtureData;
+import ru.maklas.wreckers.game.FixtureType;
 
 public class PickUpSystem extends EntitySystem implements EntityListener {
 
@@ -42,7 +44,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
                         return;
                     }
                     grabber.fixture = pc.body.createFixture(grabber.def);
-                    grabber.fixture.setUserData(grabber);
+                    grabber.fixture.setUserData(new FixtureData(FixtureType.GRABBER_SENSOR));
                 } else if (!e.state() && grabber.enabled()){
                     PhysicsComponent pc = target.get(Mappers.physicsM);
                     if (pc == null){
@@ -152,7 +154,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
             return;
         }
         pickUpC.fixture = pc.body.createFixture(pickUpC.def);
-        pickUpC.fixture.setUserData(pickUpC);
+        pickUpC.fixture.setUserData(new FixtureData(FixtureType.PICKUP_SENSOR));
     }
 
     private void disablePickUpZone(Entity attachable, PickUpComponent wpu){
@@ -216,8 +218,6 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         return true;
     }
 
-
-
     @Override
     public void entityAdded(Entity entity) {
         // Если было заспавнено оружие без владельца, ему нужно придать зону для подбирания
@@ -229,6 +229,9 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
 
     @Override
     public void entityRemoved(Entity entity) {
-
+        PickUpComponent pickUpC = entity.get(Mappers.pickUpM);
+        if (pickUpC != null && pickUpC.isAttached){
+            world.destroyJoint(pickUpC.joint);
+        }
     }
 }

@@ -8,18 +8,18 @@ import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
 import ru.maklas.wreckers.client.ClientGameModel;
-import ru.maklas.wreckers.engine.components.AttachAction;
-import ru.maklas.wreckers.engine.components.PhysicsComponent;
-import ru.maklas.wreckers.engine.components.WSocket;
-import ru.maklas.wreckers.engine.components.PickUpComponent;
+import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
+import ru.maklas.wreckers.game.FixtureData;
+import ru.maklas.wreckers.game.FixtureType;
 
 public class EntitySword extends WeaponEntity implements AttachAction {
 
     Body body;
     World world;
     PickUpComponent pickUpC;
+    Joint lastJoint;
 
     public EntitySword(int id, float x, float y, int zOrder, ClientGameModel model) {
         super(id, x, y, zOrder, model);
@@ -80,8 +80,8 @@ public class EntitySword extends WeaponEntity implements AttachAction {
                 .pos(x, y)
                 .type(BodyDef.BodyType.DynamicBody)
                 .linearDamp(0.1f)
-                .addFixture(handle)
-                .addFixture(blade)
+                .addFixture(handle, new FixtureData(FixtureType.WEAPON_NO_DAMAGE))
+                .addFixture(blade, new FixtureData(FixtureType.WEAPON_DAMAGE))
                 .angularDamp(0.1f)
                 .build();
 
@@ -96,6 +96,7 @@ public class EntitySword extends WeaponEntity implements AttachAction {
         add(new RenderComponent(unit));
         pickUpC = new PickUpComponent(model.getShaper().buildCircle(400 * scale, 178 * scale, 35), this);
         add(pickUpC);
+        add(new WeaponComponent(1, 10));
     }
 
     @Override

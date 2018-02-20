@@ -39,7 +39,7 @@ public class EntityNumber extends Entity {
         float dtX = 0;
 
         RenderComponent rc = new RenderComponent();
-        rc.color = Color.RED;
+        rc.color = Color.GREEN;
 
         for (int item : digits.items) {
             TextureRegion n = numbers[item];

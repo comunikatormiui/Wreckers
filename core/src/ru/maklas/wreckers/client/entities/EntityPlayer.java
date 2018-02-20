@@ -4,10 +4,19 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import ru.maklas.mengine.Engine;
+import ru.maklas.mengine.Subscription;
+import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
+import ru.maklas.wreckers.assets.Subscriptions;
 import ru.maklas.wreckers.client.ClientGameModel;
+import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.*;
+import ru.maklas.wreckers.engine.events.DamageEvent;
+import ru.maklas.wreckers.engine.events.DeathEvent;
+import ru.maklas.wreckers.game.FixtureData;
+import ru.maklas.wreckers.game.FixtureType;
 
 public class EntityPlayer extends GameEntity {
 
@@ -37,7 +46,7 @@ public class EntityPlayer extends GameEntity {
                 .pos(x, y)
                 .type(BodyDef.BodyType.DynamicBody)
                 .linearDamp(1f)
-                .addFixture(bodyF)
+                .addFixture(bodyF, new FixtureData(FixtureType.WRECKER_BODY))
                 .build();
 
         System.out.println(id + ": Player mass " + body.getMassData().mass);
@@ -48,5 +57,27 @@ public class EntityPlayer extends GameEntity {
         add(new AntiGravComponent(body.getMassData().mass,5, 5, 1.2f));
         add(new SocketComponent(1, EntityType.weaponTypeFor(eType)));
         add(new GrabZoneComponent(model.getShaper().buildCircle(0, 0, pickUpRadius)));
+    }
+
+    @Override
+    protected void addedToEngine(final Engine engine) {
+        subscribe(new Subscription<DeathEvent>(DeathEvent.class) {
+            @Override
+            public void receive(Signal<DeathEvent> signal, DeathEvent deathEvent) {
+                if (deathEvent.getTarget() == EntityPlayer.this){
+                    engine.remove(EntityPlayer.this);
+                    System.out.println("Died");
+                }
+            }
+        });
+
+        subscribe(new Subscription<DamageEvent>(DamageEvent.class) {
+            @Override
+            public void receive(Signal<DamageEvent> signal, DamageEvent damageEvent) {
+                if (damageEvent.getTarget() == EntityPlayer.this){
+                    System.out.println("Health left: " + get(Mappers.healthM).health);
+                }
+            }
+        });
     }
 }

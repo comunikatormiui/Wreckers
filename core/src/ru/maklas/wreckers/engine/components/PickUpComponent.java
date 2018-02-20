@@ -14,7 +14,7 @@ public class PickUpComponent implements Component {
 
 
     public final FixtureDef def; // definition для зоны подбирания
-    @Nullable public Fixture fixture; // зона подбирания предмета. Если != null, то она активна в данный момент
+    @Nullable public Fixture fixture; // зона подбирания предмета. Если != null, то она активна в данный момент. Из fixture можно достать этот компонент
 
     public boolean isAttached = false; // Присоеденён ли в данный момент. если True, то верно: owner != null && joint != null
     public final AttachAction attachAction; // Действие для прикрепления

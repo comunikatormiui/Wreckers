@@ -30,9 +30,7 @@ import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 import ru.maklas.wreckers.engine.events.requests.AttachRequest;
 import ru.maklas.wreckers.engine.systems.*;
-import ru.maklas.wreckers.game.BodyBuilder;
-import ru.maklas.wreckers.game.FDefBuilder;
-import ru.maklas.wreckers.game.ShapeBuilder;
+import ru.maklas.wreckers.game.*;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
 
@@ -58,6 +56,7 @@ public class MainMenuState extends State {
 
         engine.add(new PhysicsSystem(world));
         engine.add(new RenderingSystem(batch, cam));
+        engine.add(new CollisionSystem());
         engine.add(new DamageSystem());
         engine.add(new TTLSystem());
         engine.add(new AntiGravSystem());
@@ -102,31 +101,35 @@ public class MainMenuState extends State {
                     CollisionEvent event = new CollisionEvent(a, b, contact, impulse, true);
                     engine.dispatch(event);
                 }
-
-
-                float v = impulse.getNormalImpulses()[0];
-                if (v > 2){
-                    WorldManifold worldManifold = contact.getWorldManifold();
-                    engine.add(new EntityNumber(-(int) v, 1, worldManifold.getPoints()[0].x * GameAssets.box2dScale, worldManifold.getPoints()[0].y * GameAssets.box2dScale));
-                    System.out.println(-(int) v);
-                }
             }
 
             private void handleBothSensors(Contact contact, final Fixture fixtureA, final Fixture fixtureB) {
-                Object udA = fixtureA.getUserData();
-                Object udB = fixtureB.getUserData();
+                FixtureData udA;
+                FixtureData udB;
+                Entity eA = (Entity) fixtureA.getBody().getUserData();
+                Entity eB = (Entity) fixtureB.getBody().getUserData();
+                try {
+                    udA = (FixtureData) fixtureA.getUserData();
+                    udB = (FixtureData) fixtureB.getUserData();
+                } catch (Exception e) {
+                    System.err.println(eA + " OR " + eB + " have no fixture data on some of their fixtures");
+                    e.printStackTrace();
+                    return;
+                }
+                FixtureType type1 = udA.getFixtureType();
+                FixtureType type2 = udB.getFixtureType();
 
-                if (udA instanceof PickUpComponent && udB instanceof GrabZoneComponent){
-                    final PickUpComponent wPick = (PickUpComponent) udA;
-                    final GrabZoneComponent pPick = (GrabZoneComponent) udB;
+                if (type1 == FixtureType.PICKUP_SENSOR && type2 == FixtureType.GRABBER_SENSOR){
+                    final PickUpComponent wPick = eA.get(Mappers.pickUpM);
+                    final GrabZoneComponent pPick = eB.get(Mappers.grabM);
                     if (wPick.pickUpZoneEnabled() && pPick.enabled()){
-                        engine.dispatchLater(new AttachRequest((Entity) fixtureB.getBody().getUserData(), pPick, (Entity) fixtureA.getBody().getUserData(), wPick));
+                        engine.dispatchLater(new AttachRequest(eB, pPick, eA, wPick));
                     }
-                } else if (udA instanceof GrabZoneComponent && udB instanceof PickUpComponent){
-                    final PickUpComponent wPick = (PickUpComponent) udB;
-                    final GrabZoneComponent pPick = (GrabZoneComponent) udA;
+                } else if (type1 == FixtureType.GRABBER_SENSOR && type2 == FixtureType.PICKUP_SENSOR){
+                    final PickUpComponent wPick = eB.get(Mappers.pickUpM);
+                    final GrabZoneComponent pPick = eA.get(Mappers.grabM);
                     if (wPick.pickUpZoneEnabled() && pPick.enabled()){
-                        engine.dispatchLater(new AttachRequest((Entity) fixtureA.getBody().getUserData(), pPick, (Entity) fixtureB.getBody().getUserData(), wPick));
+                        engine.dispatchLater(new AttachRequest(eA, pPick, eB, wPick));
                     }
                 }
             }
@@ -142,14 +145,14 @@ public class MainMenuState extends State {
                         .density(10)
                         .bounciness(0.2f)
                         .mask(EntityType.OBSTACLE)
-                        .build())
+                        .build(), new FixtureData(FixtureType.OBSTACLE))
                 .pos(-360, 200)
                 .type(BodyDef.BodyType.StaticBody)
                 .linearDamp(0)
                 .build();
 
         final Entity player = new EntityPlayer(1, 0, 500, 100, model, EntityType.PLAYER);
-        final EntityPlayer opponent = new EntityPlayer(2, 200, 500, 100, model, EntityType.OPPONENT);
+        final EntityPlayer opponent = new EntityPlayer(2, 200, 500, 10, model, EntityType.OPPONENT);
         final EntitySword sword = new EntitySword(3, -200, 700, 10, model);
         final EntitySword sword2 = new EntitySword(4, 0, 300, 10, model);
         final EntityHammer hammer = new EntityHammer(5, -200, 300, 10, model);

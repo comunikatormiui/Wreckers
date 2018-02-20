@@ -1,10 +1,7 @@
 package ru.maklas.wreckers.game;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 
 public class BodyBuilder {
@@ -12,6 +9,7 @@ public class BodyBuilder {
     private World world;
     private BodyDef bDef = new BodyDef();
     private Array<FixtureDef> fixDefs = new Array<FixtureDef>();
+    private Array<FixtureData> datas = new Array<FixtureData>();
     private boolean building = false;
     private float scale;
 
@@ -35,7 +33,12 @@ public class BodyBuilder {
     }
 
     public BodyBuilder addFixture(FixtureDef fDef){
+        return addFixture(fDef, null);
+    }
+
+    public BodyBuilder addFixture(FixtureDef fDef, FixtureData data){
         fixDefs.add(fDef);
+        datas.add(data);
         return this;
     }
 
@@ -46,8 +49,10 @@ public class BodyBuilder {
         building = false;
 
         Body body = world.createBody(bDef);
-        for (FixtureDef fixDef : fixDefs) {
-            body.createFixture(fixDef);
+        int size = fixDefs.size;
+        for (int i = 0; i < size; i++) {
+            Fixture fixture = body.createFixture(fixDefs.get(i));
+            fixture.setUserData(datas.get(i));
         }
 
         return body;
@@ -130,6 +135,7 @@ public class BodyBuilder {
         bDef.linearDamping = 0;
 
         fixDefs.clear();
+        datas.clear();
     }
 
 }

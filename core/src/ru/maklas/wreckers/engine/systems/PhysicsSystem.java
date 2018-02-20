@@ -2,7 +2,10 @@ package ru.maklas.wreckers.engine.systems;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import ru.maklas.mengine.ComponentMapper;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
@@ -57,6 +60,16 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
         PhysicsComponent cc = entity.get(Mappers.physicsM);
         if (cc != null) {
             cc.body.setUserData(entity);
+            validateFixtureData(entity, cc.body);
+        }
+    }
+
+    private void validateFixtureData(Entity entity, Body body){
+        Array<Fixture> fixtureList = body.getFixtureList();
+        for (Fixture fixture : fixtureList) {
+            if (fixture.getUserData() == null){
+                throw new RuntimeException(entity.getClass().getSimpleName() + " -- " + entity.toString() + " has fixtures without user data!");
+            }
         }
     }
 

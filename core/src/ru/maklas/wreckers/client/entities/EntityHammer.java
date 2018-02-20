@@ -8,12 +8,11 @@ import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
 import ru.maklas.wreckers.client.ClientGameModel;
-import ru.maklas.wreckers.engine.components.AttachAction;
-import ru.maklas.wreckers.engine.components.PhysicsComponent;
-import ru.maklas.wreckers.engine.components.WSocket;
-import ru.maklas.wreckers.engine.components.PickUpComponent;
+import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
+import ru.maklas.wreckers.game.FixtureData;
+import ru.maklas.wreckers.game.FixtureType;
 
 public class EntityHammer extends WeaponEntity implements AttachAction {
 
@@ -27,8 +26,8 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
         final float scale = 0.13f;
         final EntityType eType = EntityType.NEUTRAL_WEAPON;
 
-        PolygonShape polygonShape = new PolygonShape();
-        PolygonShape polygonShape1 = new PolygonShape();
+        PolygonShape handle = new PolygonShape();
+        PolygonShape sharp = new PolygonShape();
 
         Vector2[] pointsHandle = new Vector2[]{
                 new Vector2(8, 245),
@@ -55,37 +54,31 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
             point.scl(scale / (GameAssets.box2dScale));
         }
 
-        polygonShape.set(pointsHandle);
-        polygonShape1.set(pointsBody);
+        handle.set(pointsHandle);
+        sharp.set(pointsBody);
 
         FixtureDef fix = model.getFixturer().newFixture()
                 .bounciness(0.1f)
                 .mask(eType)
                 .friction(1f)
-                .shape(polygonShape)
+                .shape(handle)
                 .density(8.770995f) //0.60928726
                 .build();
 
         FixtureDef fix2 = model.getFixturer().newFixture()
                 .mask(eType)
-                .shape(polygonShape1)
+                .shape(sharp)
                 .friction(0.2f)
                 .bounciness(0.1f)
                 .density(8.770995f) //1.6709557
                 .build();
 
-        final float f1 = 0.60928726f;
-        final float f2 = 1.6709557f;
-        final float sum = f1 + f2;
-        final float targetMass = 20;
-        final float density = 8.770995f;
-
         body = model.getBuilder().newBody()
                 .pos(x, y)
                 .type(BodyDef.BodyType.DynamicBody)
                 .linearDamp(0.1f)
-                .addFixture(fix)
-                .addFixture(fix2)
+                .addFixture(fix, new FixtureData(FixtureType.WEAPON_NO_DAMAGE))
+                .addFixture(fix2, new FixtureData(FixtureType.WEAPON_DAMAGE))
                 .angularDamp(0.1f)
                 .build();
 
@@ -100,6 +93,7 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
         add(new RenderComponent(unit));
         pickUpC = new PickUpComponent(model.getShaper().buildCircle(8 * scale, 287 * scale, 35), this);
         add(pickUpC);
+        add(new WeaponComponent(1, 100));
     }
 
     @Override
