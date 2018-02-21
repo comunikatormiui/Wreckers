@@ -19,6 +19,8 @@ import ru.maklas.wreckers.engine.components.PickUpComponent;
 import ru.maklas.wreckers.engine.components.WeaponComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
 import ru.maklas.wreckers.engine.events.DamageType;
+import ru.maklas.wreckers.engine.events.damage.DamageData;
+import ru.maklas.wreckers.engine.events.damage.WeaponHitDamageData;
 import ru.maklas.wreckers.engine.events.requests.DamageRequest;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.game.FixtureData;
@@ -100,7 +102,8 @@ public class CollisionSystem extends EntitySystem{
             getEngine().add(new EntityNumber((int) damageGenerated, 2, collisionPoint.x, collisionPoint.y));
             System.out.println("Damage dealt to" + player + ": " + damageGenerated);
             final Vector2 force = new Vector2(normal).scl(playerBody.getMass() * wc.additionalPush); // Сила отталкивания
-            getEngine().dispatchLater(new DamageRequest(DamageType.HIT, damageGenerated, player, weaponOwner, weapon));
+            DamageData damageData = new WeaponHitDamageData(player, damageGenerated, weapon, weaponOwner, new Vector2(point).scl(GameAssets.box2dScale), new Vector2(normal));
+            getEngine().dispatchLater(new DamageRequest(damageData));
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {

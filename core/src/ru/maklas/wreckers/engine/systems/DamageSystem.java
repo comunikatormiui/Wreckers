@@ -25,7 +25,7 @@ public class DamageSystem extends EntitySystem {
                 }
 
                 hc.health -= damageRequest.getDamage();
-                engine.dispatch(new DamageEvent(damageRequest.getType(), damageRequest.getDamage(), target, damageRequest.getDamageDealer(), damageRequest.getWeapon()));
+                engine.dispatch(new DamageEvent(damageRequest.getData()));
                 if (hc.health < 0){
                     hc.health = 0;
                     hc.dead = true;

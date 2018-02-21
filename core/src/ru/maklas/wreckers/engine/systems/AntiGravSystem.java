@@ -1,5 +1,6 @@
 package ru.maklas.wreckers.engine.systems;
 
+import com.badlogic.gdx.math.Vector2;
 import ru.maklas.mengine.*;
 import ru.maklas.mengine.utils.ImmutableArray;
 import ru.maklas.mengine.utils.Signal;
@@ -41,22 +42,25 @@ public class AntiGravSystem extends EntitySystem {
     public void update(float dt) {
         for (Entity player : entities) {
             AntiGravComponent antiGrav = player.get(Mappers.antiGravM);
-            if (!antiGrav.enabled){
+            if (!antiGrav.antiGravEnabled){
                 continue;
             }
 
-            apply(antiGrav, dt);
-
             PhysicsComponent pc = player.get(Mappers.physicsM);
             if (pc != null){
-                pc.body.applyForceToCenter(Utils.vec1.set(antiGrav.dX, (9.8f * antiGrav.mass) + antiGrav.dY), true);
+                Vector2 force = Utils.vec1;
+                force.set(0, 9.8f * antiGrav.mass);
+                if (antiGrav.randomMovementEnabled){
+                    changeDeltas(antiGrav, dt);
+                    force.add(antiGrav.dX, antiGrav.dY);
+                }
+                pc.body.applyForceToCenter(force, true);
             }
         }
     }
 
 
-    void apply(AntiGravComponent antiGrav, float dt){
-        //TODO doesn't work as expected
+    void changeDeltas(AntiGravComponent antiGrav, float dt){
         if (antiGrav.directionUp){
             antiGrav.dY += antiGrav.changeSpeed * dt;
 
