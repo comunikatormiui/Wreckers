@@ -20,6 +20,7 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
 
     private final World world;
     private ImmutableArray<Entity> entities;
+    private Array<PhysicsComponent> toDestroy = new Array<PhysicsComponent>();
 
     public PhysicsSystem(World world) {
         this.world = world;
@@ -40,6 +41,8 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
         World world = this.world;
         float scale = GameAssets.box2dScale;
 
+        destroyPendings();
+
         world.step(0.016666667f, 6, 2);
 
         ComponentMapper<PhysicsComponent> collisionM = Mappers.physicsM;
@@ -53,6 +56,15 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
 
         }
 
+    }
+
+    private void destroyPendings() {
+        for (PhysicsComponent pc : toDestroy) {
+            world.destroyBody(pc.body);
+            pc.body = null;
+        }
+
+        toDestroy.clear();
     }
 
     @Override
@@ -77,7 +89,7 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
     public void entityRemoved(Entity entity) {
         PhysicsComponent cc = entity.get(Mappers.physicsM);
         if (cc != null) {
-            world.destroyBody(cc.body);
+            toDestroy.add(cc);
         }
     }
 }

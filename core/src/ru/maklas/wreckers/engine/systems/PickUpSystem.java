@@ -1,5 +1,6 @@
 package ru.maklas.wreckers.engine.systems;
 
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.World;
@@ -57,22 +58,22 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         });
 
         // После того как оружие было установленно или наоборот изъято, нужно включить у оружия ранжу для подбирания
-        subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
-            @Override
-            public void receive(Signal<AttachEvent> signal, AttachEvent e) {
-                Entity attachable = e.getAttachable();
-                PickUpComponent pickUpC = attachable.get(Mappers.pickUpM);
-                if (pickUpC == null){
-                    return;
-                }
+        //subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
+        //    @Override
+        //    public void receive(Signal<AttachEvent> signal, AttachEvent e) {
+        //        Entity attachable = e.getAttachable();
+        //        PickUpComponent pickUpC = attachable.get(Mappers.pickUpM);
+        //        if (pickUpC == null){
+        //            return;
+        //        }
 
-                if (e.isAttached()){
-                    disablePickUpZone(attachable, pickUpC);
-                } else {
-                    enablePickUpZone(attachable, pickUpC);
-                }
-            }
-        });
+        //        if (e.isAttached()){
+        //            destroyPickUpZone(attachable, pickUpC);
+        //        } else {
+        //            createPickUpZone(attachable, pickUpC);
+        //        }
+        //    }
+        //});
 
         // Attach request. Тут мы проверяем есть ли сокет, можно ли в целом прикрепить. Если да, то диспатчим success
         subscribe(new Subscription<AttachRequest>(AttachRequest.class) {
@@ -148,16 +149,17 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         super.update(dt);
     }
 
-    private void enablePickUpZone(Entity attachable, PickUpComponent pickUpC) {
+    private void createPickUpZone(Entity attachable, PickUpComponent pickUpC) {
         PhysicsComponent pc = attachable.get(Mappers.physicsM);
         if (pc == null){
             return;
         }
-        pickUpC.fixture = pc.body.createFixture(pickUpC.def);
-        pickUpC.fixture.setUserData(new FixtureData(FixtureType.PICKUP_SENSOR));
+        Fixture fixture = pc.body.createFixture(pickUpC.def);
+        fixture.setUserData(new FixtureData(FixtureType.PICKUP_SENSOR));
+        pickUpC.fixture = fixture;
     }
 
-    private void disablePickUpZone(Entity attachable, PickUpComponent wpu){
+    private void destroyPickUpZone(Entity attachable, PickUpComponent wpu){
         PhysicsComponent pc = attachable.get(Mappers.physicsM);
         if (pc == null){
             return;
@@ -204,7 +206,11 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
             return false;
         }
 
-        world.destroyJoint(pickUpC.joint);
+        Joint joint = pickUpC.joint;
+        // Joint мог уже быть уничтожен к времени этого ивента, из-за уничтожения тела
+        if (joint.getBodyA() != null && joint.getBodyB() != null){
+            world.destroyJoint(joint);
+        }
         pickUpC.isAttached = false;
         pickUpC.owner = null;
         pickUpC.joint = null;
@@ -212,7 +218,9 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         socket.attachedEntity = null;
         socket.joint = null;
 
-        GameAssets.setFilterData(attachablePC.body, false, EntityType.NEUTRAL_WEAPON); //TODO Больше не оружие. Фиксим
+        if (attachablePC.body != null) { //Тело уже могло быть уничтожено
+            GameAssets.setFilterData(attachablePC.body, false, EntityType.NEUTRAL_WEAPON); //TODO Больше не оружие. Фиксим
+        }
         attachable.type = EntityType.NEUTRAL_WEAPON.type;
 
         return true;
@@ -223,7 +231,7 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         // Если было заспавнено оружие без владельца, ему нужно придать зону для подбирания
         PickUpComponent pickUpC = entity.get(Mappers.pickUpM);
         if (pickUpC != null && !pickUpC.isAttached && !pickUpC.pickUpZoneEnabled()){
-            enablePickUpZone(entity, pickUpC);
+            createPickUpZone(entity, pickUpC);
         }
     }
 
@@ -231,7 +239,35 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
     public void entityRemoved(Entity entity) {
         PickUpComponent pickUpC = entity.get(Mappers.pickUpM);
         if (pickUpC != null && pickUpC.isAttached){
-            world.destroyJoint(pickUpC.joint);
+            PhysicsComponent pc = entity.get(Mappers.physicsM);
+            Entity owner = pickUpC.owner;
+            SocketComponent sc = owner.get(Mappers.socketM);
+            if (pc != null && sc != null) {
+                boolean success = detachLogic(entity, pc, pickUpC, sc);
+                if (success){
+                    getEngine().dispatch(new AttachEvent(owner, entity, false));
+                }
+            }
         }
+
+        SocketComponent sc = entity.get(Mappers.socketM);
+        if (sc != null) {
+            for (WSocket socket : sc.sockets) {
+                if (!socket.isEmpty()) {
+
+                    Entity attached = socket.attachedEntity;
+
+                    PhysicsComponent attachablePC = attached.get(Mappers.physicsM);
+                    PickUpComponent attachedPickUp = attached.get(Mappers.pickUpM);
+                    if (attachablePC != null && attachedPickUp != null) {
+                        boolean success = detachLogic(attached, attachablePC, attachedPickUp, sc);
+                        if (success){
+                            getEngine().dispatch(new AttachEvent(entity, attached, false));
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

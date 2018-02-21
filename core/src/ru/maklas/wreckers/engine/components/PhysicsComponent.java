@@ -7,7 +7,7 @@ import ru.maklas.wreckers.engine.events.CollisionEvent;
 
 public class PhysicsComponent implements Component{
 
-    public final Body body;
+    public Body body;
 
     public PhysicsComponent(Body body) {
         this.body = body;

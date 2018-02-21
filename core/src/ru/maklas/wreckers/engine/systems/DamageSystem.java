@@ -29,7 +29,7 @@ public class DamageSystem extends EntitySystem {
                 if (hc.health < 0){
                     hc.health = 0;
                     hc.dead = true;
-                    engine.dispatch(new DeathEvent(target, damageRequest.getType(), damageRequest.getDamageDealer()));
+                    engine.dispatchLater(new DeathEvent(target, damageRequest.getType(), damageRequest.getDamageDealer()));
                 }
 
             }

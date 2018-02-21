@@ -58,7 +58,8 @@ public class CollisionSystem extends EntitySystem{
         });
     }
 
-    private void handleWeaponToWeapon(Entity weaponA, EntityType typeA, Entity weaponB, EntityType typeB, Contact contact, ContactImpulse impulse){
+    // Контакт нельзя передавать далее
+    private void handleWeaponToWeapon(final Entity weaponA, EntityType typeA, Entity weaponB, EntityType typeB, Contact contact, ContactImpulse impulse){
         float impulseForce = impulse.getNormalImpulses()[0];
         if (impulseForce > 100){
             getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponA));
@@ -66,6 +67,7 @@ public class CollisionSystem extends EntitySystem{
         }
     }
 
+    // Контакт нельзя передавать далее
     private void handleWeaponToPlayer(final Entity weapon, EntityType weaponType, final Entity player, EntityType playerType, Contact contact, ContactImpulse impulse, boolean weaponIsA){
         final float minimumImpulse = 100;
         float impulseForce = impulse.getNormalImpulses()[0];
@@ -115,6 +117,7 @@ public class CollisionSystem extends EntitySystem{
 
     }
 
+    // Контакт нельзя передавать далее
     private void handlePlayerToPlayer(Entity playerA, EntityType typeA, Entity playerB, EntityType typeB, Contact contact, ContactImpulse impulse){
 
     }

@@ -31,7 +31,7 @@ public class GameAssets {
     public static void setFilterData(@NotNull Body body, boolean includingSensors, EntityType type) {
         Array<Fixture> fixtureList = body.getFixtureList();
         for (Fixture fixture : fixtureList) {
-            if (fixture.isSensor() && includingSensors) {
+            if (fixture.isSensor() && !includingSensors) {
                 continue;
             }
             Filter filterData = fixture.getFilterData();

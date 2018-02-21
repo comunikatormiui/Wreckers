@@ -21,7 +21,7 @@ public class AntiGravSystem extends EntitySystem {
         subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
             @Override
             public void receive(Signal<AttachEvent> signal, AttachEvent e) {
-                AntiGravComponent antiGrav = Mappers.antiGravM.get(e.getOwner());
+                AntiGravComponent antiGrav = e.getOwner().get(Mappers.antiGravM);
                 ComponentMapper<PhysicsComponent> physicsM = Mappers.physicsM;
                 PhysicsComponent weaponPC = e.getAttachable().get(physicsM);
 
