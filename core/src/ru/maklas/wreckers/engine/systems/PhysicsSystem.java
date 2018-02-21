@@ -63,7 +63,6 @@ public class PhysicsSystem extends CollisionEntitySystem implements EntityListen
             world.destroyBody(pc.body);
             pc.body = null;
         }
-
         toDestroy.clear();
     }
 

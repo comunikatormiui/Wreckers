@@ -8,16 +8,16 @@ import ru.maklas.wreckers.assets.EntityType;
 public class SocketComponent implements Component{
 
     public final WSocket[] sockets;
-    public final EntityType weaponType;
+    public final EntityType attachedEntityType;
 
-    public SocketComponent(WSocket[] sockets, EntityType weaponType) {
+    public SocketComponent(WSocket[] sockets, EntityType attachedEntityType) {
         this.sockets = sockets;
-        this.weaponType = weaponType;
+        this.attachedEntityType = attachedEntityType;
     }
 
-    public SocketComponent(int sockets, EntityType weaponType) {
+    public SocketComponent(int sockets, EntityType attachedEntityType) {
         this.sockets = new WSocket[sockets];
-        this.weaponType = weaponType;
+        this.attachedEntityType = attachedEntityType;
         for (int i = 0; i < sockets; i++) {
             this.sockets[i] = new WSocket();
         }

@@ -96,7 +96,7 @@ public class EntitySword extends WeaponEntity implements AttachAction {
         add(new RenderComponent(unit));
         pickUpC = new PickUpComponent(model.getShaper().buildCircle(400 * scale, 178 * scale, 35), this);
         add(pickUpC);
-        add(new WeaponComponent(1, 10));
+        add(new WeaponComponent(0.2f, 1, 1, 1, 1));
     }
 
     @Override

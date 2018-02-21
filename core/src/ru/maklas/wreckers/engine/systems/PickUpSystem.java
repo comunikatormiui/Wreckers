@@ -191,8 +191,8 @@ public class PickUpSystem extends EntitySystem implements EntityListener {
         wSocket.attachedEntity = attachable;
         wSocket.joint = joint;
 
-        GameAssets.setFilterData(attachablePC.body, false, ownerSocketC.weaponType); //TODO Больше не оружие. Фиксим
-        attachable.type = ownerSocketC.weaponType.type;
+        GameAssets.setFilterData(attachablePC.body, false, ownerSocketC.attachedEntityType); //TODO Больше не оружие. Фиксим
+        attachable.type = ownerSocketC.attachedEntityType.type;
         return true;
     }
 

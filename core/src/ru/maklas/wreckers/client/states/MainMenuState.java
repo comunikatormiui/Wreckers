@@ -90,7 +90,7 @@ public class MainMenuState extends State {
 
             @Override
             public void preSolve(Contact contact, Manifold oldManifold) {
-
+                //TODO postSolve -> endContact
             }
 
             @Override
@@ -140,8 +140,8 @@ public class MainMenuState extends State {
         Body platformBody = model.getBuilder()
                 .newBody()
                 .addFixture(model.getFixturer().newFixture()
-                        .shape(model.getShaper().buildRectangle(0, 0, 720, 100))
-                        .friction(0)
+                        .shape(model.getShaper().buildRectangle(0, 0, 2000, 100))
+                        .friction(0.1f)
                         .density(10)
                         .bounciness(0.2f)
                         .mask(EntityType.OBSTACLE)
@@ -151,8 +151,8 @@ public class MainMenuState extends State {
                 .linearDamp(0)
                 .build();
 
-        final Entity player = new EntityPlayer(1, 0, 500, 100, model, EntityType.PLAYER);
-        final EntityPlayer opponent = new EntityPlayer(2, 200, 500, 10, model, EntityType.OPPONENT);
+        final Entity player         = new EntityPlayer(1, 0,   500, 10000, model, EntityType.PLAYER);
+        final EntityPlayer opponent = new EntityPlayer(2, 200, 500, 10000, model, EntityType.OPPONENT);
         final EntitySword sword = new EntitySword(3, -200, 700, 10, model);
         final EntitySword sword2 = new EntitySword(4, 0, 300, 10, model);
         final EntityHammer hammer = new EntityHammer(5, -200, 300, 10, model);

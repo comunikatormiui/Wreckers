@@ -24,6 +24,7 @@ public class Mappers {
     public static final ComponentMapper<PickUpComponent>                pickUpM = ComponentMapper.of(PickUpComponent.class);
     public static final ComponentMapper<MotorComponent>                 motorM = ComponentMapper.of(MotorComponent.class);
     public static final ComponentMapper<WeaponComponent>                weaponM = ComponentMapper.of(WeaponComponent.class);
+    public static final ComponentMapper<WreckerComponent>               wreckerM = ComponentMapper.of(WreckerComponent.class);
 
 
     public static void init(){
