@@ -1,5 +1,6 @@
 package ru.maklas.wreckers.engine.systems;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
@@ -7,7 +8,9 @@ import ru.maklas.mengine.EntitySystem;
 import ru.maklas.mengine.Subscription;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.GameAssets;
+import ru.maklas.wreckers.client.entities.EntityArrow;
 import ru.maklas.wreckers.client.entities.EntityNumber;
+import ru.maklas.wreckers.client.entities.EntityString;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.HealthComponent;
 import ru.maklas.wreckers.engine.components.WeaponComponent;
@@ -18,7 +21,14 @@ import ru.maklas.wreckers.engine.events.Event;
 import ru.maklas.wreckers.engine.events.requests.WeaponWreckerHitEvent;
 import ru.maklas.wreckers.libs.Utils;
 
+import java.util.Random;
+
 public class DamageSystem extends EntitySystem {
+
+    private final Vector2 vec1 = new Vector2();
+    private final Vector2 vec2 = new Vector2();
+    private final Random random = new Random();
+
 
     @Override
     public void onAddedToEngine(final Engine engine) {
@@ -34,27 +44,56 @@ public class DamageSystem extends EntitySystem {
                     return;
                 }
 
-                float trueDullDamage = e.getImpulse()  * e.getDullness()  * weapC.dullDamage;
-                float trueSliceDamage = e.getImpulse() * e.getSharpness() * weapC.sliceDamage;
+                //РАСЧЁТ УРОНА
 
-                float dullArmor  = ((100) / (100 + wreckC.dullArmor));
-                float sliceArmor = ((100) / (100 + wreckC.sliceArmor));
+                final float damageAdjustment = e.getWeaponOwner() == null ? 1/1000f : 1/300f; // Оружие без владельца наносит в разы меньше урона
 
-                float dullDamage = trueDullDamage * dullArmor;
-                float sliceDamage = trueSliceDamage * sliceArmor;
+                float trueDullDamage = e.getImpulse()  * e.getDullness()  * weapC.dullDamage * damageAdjustment;
+                float trueSliceDamage = e.getImpulse() * e.getSharpness() * weapC.sliceDamage * damageAdjustment;
+
+                float dullDamage = trueDullDamage * leagueFormula(wreckC.dullArmor);
+                float sliceDamage = trueSliceDamage * leagueFormula(wreckC.sliceArmor);
 
                 float totalDamage = dullDamage + sliceDamage; // конечный Дамаг
-                float additionalImpulse = e.getWreckerBody().getMass() * (e.getImpulse() * ((weapC.hitImpulse - wreckC.stability) / 100) ); // дополнительное отбрасывание. может быть меньше нуля
-                float stunChance = (e.getImpulse() * e.getDullness()) //мощность тупого удара
-                        * (weapC.stunAbility - wreckC.stunResist); // скилл на резист. Может оказаться отрицательным значением
-                System.out.println("DULL HIT FORCE FOR STUN CALC: " + e.getImpulse() * e.getDullness());
 
-                Vector2 box2dPos = Utils.vec1.set(e.getPoint()).scl(1 / GameAssets.box2dScale);
-                Vector2 box2dImpulse = Utils.vec2.set(e.getNormal()).scl(additionalImpulse);
-                e.getWreckerBody().applyForce(box2dImpulse, box2dPos, true);
-                applyDamageAndDispatch(e.getTargetWrecker(), hc, totalDamage, e);
+
+                //РАСЧЁТ ДОП ИМУЛЬСА
+
+                float additionalImpulse = e.getWreckerBody().getMass() * (e.getImpulse() * ((weapC.hitImpulse * leagueFormula(wreckC.stability)) / 100) ); // дополнительное отбрасывание. может быть меньше нуля
+
+
+                //РАССЧЁТ СТАНА
+
+                float dullHitForce = ((e.getImpulse() * e.getDullness()) / 500);
+                dullHitForce = dullHitForce > 1 ? 1 : dullHitForce;   // мощность тупого удара. 0..1
+                float stunChance = dullHitForce * (weapC.stunAbility / 100f) //полностью зависит от статы оружия. 1, только если stunAbility == 100
+                        * leagueFormula(wreckC.stunResist); // Добавляем резисты.
+                System.out.println("Stun chance: " + stunChance);
+                boolean doStun = random.nextFloat() < stunChance;
+                float stunDuration = 0;
+                if (doStun){
+                    stunDuration = weapC.stunAbility / 40f; //До 2.5 секунд стана.
+                }
+
+
+
+
+                Vector2 box2dPos = vec1.set(e.getPoint()).scl(1 / GameAssets.box2dScale);
+                Vector2 box2dImpulse = vec2.set(e.getNormal()).scl(additionalImpulse);
+                e.getWreckerBody().applyForce(box2dImpulse, box2dPos, true); //Применяем доп импульс.
+                applyDamageAndDispatch(e.getTargetWrecker(), hc, totalDamage, e);  //Применяем урон
 
                 engine.add(new EntityNumber((int) totalDamage, 2, e.getPoint().x, e.getPoint().y));
+                if (doStun){
+                    engine.add(new EntityString("STUN!", 2, e.getPoint().x, e.getPoint().y + 50, Color.RED));
+                }
+                if (e.getSharpness() > 0.90f){
+                    engine.add(new EntityString("Sharp! " + (int)(e.getSharpness() * 100), 2, e.getPoint().x + (random.nextFloat() * 50 - 25), e.getPoint().y + 25, Color.BLUE));
+                }
+                if (e.getDullness() > 0.90f){
+                    engine.add(new EntityString("Dull! " + (int)(e.getDullness() * 100), 2, e.getPoint().x + (random.nextFloat() * 50 - 25), e.getPoint().y - 25, Color.RED));
+                }
+                engine.add(new EntityArrow(e.getPoint(), e.getNormal().scl(75).add(e.getPoint()), 1, Color.ORANGE));
             }
         });
     }
@@ -68,6 +107,14 @@ public class DamageSystem extends EntitySystem {
             hc.dead = true;
             getEngine().dispatchLater(new DeathEvent(e, hitEvent));
         }
+    }
+
+    /**
+     * Возвращает процент проходимого урона после учёта резистов. Применяется так:
+     * <p>уронСУчётомРезистов = чистыйУрон * leagueFormula(резист);</p>
+     */
+    private float leagueFormula(float resist){
+        return ((100) / (100 + resist));
     }
 
 }

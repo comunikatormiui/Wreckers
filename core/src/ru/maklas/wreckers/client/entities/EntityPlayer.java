@@ -57,7 +57,11 @@ public class EntityPlayer extends GameEntity {
         add(new AntiGravComponent(body.getMassData().mass,5, 5, 1.2f));
         add(new SocketComponent(1, EntityType.weaponTypeFor(eType)));
         add(new GrabZoneComponent(model.getShaper().buildCircle(0, 0, pickUpRadius)));
-        add(new WreckerComponent(200, 0, 0, 0, 0));
+        add(new WreckerComponent(100,
+                80,
+                50,
+                50,
+                50));
     }
 
     @Override
@@ -76,7 +80,7 @@ public class EntityPlayer extends GameEntity {
             @Override
             public void receive(Signal<DamageEvent> signal, DamageEvent damageEvent) {
                 if (damageEvent.getTarget() == EntityPlayer.this){
-                    System.out.println(EntityPlayer.this.toString() + " Health left: " + get(Mappers.healthM).health);
+                    System.out.println(EntityPlayer.this.toString() + " Damage: " + damageEvent.getDamage() + " Health left: " + get(Mappers.healthM).health);
                 }
             }
         });

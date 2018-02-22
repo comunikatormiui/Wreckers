@@ -90,7 +90,7 @@ public class MainMenuState extends State {
 
             @Override
             public void preSolve(Contact contact, Manifold oldManifold) {
-                //TODO postSolve -> endContact
+
             }
 
             @Override

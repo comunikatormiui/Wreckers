@@ -93,7 +93,11 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
         add(new RenderComponent(unit));
         pickUpC = new PickUpComponent(model.getShaper().buildCircle(8 * scale, 287 * scale, 35), this);
         add(pickUpC);
-        add(new WeaponComponent(1, 0.2f, 100, 1, 1));
+        add(new WeaponComponent(45,
+                10,
+                50,
+                55,
+                40));
     }
 
     @Override

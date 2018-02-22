@@ -53,6 +53,9 @@ public class WeaponWreckerHitEvent implements Event {
         return impulse;
     }
 
+    /**
+     * Vector pointing from weapon to the body
+     */
     public Vector2 getNormal() {
         return normal;
     }

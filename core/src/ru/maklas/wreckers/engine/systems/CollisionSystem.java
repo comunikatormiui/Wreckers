@@ -67,15 +67,13 @@ public class CollisionSystem extends EntitySystem{
             return;
         }
 
-
-
         WeaponComponent wc = weapon.get(Mappers.weaponM);
         if (wc == null){
             return;
         }
 
         final WorldManifold worldManifold = contact.getWorldManifold();
-        final Vector2 normal = worldManifold.getNormal();
+        final Vector2 normal = weaponIsA ? worldManifold.getNormal() : worldManifold.getNormal().scl(-1); //Vector from weapon to player
         final Vector2 point = worldManifold.getPoints()[0];
         final Fixture weaponFixture = weaponIsA ? contact.getFixtureA() : contact.getFixtureB();
         final Body weaponBody = weaponFixture.getBody();
@@ -93,10 +91,6 @@ public class CollisionSystem extends EntitySystem{
 
             WeaponWreckerHitEvent event = new WeaponWreckerHitEvent(weapon, weaponOwner, player, new Vector2(point).scl(GameAssets.box2dScale), new Vector2(normal), impulseForce, sharpPercent, dullPercent, weaponBody, playerBody);
             getEngine().dispatchLater(event);
-
-            //final float directDamage = (wc.hitDamage   * (impulseForce / 100)) * dullPercent;  // Рассчитываем прямой урон
-            //final float sharpDamage  = (wc.sliceDamage * (impulseForce / 100)) * sharpPercent;   // Рассчитываем режущий урон
-            //final Vector2 force = new Vector2(normal).scl(playerBody.getMass() * wc.hitImpulse); // Сила дополнительного отталкивания
         }
 
     }
