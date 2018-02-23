@@ -13,23 +13,25 @@ public class WeaponWreckerHitEvent implements Event {
     Entity targetWrecker;
     Vector2 point;
     Vector2 normal;
+    private final Vector2 collisionVelocity;
     float impulse;
     float sharpness;
     float dullness;
-    private final Body weaponMass;
-    private final Body wreckerMass;
+    private final Body weaponBody;
+    private final Body wreckerBody;
 
-    public WeaponWreckerHitEvent(Entity weapon, @Nullable Entity weaponOwner, Entity targetWrecker, Vector2 point, Vector2 normal, float impulse, float sharpness, float dullness, Body weaponMass, Body wreckerMass) {
+    public WeaponWreckerHitEvent(Entity weapon, @Nullable Entity weaponOwner, Entity targetWrecker, Vector2 point, Vector2 normal, Vector2 collisionVelocity, float impulse, float sharpness, float dullness, Body weaponBody, Body wreckerBody) {
         this.weapon = weapon;
         this.weaponOwner = weaponOwner;
         this.targetWrecker = targetWrecker;
         this.point = point;
+        this.collisionVelocity = collisionVelocity;
         this.impulse = impulse;
         this.normal = normal;
         this.sharpness = sharpness;
         this.dullness = dullness;
-        this.weaponMass = weaponMass;
-        this.wreckerMass = wreckerMass;
+        this.weaponBody = weaponBody;
+        this.wreckerBody = wreckerBody;
     }
 
     public Entity getWeapon() {
@@ -54,10 +56,14 @@ public class WeaponWreckerHitEvent implements Event {
     }
 
     /**
-     * Vector pointing from weapon to the body
+     * Vector pointing from body to the weapon
      */
     public Vector2 getNormal() {
         return normal;
+    }
+
+    public Vector2 getCollisionVelocity() {
+        return collisionVelocity;
     }
 
     public float getSharpness() {
@@ -69,10 +75,10 @@ public class WeaponWreckerHitEvent implements Event {
     }
 
     public Body getWeaponBody() {
-        return weaponMass;
+        return weaponBody;
     }
 
     public Body getWreckerBody() {
-        return wreckerMass;
+        return wreckerBody;
     }
 }

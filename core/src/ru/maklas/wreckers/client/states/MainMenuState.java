@@ -33,6 +33,7 @@ import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
+import sun.misc.Unsafe;
 
 public class MainMenuState extends State {
 

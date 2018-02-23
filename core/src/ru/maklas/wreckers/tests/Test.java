@@ -2,6 +2,7 @@ package ru.maklas.wreckers.tests;
 
 
 import com.badlogic.gdx.math.Vector2;
+import ru.maklas.wreckers.engine.systems.CollisionSystem;
 import ru.maklas.wreckers.libs.ClassUtils;
 import ru.maklas.wreckers.libs.Utils;
 
@@ -17,16 +18,14 @@ public class Test {
     public static void main(String[] args){
 
 
-        Vector2 vel = new Vector2(1, -4).nor();
-        Vector2 nor = new Vector2(-1, 0).nor();
-        float angle = vel.angle(nor);
-        angle = angle < 0 ? -angle : angle;
-        angle -= 90;
-        angle = angle < 0 ? -angle : angle;
-        float directPercent = angle / 90f;
-        float sharpPercent = 1 - directPercent;
+        Vector2 vel = new Vector2(0, -3).nor();
+        Vector2 playerNorm = new Vector2(-1.1f, 0).nor();
+        System.out.println(vel.angle(playerNorm));
+
+        float dullPercent = CollisionSystem.calculateDullness(vel, playerNorm);
+        float sharpPercent = 1 - dullPercent;
         System.out.println("Sharp:  " + Utils.floatFormatted(sharpPercent  * 100, 2) + '%');
-        System.out.println("Direct: " + Utils.floatFormatted(directPercent * 100, 2) + '%');
+        System.out.println("Direct: " + Utils.floatFormatted(dullPercent * 100, 2) + '%');
 
 
         //System.out.println(angle);

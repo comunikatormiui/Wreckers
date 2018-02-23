@@ -57,9 +57,10 @@ public class EntityPlayer extends GameEntity {
         add(new AntiGravComponent(body.getMassData().mass,5, 5, 1.2f));
         add(new SocketComponent(1, EntityType.weaponTypeFor(eType)));
         add(new GrabZoneComponent(model.getShaper().buildCircle(0, 0, pickUpRadius)));
-        add(new WreckerComponent(100,
-                80,
-                50,
+        add(new WreckerComponent(
+                0,
+                0,
+                0,
                 50,
                 50));
     }

@@ -46,10 +46,12 @@ public class DamageSystem extends EntitySystem {
 
                 //РАСЧЁТ УРОНА
 
-                final float damageAdjustment = e.getWeaponOwner() == null ? 1/1000f : 1/300f; // Оружие без владельца наносит в разы меньше урона
+                final float impulseAdjustment = e.getWeaponOwner() == null ? 1/1000f : 1/300f; // Оружие без владельца наносит в разы меньше урона
+                final float velocityAdjustment = e.getWeaponOwner() == null ? 0.02f : 0.13333334f;
 
-                float trueDullDamage = e.getImpulse()  * e.getDullness()  * weapC.dullDamage * damageAdjustment;
-                float trueSliceDamage = e.getImpulse() * e.getSharpness() * weapC.sliceDamage * damageAdjustment;
+                float trueDullDamage = e.getImpulse()  * e.getDullness()  * weapC.dullDamage * impulseAdjustment;
+                float trueSliceDamage = e.getCollisionVelocity().len() * e.getSharpness() * weapC.sliceDamage * velocityAdjustment;
+                System.out.println("Impulse: " + e.getImpulse() + ", vel: " + (e.getCollisionVelocity().len() * velocityAdjustment) / impulseAdjustment);
 
                 float dullDamage = trueDullDamage * leagueFormula(wreckC.dullArmor);
                 float sliceDamage = trueSliceDamage * leagueFormula(wreckC.sliceArmor);
@@ -79,7 +81,7 @@ public class DamageSystem extends EntitySystem {
 
 
                 Vector2 box2dPos = vec1.set(e.getPoint()).scl(1 / GameAssets.box2dScale);
-                Vector2 box2dImpulse = vec2.set(e.getNormal()).scl(additionalImpulse);
+                Vector2 box2dImpulse = vec2.set(e.getCollisionVelocity()).nor().scl(additionalImpulse);
                 e.getWreckerBody().applyForce(box2dImpulse, box2dPos, true); //Применяем доп импульс.
                 applyDamageAndDispatch(e.getTargetWrecker(), hc, totalDamage, e);  //Применяем урон
 
@@ -89,11 +91,14 @@ public class DamageSystem extends EntitySystem {
                 }
                 if (e.getSharpness() > 0.90f){
                     engine.add(new EntityString("Sharp! " + (int)(e.getSharpness() * 100), 2, e.getPoint().x + (random.nextFloat() * 50 - 25), e.getPoint().y + 25, Color.BLUE));
-                }
+                } else
                 if (e.getDullness() > 0.90f){
                     engine.add(new EntityString("Dull! " + (int)(e.getDullness() * 100), 2, e.getPoint().x + (random.nextFloat() * 50 - 25), e.getPoint().y - 25, Color.RED));
+                } else{
+                    engine.add(new EntityString("Sharpness: " + (int)(e.getSharpness() * 100), 2, e.getPoint().x + (random.nextFloat() * 50 - 25), e.getPoint().y + 25, Color.PINK));
                 }
-                engine.add(new EntityArrow(e.getPoint(), e.getNormal().scl(75).add(e.getPoint()), 1, Color.ORANGE));
+                engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getCollisionVelocity()).nor().scl(75).add(e.getPoint()), 1, Color.ORANGE));
+                engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getNormal()).scl(75).add(e.getPoint()), 1, Color.BROWN));
             }
         });
     }

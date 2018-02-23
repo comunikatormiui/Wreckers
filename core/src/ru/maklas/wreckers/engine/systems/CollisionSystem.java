@@ -72,34 +72,47 @@ public class CollisionSystem extends EntitySystem{
             return;
         }
 
-        final WorldManifold worldManifold = contact.getWorldManifold();
-        final Vector2 normal = weaponIsA ? worldManifold.getNormal() : worldManifold.getNormal().scl(-1); //Vector from weapon to player
-        final Vector2 point = worldManifold.getPoints()[0];
+        final WorldManifold manifold = contact.getWorldManifold();
         final Fixture weaponFixture = weaponIsA ? contact.getFixtureA() : contact.getFixtureB();
         final Body weaponBody = weaponFixture.getBody();
-        final Body playerBody = (weaponIsA ? contact.getFixtureB() : contact.getFixtureA()).getBody();
+        final Fixture playerFixture = weaponIsA ? contact.getFixtureB() : contact.getFixtureA();
+        final Body playerBody = playerFixture.getBody();
+
+        final Vector2 collisionPoint = manifold.getPoints()[0];
+        final Vector2 playerNormal = calculatePlayerNormal(manifold, weaponIsA, playerFixture, collisionPoint); //Вектор нормали игрока в точке
+
         PickUpComponent pickUpC = weapon.get(Mappers.pickUpM);
         @Nullable final Entity weaponOwner = pickUpC == null ? null : pickUpC.owner;
 
 
-        float dullPercent = calculateDullness(weaponBody, point, normal); // на сколько процентов данный удар является прямым
-        float sharpPercent = 1 - dullPercent;                             // на сколько процентов данный удар является режущим
+        // скорость удара в точке
+        Vector2 collisionPointVelocity = new Vector2(weaponBody.getLinearVelocityFromWorldPoint(collisionPoint)).sub(playerBody.getLinearVelocityFromWorldPoint(collisionPoint));
+        float dullPercent = calculateDullness(collisionPointVelocity, playerNormal); // на сколько процентов данный удар является прямым
+        float sharpPercent = 1 - dullPercent; // на сколько процентов данный удар является режущим
 
         FixtureType weaponFixtureType = ((FixtureData) weaponFixture.getUserData()).getFixtureType();
 
         if (weaponFixtureType == FixtureType.WEAPON_DAMAGE) { // если ударившая часть является дамажущей
-
-            WeaponWreckerHitEvent event = new WeaponWreckerHitEvent(weapon, weaponOwner, player, new Vector2(point).scl(GameAssets.box2dScale), new Vector2(normal), impulseForce, sharpPercent, dullPercent, weaponBody, playerBody);
+            WeaponWreckerHitEvent event = new WeaponWreckerHitEvent(weapon, weaponOwner, player, new Vector2(collisionPoint).scl(GameAssets.box2dScale), new Vector2(playerNormal), collisionPointVelocity, impulseForce, sharpPercent, dullPercent, weaponBody, playerBody);
             getEngine().dispatchLater(event);
         }
 
     }
 
-    private float calculateDullness(Body weapon, Vector2 box2dPoint, Vector2 box2dNormal){
-        float angle = weapon.getLinearVelocityFromWorldPoint(box2dPoint).angle(box2dNormal);
-        angle = angle < 0 ? -angle : angle;
-        angle -= 90;
-        angle = angle < 0 ? -angle : angle;
+    private Vector2 calculatePlayerNormal(WorldManifold manifold, boolean weaponIsA, Fixture playerFixture, Vector2 collisionPoint) {
+        if (playerFixture.getShape() instanceof CircleShape){
+
+            return new Vector2(collisionPoint).sub(playerFixture.getBody().getPosition()).nor();
+        } else {
+            return new Vector2(weaponIsA ? manifold.getNormal().scl(-1) : manifold.getNormal());
+        }
+    }
+
+    public static float calculateDullness(Vector2 collisionVelocity, Vector2 box2dPlayerNormal){
+        float angle = collisionVelocity.angle(box2dPlayerNormal);
+        angle = angle < 0 ? -angle : angle; // abs(angle) 0..180
+        angle -= 90; // -90..90
+        angle = angle < 0 ? -angle : angle; //0..90 где 0 - абсолютно режущий удар, а 90 - абсолютно тупой
         return angle / 90f;
     }
 
