@@ -12,6 +12,7 @@ import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PickUpComponent;
+import ru.maklas.wreckers.engine.components.WreckerComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.WeaponWreckerHitEvent;
@@ -50,16 +51,33 @@ public class CollisionSystem extends EntitySystem{
         });
     }
 
-    // Контакт нельзя передавать далее
+    // Контакт и импульс нельзя передавать далее
     private void handleWeaponToWeapon(final Entity weaponA, EntityType typeA, Entity weaponB, EntityType typeB, Contact contact, ContactImpulse impulse){
-        float impulseForce = impulse.getNormalImpulses()[0];
-        if (impulseForce > 250){
-            getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponA));
-            getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponB));
+        final float impulseAdjustment = 0.12f;
+        float impulseForce = impulse.getNormalImpulses()[0] * impulseAdjustment;
+        PickUpComponent w1Pick = weaponA.get(Mappers.pickUpM);
+        PickUpComponent w2Pick = weaponB.get(Mappers.pickUpM);
+        if (w1Pick == null || w2Pick == null) {
+            return;
         }
+
+        @Nullable Entity owner1 = w1Pick.owner;
+        @Nullable Entity owner2 = w1Pick.owner;
+        @Nullable WreckerComponent wr1 = owner1 == null ? null : owner1.get(Mappers.wreckerM);
+        @Nullable WreckerComponent wr2 = owner2 == null ? null : owner2.get(Mappers.wreckerM);
+        float disarmResist1 = wr1 == null ? 9999999f : wr1.disarmResist;
+        float disarmResist2 = wr2 == null ? 9999999f : wr2.disarmResist;
+
+        final float minToDisarm = 50;
+        boolean disarm1 = impulseForce * leagueFormula(disarmResist1) > minToDisarm;
+        boolean disarm2 = impulseForce * leagueFormula(disarmResist2) > minToDisarm;
+        if (impulseForce * leagueFormula(disarmResist2) > 1) System.out.println(impulseForce * leagueFormula(disarmResist1)  + " : " + impulseForce * leagueFormula(disarmResist2));
+
+        if (disarm1) getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponA));
+        if (disarm2) getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponB));
     }
 
-    // Контакт нельзя передавать далее
+    // Контакт и импульс нельзя передавать далее
     private void handleWeaponToPlayer(final Entity weapon, EntityType weaponType, final Entity player, EntityType playerType, Contact contact, ContactImpulse impulse, boolean weaponIsA){
         //*********************//
         //* FIXTURE CONDITION *//
@@ -163,9 +181,20 @@ public class CollisionSystem extends EntitySystem{
         return angle / 90f;
     }
 
-    // Контакт нельзя передавать далее
+    // Контакт и импульс нельзя передавать далее
     private void handlePlayerToPlayer(Entity playerA, EntityType typeA, Entity playerB, EntityType typeB, Contact contact, ContactImpulse impulse){
 
+    }
+
+    /**
+     * Возвращает процент проходимого урона после учёта резистов. Применяется так:
+     * <p>уронСУчётомРезистов = чистыйУрон * leagueFormula(резист);</p>
+     */
+    private float leagueFormula(float resist){
+        if (resist < -50){
+            resist = -50;
+        }
+        return ((100) / (100 + resist));
     }
 
 }

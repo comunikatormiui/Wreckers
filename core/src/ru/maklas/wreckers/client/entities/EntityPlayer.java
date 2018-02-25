@@ -61,8 +61,8 @@ public class EntityPlayer extends GameEntity {
                 0,
                 0,
                 0,
-                50,
-                50));
+                10,
+                20));
     }
 
     @Override

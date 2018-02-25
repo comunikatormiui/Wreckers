@@ -100,7 +100,7 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
                 1,
                 1,
                 1,
-                50,
+                100,
                 55,
                 40));
     }

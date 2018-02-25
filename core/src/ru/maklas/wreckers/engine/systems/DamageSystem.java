@@ -100,7 +100,7 @@ public class DamageSystem extends EntitySystem {
                 //***********************//
                 //* РАССЧЁТ ЗАСТРЕВАНИЯ *//
                 //***********************//
-                boolean stuck = e.getSharpness() > 0.7f && impulse > 200;
+                boolean stuck = e.getSharpness() > 0.7f && impulse > 200; //TODO
 
 
                 //**************//
@@ -109,10 +109,10 @@ public class DamageSystem extends EntitySystem {
 
                 if (additionalImpulse > 1) {
                     Vector2 box2dPos = vec1.set(e.getPoint()).scl(1 / GameAssets.box2dScale);
-                    Vector2 box2dImpulse = vec2.set(e.getCollisionVelocity()).nor().scl(additionalImpulse);
-                    e.getWreckerBody().applyForce(box2dImpulse, box2dPos, true); //Применяем доп импульс.
+                    Vector2 box2dImpulse = vec2.set(e.getCollisionVelocity()).nor().scl(-additionalImpulse);
+                    e.getWreckerBody().applyForceToCenter(box2dImpulse, true); //Применяем доп импульс.
                 }
-                //if (stuck){
+                //if (stuck){ //TODO
                 //    System.out.println("Stuck");
                 //    engine.execureAfterUpdate(new Runnable() {
                 //        @Override
@@ -170,6 +170,9 @@ public class DamageSystem extends EntitySystem {
      * <p>уронСУчётомРезистов = чистыйУрон * leagueFormula(резист);</p>
      */
     private float leagueFormula(float resist){
+        if (resist < -50){
+            resist = -50;
+        }
         return ((100) / (100 + resist));
     }
 
