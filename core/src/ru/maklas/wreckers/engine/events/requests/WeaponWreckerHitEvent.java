@@ -14,22 +14,28 @@ public class WeaponWreckerHitEvent implements Event {
     Vector2 point;
     Vector2 normal;
     private final Vector2 collisionVelocity;
+    private final Vector2 weaponStuckPoint;
     float impulse;
-    float sharpness;
+    float sliceness;
     float dullness;
+    float sharpness;
     private final Body weaponBody;
     private final Body wreckerBody;
+    private Vector2 piercingDirection;
 
-    public WeaponWreckerHitEvent(Entity weapon, @Nullable Entity weaponOwner, Entity targetWrecker, Vector2 point, Vector2 normal, Vector2 collisionVelocity, float impulse, float sharpness, float dullness, Body weaponBody, Body wreckerBody) {
+    public WeaponWreckerHitEvent(Entity weapon, @Nullable Entity weaponOwner, Entity targetWrecker, Vector2 point, Vector2 normal, Vector2 collisionVelocity, Vector2 piercingDirection, Vector2 weaponStuckPoint, float impulse, float sliceness, float dullness, float sharpness, Body weaponBody, Body wreckerBody) {
         this.weapon = weapon;
         this.weaponOwner = weaponOwner;
         this.targetWrecker = targetWrecker;
         this.point = point;
         this.collisionVelocity = collisionVelocity;
+        this.piercingDirection = piercingDirection;
+        this.weaponStuckPoint = weaponStuckPoint;
         this.impulse = impulse;
         this.normal = normal;
-        this.sharpness = sharpness;
+        this.sliceness = sliceness;
         this.dullness = dullness;
+        this.sharpness = sharpness;
         this.weaponBody = weaponBody;
         this.wreckerBody = wreckerBody;
     }
@@ -66,6 +72,10 @@ public class WeaponWreckerHitEvent implements Event {
         return collisionVelocity;
     }
 
+    public float getSliceness() {
+        return sliceness;
+    }
+
     public float getSharpness() {
         return sharpness;
     }
@@ -80,5 +90,13 @@ public class WeaponWreckerHitEvent implements Event {
 
     public Body getWreckerBody() {
         return wreckerBody;
+    }
+
+    public Vector2 getPiercingDirection() {
+        return piercingDirection;
+    }
+
+    public Vector2 getWeaponStuckPoint() {
+        return weaponStuckPoint;
     }
 }

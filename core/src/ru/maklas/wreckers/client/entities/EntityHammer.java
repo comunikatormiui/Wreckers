@@ -11,7 +11,7 @@ import ru.maklas.wreckers.client.ClientGameModel;
 import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
-import ru.maklas.wreckers.game.FixtureData;
+import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.FixtureType;
 
 public class EntityHammer extends WeaponEntity implements AttachAction {
@@ -94,8 +94,12 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
         pickUpC = new PickUpComponent(model.getShaper().buildCircle(8 * scale, 287 * scale, 35), this);
         add(pickUpC);
         add(new WeaponComponent(
-                45,
-                10,
+                50,
+                0,
+                0,
+                1,
+                1,
+                1,
                 50,
                 55,
                 40));

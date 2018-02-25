@@ -31,9 +31,9 @@ import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 import ru.maklas.wreckers.engine.events.requests.AttachRequest;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
+import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
-import sun.misc.Unsafe;
 
 public class MainMenuState extends State {
 
@@ -105,13 +105,13 @@ public class MainMenuState extends State {
             }
 
             private void handleBothSensors(Contact contact, final Fixture fixtureA, final Fixture fixtureB) {
-                FixtureData udA;
-                FixtureData udB;
+                ru.maklas.wreckers.game.fixtures.FixtureData udA;
+                ru.maklas.wreckers.game.fixtures.FixtureData udB;
                 Entity eA = (Entity) fixtureA.getBody().getUserData();
                 Entity eB = (Entity) fixtureB.getBody().getUserData();
                 try {
-                    udA = (FixtureData) fixtureA.getUserData();
-                    udB = (FixtureData) fixtureB.getUserData();
+                    udA = (ru.maklas.wreckers.game.fixtures.FixtureData) fixtureA.getUserData();
+                    udB = (ru.maklas.wreckers.game.fixtures.FixtureData) fixtureB.getUserData();
                 } catch (Exception e) {
                     System.err.println(eA + " OR " + eB + " have no fixture data on some of their fixtures");
                     e.printStackTrace();
@@ -157,6 +157,7 @@ public class MainMenuState extends State {
         final EntitySword sword = new EntitySword(3, -200, 700, 10, model);
         final EntitySword sword2 = new EntitySword(4, 0, 300, 10, model);
         final EntityHammer hammer = new EntityHammer(5, -200, 300, 10, model);
+        final Entity scythe = new EntityScythe(6, 370, 300, 10, model);
         final Entity platform = new GameEntity(-2, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
 
         model.setPlayer(player);
@@ -167,6 +168,7 @@ public class MainMenuState extends State {
         engine.add(sword);
         engine.add(sword2);
         engine.add(hammer);
+        engine.add(scythe);
         engine.add(platform);
 
 

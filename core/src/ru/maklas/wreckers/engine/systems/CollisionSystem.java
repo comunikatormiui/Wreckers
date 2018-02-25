@@ -12,12 +12,12 @@ import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PickUpComponent;
-import ru.maklas.wreckers.engine.components.WeaponComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.WeaponWreckerHitEvent;
-import ru.maklas.wreckers.game.FixtureData;
 import ru.maklas.wreckers.game.FixtureType;
+import ru.maklas.wreckers.game.fixtures.FixtureData;
+import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
 
 import static ru.maklas.wreckers.assets.EntityType.*;
 
@@ -53,7 +53,7 @@ public class CollisionSystem extends EntitySystem{
     //  онтакт нельз€ передавать далее
     private void handleWeaponToWeapon(final Entity weaponA, EntityType typeA, Entity weaponB, EntityType typeB, Contact contact, ContactImpulse impulse){
         float impulseForce = impulse.getNormalImpulses()[0];
-        if (impulseForce > 100){
+        if (impulseForce > 250){
             getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponA));
             getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponB));
         }
@@ -61,42 +61,89 @@ public class CollisionSystem extends EntitySystem{
 
     //  онтакт нельз€ передавать далее
     private void handleWeaponToPlayer(final Entity weapon, EntityType weaponType, final Entity player, EntityType playerType, Contact contact, ContactImpulse impulse, boolean weaponIsA){
-        final float minimumImpulse = 100;
-        float impulseForce = impulse.getNormalImpulses()[0];
-        if (impulseForce < minimumImpulse){
-            return;
-        }
-
-        WeaponComponent wc = weapon.get(Mappers.weaponM);
-        if (wc == null){
-            return;
-        }
-
-        final WorldManifold manifold = contact.getWorldManifold();
+        //*********************//
+        //* FIXTURE CONDITION *//
+        //*********************//
         final Fixture weaponFixture = weaponIsA ? contact.getFixtureA() : contact.getFixtureB();
-        final Body weaponBody = weaponFixture.getBody();
+        final FixtureData weaponFixtureData = (FixtureData) weaponFixture.getUserData();
+        if (weaponFixtureData.getFixtureType() != FixtureType.WEAPON_DAMAGE) {
+            return;
+        }
+
+
+        //******************************//
+        //* MINIMAL VELOCITY CONDITION *//
+        //******************************//
         final Fixture playerFixture = weaponIsA ? contact.getFixtureB() : contact.getFixtureA();
+        final Body weaponBody = weaponFixture.getBody();
         final Body playerBody = playerFixture.getBody();
-
+        final WorldManifold manifold = contact.getWorldManifold();
         final Vector2 collisionPoint = manifold.getPoints()[0];
-        final Vector2 playerNormal = calculatePlayerNormal(manifold, weaponIsA, playerFixture, collisionPoint); //¬ектор нормали игрока в точке
+        final Vector2 collisionVelocity = new Vector2(weaponBody.getLinearVelocityFromWorldPoint(collisionPoint)).sub(playerBody.getLinearVelocityFromWorldPoint(collisionPoint));
+        if (collisionVelocity.len2() < 15){
+            return;
+        }
+        System.out.println(collisionVelocity.len2());
 
+
+        //**********************//
+        //* DULL, SLICE, SHARP *//
+        //**********************//
+        float dullness;
+        float sliceness;
+        float sharpness;
+
+
+        final Vector2 playerNormal = calculatePlayerNormal(manifold, weaponIsA, playerFixture, collisionPoint); //¬ектор нормали игрока в точке
+        final Vector2 piercingDirection = new Vector2(1, 0);
+        final Vector2 weaponStuckPoint = new Vector2(1, 0);
+        dullness = calculateDullness(collisionVelocity, playerNormal);
+        sliceness = 1 - dullness;
+        if (weaponFixtureData instanceof WeaponPiercingFD) {
+            sharpness = calculateSharpness((WeaponPiercingFD) weaponFixtureData, weaponFixture, collisionVelocity);
+            float oldDullness = dullness;
+            dullness = oldDullness * (1 - sharpness);
+            sharpness = oldDullness * sharpness;
+            ((WeaponPiercingFD) weaponFixtureData).getWorldDirection(weaponFixture, piercingDirection);
+            weaponStuckPoint.set(((WeaponPiercingFD) weaponFixtureData).getStuckPoint());
+        } else {
+            sharpness = 0;
+        }
+
+        //************//
+        //* DISPATCH *//
+        //************//
+        final float impulseForce = impulse.getNormalImpulses()[0];
         PickUpComponent pickUpC = weapon.get(Mappers.pickUpM);
         @Nullable final Entity weaponOwner = pickUpC == null ? null : pickUpC.owner;
+        WeaponWreckerHitEvent event = new WeaponWreckerHitEvent(
+                weapon,
+                weaponOwner,
+                player,
+                new Vector2(collisionPoint).scl(GameAssets.box2dScale),
+                new Vector2(playerNormal),
+                collisionVelocity,
+                piercingDirection,
+                weaponStuckPoint,
+                impulseForce,
 
+                sliceness,
+                dullness,
+                sharpness,
 
-        // скорость удара в точке
-        Vector2 collisionPointVelocity = new Vector2(weaponBody.getLinearVelocityFromWorldPoint(collisionPoint)).sub(playerBody.getLinearVelocityFromWorldPoint(collisionPoint));
-        float dullPercent = calculateDullness(collisionPointVelocity, playerNormal); // на сколько процентов данный удар €вл€етс€ пр€мым
-        float sharpPercent = 1 - dullPercent; // на сколько процентов данный удар €вл€етс€ режущим
+                weaponBody,
+                playerBody);
+        getEngine().dispatchLater(event);
+    }
 
-        FixtureType weaponFixtureType = ((FixtureData) weaponFixture.getUserData()).getFixtureType();
-
-        if (weaponFixtureType == FixtureType.WEAPON_DAMAGE) { // если ударивша€ часть €вл€етс€ дамажущей
-            WeaponWreckerHitEvent event = new WeaponWreckerHitEvent(weapon, weaponOwner, player, new Vector2(collisionPoint).scl(GameAssets.box2dScale), new Vector2(playerNormal), collisionPointVelocity, impulseForce, sharpPercent, dullPercent, weaponBody, playerBody);
-            getEngine().dispatchLater(event);
-        }
-
+    private float calculateSharpness(WeaponPiercingFD weaponFD, Fixture weaponFixture, Vector2 collisionVelocity) {
+        Vector2 worldPierceDirection = new Vector2();
+        weaponFD.getWorldDirection(weaponFixture, worldPierceDirection);
+        float angle = worldPierceDirection.angle(collisionVelocity); // будут ценитс€ значени€ ~0 и ~180
+        angle = angle < 0 ? -angle : angle; // берем модуль 0..180
+        angle -= 90; // -90..90 ÷ен€тс€ ~-90 и ~90
+        angle = angle < 0 ? -angle : angle; // снова берем модуль 0..90. где 90 - топ
+        return angle / 90f;
     }
 
     private Vector2 calculatePlayerNormal(WorldManifold manifold, boolean weaponIsA, Fixture playerFixture, Vector2 collisionPoint) {

@@ -3,13 +3,14 @@ package ru.maklas.wreckers.game;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import ru.maklas.wreckers.game.fixtures.FixtureData;
 
 public class BodyBuilder {
 
     private World world;
     private BodyDef bDef = new BodyDef();
     private Array<FixtureDef> fixDefs = new Array<FixtureDef>();
-    private Array<FixtureData> datas = new Array<FixtureData>();
+    private Array<ru.maklas.wreckers.game.fixtures.FixtureData> datas = new Array<ru.maklas.wreckers.game.fixtures.FixtureData>();
     private boolean building = false;
     private float scale;
 

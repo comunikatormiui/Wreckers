@@ -9,13 +9,12 @@ import ru.maklas.mengine.Subscription;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
-import ru.maklas.wreckers.assets.Subscriptions;
 import ru.maklas.wreckers.client.ClientGameModel;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.events.DamageEvent;
 import ru.maklas.wreckers.engine.events.DeathEvent;
-import ru.maklas.wreckers.game.FixtureData;
+import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.FixtureType;
 
 public class EntityPlayer extends GameEntity {
@@ -58,6 +57,7 @@ public class EntityPlayer extends GameEntity {
         add(new SocketComponent(1, EntityType.weaponTypeFor(eType)));
         add(new GrabZoneComponent(model.getShaper().buildCircle(0, 0, pickUpRadius)));
         add(new WreckerComponent(
+                0,
                 0,
                 0,
                 0,

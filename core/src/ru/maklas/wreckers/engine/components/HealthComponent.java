@@ -6,6 +6,7 @@ public class HealthComponent implements Component{
 
     public float health;
     public boolean dead = false;
+    public long lastDamageDone;
 
     public HealthComponent(float health) {
         this.health = health;

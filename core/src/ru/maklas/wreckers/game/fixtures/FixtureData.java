@@ -1,4 +1,6 @@
-package ru.maklas.wreckers.game;
+package ru.maklas.wreckers.game.fixtures;
+
+import ru.maklas.wreckers.game.FixtureType;
 
 public class FixtureData {
 
