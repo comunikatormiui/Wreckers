@@ -1,13 +1,13 @@
 package ru.maklas.wreckers.server;
 
+import ru.maklas.libs.game_looper.LoopedApplication;
+import ru.maklas.libs.game_looper.LooperAccessor;
 import ru.maklas.mnet.ServerAuthenticator;
 import ru.maklas.mnet.ServerSocket;
 import ru.maklas.mnet.Socket;
 import ru.maklas.mrudp.ConnectionResponsePackage;
 import ru.maklas.wreckers.assets.DCAssets;
 import ru.maklas.wreckers.libs.Log;
-import ru.maklas.wreckers.libs.game_looper.LoopedApplication;
-import ru.maklas.wreckers.libs.game_looper.LooperAccessor;
 import ru.maklas.wreckers.server.events.ConnectionRequest;
 import ru.maklas.wreckers.server.events.ConnectionResponse;
 

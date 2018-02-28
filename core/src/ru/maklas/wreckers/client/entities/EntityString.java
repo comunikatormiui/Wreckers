@@ -36,6 +36,8 @@ public class EntityString extends Entity {
                 n = questionMark;
             }
             RenderUnit ru = new RenderUnit(n);
+            ru.pivotX = 0;
+            ru.pivotY = 0;
             ru.localX = dtX;
             ru.scaleX = ru.scaleY = scale;
             dtX += n.getRegionWidth() * scale + spaceWidth * scale;

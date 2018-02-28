@@ -23,8 +23,12 @@ import ru.maklas.wreckers.engine.events.DamageEvent;
 import ru.maklas.wreckers.engine.events.DeathEvent;
 import ru.maklas.wreckers.engine.events.Event;
 import ru.maklas.wreckers.engine.events.requests.WeaponWreckerHitEvent;
+import ru.maklas.wreckers.engine.others.StunEffect;
+import ru.maklas.wreckers.libs.Utils;
 
 import java.util.Random;
+
+import static ru.maklas.wreckers.assets.GameAssets.leagueFormula;
 
 public class DamageSystem extends EntitySystem {
 
@@ -44,8 +48,11 @@ public class DamageSystem extends EntitySystem {
                 HealthComponent hc = e.getTargetWrecker().get(Mappers.healthM);
                 long currentTime = System.currentTimeMillis();
                 final long timeBeforeNextDamage = (long) ((10 * 1000) /60f);
-                if (weapC == null || wreckC == null || hc == null || (currentTime - hc.lastDamageDone < timeBeforeNextDamage)){
-                    //TODO System.err.println("Wrecker or Weapon doesn't have stats to do damage");
+                if (weapC == null || wreckC == null || hc == null){
+                    System.err.println("Wrecker or Weapon doesn't have stats to do damage");
+                    return;
+                } else
+                if (currentTime - hc.lastDamageDone < timeBeforeNextDamage){ // имунитет к ударам на некоторое время
                     return;
                 }
                 float impulse = e.getImpulse();
@@ -94,7 +101,8 @@ public class DamageSystem extends EntitySystem {
                 boolean doStun = random.nextFloat() < stunChance;
                 float stunDuration = 0;
                 if (doStun){
-                    stunDuration = weapC.stunAbility / 40f; //До 2.5 секунд стана.
+                    stunDuration = (weapC.stunAbility / 20) //Максимальный стан без резиста == 5 секунд
+                            * leagueFormula(wreckC.stunResist); //
                 }
 
                 //***********************//
@@ -140,7 +148,8 @@ public class DamageSystem extends EntitySystem {
 
                 engine.add(new EntityNumber((int) totalDamage, 2, e.getPoint().x, e.getPoint().y));
                 if (doStun){
-                    engine.add(new EntityString("STUN!", 2, e.getPoint().x, e.getPoint().y + 50, Color.RED));
+                    engine.add(new EntityString("STUN! " + Utils.floatFormatted(stunDuration), 2, e.getPoint().x, e.getPoint().y + 50, Color.RED));
+                    e.getTargetWrecker().get(Mappers.effectM).add(new StunEffect(stunDuration));
                 }
                 engine.add(new EntityString(
                         (int)(e.getDullness() * 100) + " / " +
@@ -163,17 +172,6 @@ public class DamageSystem extends EntitySystem {
             hc.dead = true;
             getEngine().dispatchLater(new DeathEvent(e, hitEvent));
         }
-    }
-
-    /**
-     * Возвращает процент проходимого урона после учёта резистов. Применяется так:
-     * <p>уронСУчётомРезистов = чистыйУрон * leagueFormula(резист);</p>
-     */
-    private float leagueFormula(float resist){
-        if (resist < -50){
-            resist = -50;
-        }
-        return ((100) / (100 + resist));
     }
 
 }

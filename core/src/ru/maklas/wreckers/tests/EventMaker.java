@@ -1,7 +1,7 @@
 package ru.maklas.wreckers.tests;
 
 import com.badlogic.gdx.utils.Array;
-import ru.maklas.wreckers.libs.SimpleProfiler;
+import ru.maklas.libs.SimpleProfiler;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -25,10 +25,12 @@ import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.engine.components.GrabZoneComponent;
 import ru.maklas.wreckers.engine.components.PickUpComponent;
+import ru.maklas.wreckers.engine.components.StatusEffectComponent;
 import ru.maklas.wreckers.engine.events.CollisionEvent;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 import ru.maklas.wreckers.engine.events.requests.AttachRequest;
+import ru.maklas.wreckers.engine.others.DisarmStatusEffect;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
@@ -63,6 +65,7 @@ public class MainMenuState extends State {
         engine.add(new AntiGravSystem());
         engine.add(new PickUpSystem(world));
         engine.add(new MotorSystem());
+        engine.add(new StatusEffectSystem());
 
 
         model = new ClientGameModel();
@@ -104,14 +107,15 @@ public class MainMenuState extends State {
                 }
             }
 
+            @SuppressWarnings("all")
             private void handleBothSensors(Contact contact, final Fixture fixtureA, final Fixture fixtureB) {
-                ru.maklas.wreckers.game.fixtures.FixtureData udA;
-                ru.maklas.wreckers.game.fixtures.FixtureData udB;
+                FixtureData udA;
+                FixtureData udB;
                 Entity eA = (Entity) fixtureA.getBody().getUserData();
                 Entity eB = (Entity) fixtureB.getBody().getUserData();
                 try {
-                    udA = (ru.maklas.wreckers.game.fixtures.FixtureData) fixtureA.getUserData();
-                    udB = (ru.maklas.wreckers.game.fixtures.FixtureData) fixtureB.getUserData();
+                    udA = (FixtureData) fixtureA.getUserData();
+                    udB = (FixtureData) fixtureB.getUserData();
                 } catch (Exception e) {
                     System.err.println(eA + " OR " + eB + " have no fixture data on some of their fixtures");
                     e.printStackTrace();
@@ -123,13 +127,17 @@ public class MainMenuState extends State {
                 if (type1 == FixtureType.PICKUP_SENSOR && type2 == FixtureType.GRABBER_SENSOR){
                     final PickUpComponent wPick = eA.get(Mappers.pickUpM);
                     final GrabZoneComponent pPick = eB.get(Mappers.grabM);
-                    if (wPick.pickUpZoneEnabled() && pPick.enabled()){
+                    StatusEffectComponent secB = eB.get(Mappers.effectM);
+                    boolean grabberHasNoDisarmStatus = secB == null || !secB.contains(DisarmStatusEffect.class);
+                    if (wPick.pickUpZoneEnabled() && pPick.enabled() && grabberHasNoDisarmStatus){
                         engine.dispatchLater(new AttachRequest(eB, pPick, eA, wPick));
                     }
                 } else if (type1 == FixtureType.GRABBER_SENSOR && type2 == FixtureType.PICKUP_SENSOR){
                     final PickUpComponent wPick = eB.get(Mappers.pickUpM);
                     final GrabZoneComponent pPick = eA.get(Mappers.grabM);
-                    if (wPick.pickUpZoneEnabled() && pPick.enabled()){
+                    StatusEffectComponent secA = eA.get(Mappers.effectM);
+                    boolean grabberHasNoDisarmStatus = secA == null || !secA.contains(DisarmStatusEffect.class);
+                    if (wPick.pickUpZoneEnabled() && pPick.enabled() && grabberHasNoDisarmStatus){
                         engine.dispatchLater(new AttachRequest(eA, pPick, eB, wPick));
                     }
                 }

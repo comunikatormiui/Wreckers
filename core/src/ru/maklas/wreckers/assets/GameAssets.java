@@ -40,4 +40,16 @@ public class GameAssets {
             fixture.setFilterData(filterData);
         }
     }
+
+    /**
+     * Возвращает процент проходимого урона после учёта резистов. Применяется так:
+     * <p>уронСУчётомРезистов = чистыйУрон * leagueFormula(резист);</p>
+     * 300 -> 25% от чистого урона
+     */
+    public static float leagueFormula(float resist){
+        if (resist < -50){
+            resist = -50;
+        }
+        return ((100) / (100 + resist));
+    }
 }

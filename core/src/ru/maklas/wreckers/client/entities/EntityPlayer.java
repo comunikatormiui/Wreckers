@@ -46,6 +46,7 @@ public class EntityPlayer extends GameEntity {
                 .type(BodyDef.BodyType.DynamicBody)
                 .linearDamp(1f)
                 .addFixture(bodyF, new FixtureData(FixtureType.WRECKER_BODY))
+                .angularDamp(5)
                 .build();
 
         System.out.println(id + ": Player mass " + body.getMassData().mass);
@@ -67,6 +68,7 @@ public class EntityPlayer extends GameEntity {
 
     @Override
     protected void addedToEngine(final Engine engine) {
+        add(new StatusEffectComponent(engine, this));
         subscribe(new Subscription<DeathEvent>(DeathEvent.class) {
             @Override
             public void receive(Signal<DeathEvent> signal, DeathEvent deathEvent) {
