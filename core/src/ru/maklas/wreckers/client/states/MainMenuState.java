@@ -1,19 +1,11 @@
 package ru.maklas.wreckers.client.states;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
@@ -37,15 +29,14 @@ import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
 
-public class MainMenuState extends State {
+public class MainMenuState extends State implements GameController {
 
     Engine engine;
     World world;
     PhysicsDebugSystem debugSystem;
     OrthographicCamera cam;
     ClientGameModel model;
-    Stage stage;
-    Touchpad touchpad;
+    GameUI ui;
 
     @Override
     protected void onCreate() {
@@ -54,8 +45,7 @@ public class MainMenuState extends State {
         cam = new OrthographicCamera(1280, 720);
         engine = new Engine();
         world = new World(new Vector2(0, -9.8f), true);
-
-        setUpStage();
+        ui = new GameUI(this);
 
         engine.add(new PhysicsSystem(world));
         engine.add(new RenderingSystem(batch, cam));
@@ -183,51 +173,19 @@ public class MainMenuState extends State {
         engine.dispatch(new GrabZoneChangeRequest(true, opponent));
     }
 
-    private static boolean enableStage = false;
-    private void setUpStage() {
-        stage = new Stage();
+    @Override
+    public void onDropClicked() {
+        engine.dispatch(new DetachRequest(model.getPlayer(), DetachRequest.Type.FIRST, null));
+    }
 
-        if (enableStage) {
-            touchpad = new Touchpad(10, Images.touchStyle);
-            touchpad.setBounds(15, 15, 200, 200);
-            TextureRegionDrawable block = new TextureRegionDrawable(Images.touchBlock);
-            TextButton.TextButtonStyle style = new TextButton.TextButtonStyle(block, block, block, Images.font);
-            TextButton pickUpButton = new TextButton("Pick up", style);
-            TextButton dropButton = new TextButton("Drop", style);
-            pickUpButton.setColor(Color.GREEN);
-            dropButton.setColor(Color.RED);
+    @Override
+    public void onAttachDown() {
+        engine.dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
+    }
 
-
-            pickUpButton.setPosition(200, 0);
-            pickUpButton.sizeBy(2);
-            dropButton.setPosition(72 + 200, 0);
-            stage.addActor(touchpad);
-            stage.addActor(pickUpButton);
-            stage.addActor(dropButton);
-
-
-            dropButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    engine.dispatch(new DetachRequest(model.getPlayer(), DetachRequest.Type.FIRST, null));
-                }
-            });
-
-
-            pickUpButton.addListener(new ClickListener() {
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    engine.dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
-                    return true;
-                }
-
-                @Override
-                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                    engine.dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
-                }
-            });
-        }
-
+    @Override
+    public void onAttachUp() {
+        engine.dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
     }
 
     @Override
@@ -270,7 +228,11 @@ public class MainMenuState extends State {
         };
 
 
-        return new InputMultiplexer(stage, input);
+        if (Gdx.app.getType() == Application.ApplicationType.Android){
+            return new InputMultiplexer(ui, input);
+        } else {
+            return input;
+        }
     }
 
     @Override
@@ -279,20 +241,28 @@ public class MainMenuState extends State {
         cam.position.set(model.getPlayer().x, model.getPlayer().y, 0);
 
         Vector2 directionVec = Utils.vec2.set(0, 0);
-        if (Gdx.input.isKeyPressed(Input.Keys.W)){
-            directionVec.add(0, 1);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)){
-            directionVec.add(0, -1);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)){
-            directionVec.add(-1, 0);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)){
-            directionVec.add(1, 0);
+        if (Gdx.app.getType() == Application.ApplicationType.Android){
+
+            directionVec.set(ui.getTouchX(), ui.getTouchY());
+
+        } else if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
+
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                directionVec.add(0, 1);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+                directionVec.add(0, -1);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                directionVec.add(-1, 0);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                directionVec.add(1, 0);
+            }
         }
 
         model.getPlayer().get(Mappers.motorM).direction.set(directionVec);
+        ui.act(dt);
     }
 
     @Override
@@ -301,7 +271,10 @@ public class MainMenuState extends State {
         engine.render();
         batch.end();
         debugSystem.update(0);
-        stage.draw();
+
+        if (Gdx.app.getType() == Application.ApplicationType.Android) {
+            ui.draw();
+        }
     }
 
     @Override
