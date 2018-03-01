@@ -13,13 +13,13 @@ import ru.maklas.wreckers.assets.EntityType;
 public class PickUpComponent implements Component {
 
 
-    public final FixtureDef def; // definition РґР»СЏ Р·РѕРЅС‹ РїРѕРґР±РёСЂР°РЅРёСЏ
-    @Nullable public Fixture fixture; // Р·РѕРЅР° РїРѕРґР±РёСЂР°РЅРёСЏ РїСЂРµРґРјРµС‚Р°. Р•СЃР»Рё != null, С‚Рѕ РѕРЅР° Р°РєС‚РёРІРЅР° РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚. РР· fixture РјРѕР¶РЅРѕ РґРѕСЃС‚Р°С‚СЊ СЌС‚РѕС‚ РєРѕРјРїРѕРЅРµРЅС‚
+    public final FixtureDef def; // definition для зоны подбирания
+    @Nullable public Fixture fixture; // зона подбирания предмета. Если != null, то она активна в данный момент. Из fixture можно достать этот компонент
 
-    public boolean isAttached = false; // РџСЂРёСЃРѕРµРґРµРЅС‘РЅ Р»Рё РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚. РµСЃР»Рё True, С‚Рѕ РІРµСЂРЅРѕ: owner != null && joint != null
-    public final AttachAction attachAction; // Р”РµР№СЃС‚РІРёРµ РґР»СЏ РїСЂРёРєСЂРµРїР»РµРЅРёСЏ
-    public Entity owner; //РўРµРєСѓС‰РёР№ РІР»Р°РґРµР»РµС†
-    public Joint joint;  //Joint РєРѕС‚РѕСЂС‹Р№ СЃРѕРµРґРµРЅСЏРµС‚ СЃ РІР»Р°РґРµР»СЊС†РµРј РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚
+    public boolean isAttached = false; // Присоеденён ли в данный момент. если True, то верно: owner != null && joint != null
+    public final AttachAction attachAction; // Действие для прикрепления
+    public Entity owner; //Текущий владелец
+    public Joint joint;  //Joint который соеденяет с владельцем в данный момент
 
     public PickUpComponent(FixtureDef def, AttachAction attachAction) {
         this.def = def;

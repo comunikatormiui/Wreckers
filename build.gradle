@@ -41,7 +41,9 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "java"
-
+    tasks.withType(JavaCompile) {
+        options.encoding = 'windows-1251'
+    }
 
     dependencies {
         compile project(":core")
