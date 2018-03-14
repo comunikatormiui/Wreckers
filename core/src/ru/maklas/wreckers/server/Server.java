@@ -8,8 +8,8 @@ import ru.maklas.mnet.Socket;
 import ru.maklas.mrudp.ConnectionResponsePackage;
 import ru.maklas.wreckers.assets.DCAssets;
 import ru.maklas.wreckers.libs.Log;
-import ru.maklas.wreckers.server.events.ConnectionRequest;
-import ru.maklas.wreckers.server.events.ConnectionResponse;
+import ru.maklas.wreckers.network.events.ConnectionRequest;
+import ru.maklas.wreckers.network.events.ConnectionResponse;
 
 import java.net.InetAddress;
 import java.util.concurrent.Callable;

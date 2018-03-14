@@ -24,7 +24,7 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
-        mnetVersion  = '53ca6c63960f8044cff1ad8957fc7c54aace74c2'
+        mnetVersion  = '268e6812b7bf643089e9ff6d4d6d5cf2d4862e7a'
         mengineVersion = '6bff2acc735feca9a247f7f8abdcf9da1a7d4b73'
         mLibsVersion = 'b67aaab8c91b1098319ddeb7648429a012c5cd79'
     }

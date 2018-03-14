@@ -1,4 +1,4 @@
-package ru.maklas.wreckers.server.events;
+package ru.maklas.wreckers.network.events;
 
 import ru.maklas.wreckers.libs.Copyable;
 

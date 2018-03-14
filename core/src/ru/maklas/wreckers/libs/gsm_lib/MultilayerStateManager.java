@@ -45,26 +45,31 @@ public class MultilayerStateManager implements GameStateManager {
 
 
     public void update(float dt){
-        processCommand();
+        try {
+            processCommand();
 
-        Stack<State> states = this.states;
-        int size = states.size();
-        for (int i = 0; i < size; i++) {
-            State state = states.get(i);
-            if (state.updatable){
-                state.update(dt);
+            Stack<State> states = this.states;
+            int size = states.size();
+            for (int i = 0; i < size; i++) {
+                State state = states.get(i);
+                if (state.updatable){
+                    state.update(dt);
+                }
             }
-        }
 
-        for (int i = 0; i < size; i++) {
-            State state = states.get(i);
-            if (state.render){
-                state.render(batch);
+            for (int i = 0; i < size; i++) {
+                State state = states.get(i);
+                if (state.render){
+                    state.render(batch);
+                }
             }
-        }
 
-        renderMsgs(dt);
-        processCommand();
+            renderMsgs(dt);
+            processCommand();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Gdx.app.exit();
+        }
     }
 
     public void toBackground(){

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import ru.maklas.wreckers.engine.systems.CollisionSystem;
 import ru.maklas.wreckers.libs.ClassUtils;
 import ru.maklas.wreckers.libs.Utils;
+import ru.maklas.wreckers.network.events.BodySyncEvent;
 
 /**
  * Created by maklas on 04-Jan-18.
@@ -17,6 +18,16 @@ public class Test {
 
     public static void main(String[] args){
 
+        new EventMaker()
+                .name("WreckerSyncEvent")
+                .field(BodySyncEvent.class, "pos")
+                .float_("motorX")
+                .float_("motorY")
+                .build();
+
+        if (true){
+            return;
+        }
 
         Vector2 vel = new Vector2(0, -3).nor();
         Vector2 playerNorm = new Vector2(-1.1f, 0).nor();

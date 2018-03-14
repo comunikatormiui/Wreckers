@@ -89,11 +89,18 @@ public class EventMaker {
         writer.flush();
 
         System.out.println(className + " was successfully built in " + SimpleProfiler.getTimeAsString(4) + " seconds.");
+        String path;
+        try {
+            path = file.getCanonicalPath();
+        } catch (IOException e) {
+            path = file.getPath();
+        }
+        System.out.println("Location: " + path);
 
     }
 
     private File checkFileNameIsNotTaken() {
-        File file = new File(".\\core\\src\\ru\\maklas\\wreckers\\server\\events\\" + className + ".java");
+        File file = new File(".\\core\\src\\ru\\maklas\\wreckers\\network\\events\\" + className + ".java");
         if (file.exists()){
             className = className + "1";
             return checkFileNameIsNotTaken();
@@ -115,7 +122,7 @@ public class EventMaker {
     }
 
     private void doPackage(){
-        writer.println("package ru.maklas.wreckers.server.events" + ';');
+        writer.println("package ru.maklas.wreckers.network.events" + ';');
     }
 
     private void doImports() {
