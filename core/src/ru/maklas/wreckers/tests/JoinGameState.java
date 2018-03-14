@@ -48,6 +48,7 @@ public class JoinGameState extends State implements SocketProcessor {
         cam = new OrthographicCamera(1280, 720);
         engine = new Engine();
         World world = new World(new Vector2(0, -9.8f), true);
+        model = new GameModel();
 
         engine.add(new PhysicsSystem(world));
         engine.add(new RenderingSystem(batch, cam));
@@ -60,7 +61,6 @@ public class JoinGameState extends State implements SocketProcessor {
         engine.add(new JoinDamageSystem());
         engine.add(new JoinPickUpSystem(model));
 
-        model = new GameModel();
         model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
         model.setEngine(engine);
         model.setFixturer(new FDefBuilder());
