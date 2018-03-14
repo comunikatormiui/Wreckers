@@ -97,7 +97,7 @@ public class JoinGameState extends State implements SocketProcessor {
 
     @Override
     public void process(Object o, Socket socket, SocketIterator iterator) {
-        Log.CLIENT.event(o);
+        if (!((o instanceof BodySyncEvent) || (o instanceof WreckerSyncEvent)))Log.CLIENT.event(o);
         engine.dispatch(o);
 
         if (o instanceof BodySyncEvent){
