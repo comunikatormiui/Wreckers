@@ -4,16 +4,15 @@ import com.esotericsoftware.kryo.Kryo;
 import ru.maklas.mnet.Provider;
 import ru.maklas.mnet.Serializer;
 import ru.maklas.mnet.impl.KryoSerializer;
-import ru.maklas.wreckers.network.events.BodySyncEvent;
-import ru.maklas.wreckers.network.events.ConnectionRequest;
-import ru.maklas.wreckers.network.events.ConnectionResponse;
-import ru.maklas.wreckers.network.events.WreckerSyncEvent;
+import ru.maklas.wreckers.network.events.*;
 
 public class InetAssets {
 
 
     public static final int defaultPort = 1228;
     public static final int defaultBufferSize = 512;
+    public static final int defaultClientSocketUpdate = 75;
+    public static final int defaultServerSocketUpdate = 100;
 
     public static Kryo newKryo(){
         Kryo kryo = new Kryo();
@@ -21,6 +20,10 @@ public class InetAssets {
         kryo.register(ConnectionResponse.class);
         kryo.register(BodySyncEvent.class);
         kryo.register(WreckerSyncEvent.class);
+        kryo.register(EntityCreationEvent.class);
+        kryo.register(NetAttachDetachEvent.class);
+        kryo.register(NetHitEvent.class);
+        kryo.register(NetGrabZoneChange.class);
         return kryo;
     }
 

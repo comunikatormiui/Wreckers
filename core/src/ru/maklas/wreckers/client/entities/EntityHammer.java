@@ -7,7 +7,7 @@ import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
-import ru.maklas.wreckers.client.ClientGameModel;
+import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
@@ -20,7 +20,7 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
     World world;
     PickUpComponent pickUpC;
 
-    public EntityHammer(int id, float x, float y, int zOrder, ClientGameModel model) {
+    public EntityHammer(int id, float x, float y, int zOrder, GameModel model) {
         super(id, x, y, zOrder, model);
         this.world = model.getWorld();
         final float scale = 0.13f;

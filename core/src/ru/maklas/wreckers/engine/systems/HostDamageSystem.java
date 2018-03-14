@@ -2,16 +2,13 @@ package ru.maklas.wreckers.engine.systems;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
-import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
-import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.EntitySystem;
 import ru.maklas.mengine.Subscription;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.GameAssets;
+import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.client.entities.EntityArrow;
 import ru.maklas.wreckers.client.entities.EntityNumber;
 import ru.maklas.wreckers.client.entities.EntityString;
@@ -25,17 +22,32 @@ import ru.maklas.wreckers.engine.events.Event;
 import ru.maklas.wreckers.engine.events.requests.WeaponWreckerHitEvent;
 import ru.maklas.wreckers.engine.others.StunEffect;
 import ru.maklas.wreckers.libs.Utils;
+import ru.maklas.wreckers.network.events.NetHitEvent;
 
 import java.util.Random;
 
 import static ru.maklas.wreckers.assets.GameAssets.leagueFormula;
 
-public class DamageSystem extends EntitySystem {
+/**
+ * <p>
+ *     –°–∏—Å—Ç–µ–º–∞ –ø–æ–¥–ø–∏—Å—ã–≤–∞–µ—Ç—Å—è –Ω–∞ HitEvent. –†–∞–±–æ—Ç–∞–µ—Ç —Å HealthComponent. –û–±—Ä–∞–±–∞—Ç—ã–≤–∞–µ—Ç –º–æ–º–µ–Ω—Ç —É–¥–∞—Ä–∞,
+ *     —Ä–∞—Å—Å—á–∏—Ç—ã–≤–∞–µ—Ç —É—Ä–æ–Ω –∑–∞—â–∏—Ç—É, –ø—Ä–∏–Ω–∏–º–∞–µ—Ç –≤–æ –≤–Ω–∏–º–∞–Ω–∏–µ —ç—Ñ—Ñ–µ–∫—Ç—ã –∏ –≥–µ–Ω–µ—Ä–∏—Ä—É–µ—Ç DamageEvent, DeathEvent.
+ * </p>
+ * <p>
+ *     –í—ã–∑—ã–≤–∞–µ—Ç —ç—Ñ—Ñ–µ–∫—Ç—ã –≤–æ–∑–º–æ–∂–Ω—ã–µ –ø—Ä–∏ —É–¥–∞—Ä–µ. –¢–∞–∫–∏–µ –∫–∞–∫ —Å—Ç–∞–Ω, –¥–æ–ø–æ–ª–Ω–∏—Ç–µ–ª—å–Ω–æ–µ –æ—Ç—Ç–∞–ª–∫–∏–≤–∞–Ω–∏–µ, –∑–∞—Å—Ç—Ä–µ–≤–∞–Ω–∏–µ –æ—Ä—É–∂–∏—è –≤ —Ç–µ–ª–µ.
+ * </p>
+ */
+public class HostDamageSystem extends EntitySystem {
 
     private final Vector2 vec1 = new Vector2();
     private final Vector2 vec2 = new Vector2();
-    private final Random random = new Random();
+    private final Random rand = new Random();
+    private final GameModel model;
 
+
+    public HostDamageSystem(GameModel model) {
+        this.model = model;
+    }
 
     @Override
     public void onAddedToEngine(final Engine engine) {
@@ -52,7 +64,7 @@ public class DamageSystem extends EntitySystem {
                     System.err.println("Wrecker or Weapon doesn't have stats to do damage");
                     return;
                 } else
-                if (currentTime - hc.lastDamageDone < timeBeforeNextDamage){ // ËÏÛÌËÚÂÚ Í Û‰‡‡Ï Ì‡ ÌÂÍÓÚÓÓÂ ‚ÂÏˇ
+                if (currentTime - hc.lastDamageDone < timeBeforeNextDamage){ // –∏–º—É–Ω–∏—Ç–µ—Ç –∫ —É–¥–∞—Ä–∞–º –Ω–∞ –Ω–µ–∫–æ—Ç–æ—Ä–æ–µ –≤—Ä–µ–º—è
                     return;
                 }
                 float impulse = e.getImpulse();
@@ -60,65 +72,65 @@ public class DamageSystem extends EntitySystem {
 
 
                 //*****************//
-                //* –¿——◊®“ ”–ŒÕ¿ *//
+                //* –†–ê–°–°–ß–Å–¢ –£–†–û–ù–ê *//
                 //*****************//
 
-                //Õ‡ÒÚÓÈÍË
-                final float impulseAdjustment = e.getWeaponOwner() == null  ? 1/1000f : 1/300f; // ŒÛÊËÂ ·ÂÁ ‚Î‡‰ÂÎ¸ˆ‡ Ì‡ÌÓÒËÚ ‚ ‡Á˚ ÏÂÌ¸¯Â ÛÓÌ‡
+                //–ù–∞—Å—Ç—Ä–æ–π–∫–∏
+                final float impulseAdjustment = e.getWeaponOwner() == null  ? 1/1000f : 1/300f; // –û—Ä—É–∂–∏–µ –±–µ–∑ –≤–ª–∞–¥–µ–ª—å—Ü–∞ –Ω–∞–Ω–æ—Å–∏—Ç –≤ —Ä–∞–∑—ã –º–µ–Ω—å—à–µ —É—Ä–æ–Ω–∞
                 final float velocityAdjustment = e.getWeaponOwner() == null ? 0.04f : 0.133f;
 
-                //◊ËÒÚ˚È ÛÓÌ
+                //–ß–∏—Å—Ç—ã–π —É—Ä–æ–Ω
                 float trueDullDamage  = impulse    * e.getDullness()  * weapC.dullDamage   * weapC.dullAdjustment   * impulseAdjustment;
                 float trueSliceDamage = velAtPoint * e.getSliceness() * weapC.sliceDamage  * weapC.sliceAdjustment  * velocityAdjustment;
                 float truePierceDamage = impulse   * e.getSharpness() * weapC.pierceDamage * weapC.pierceAdjustment * impulseAdjustment;
 
-                //”ÓÌ Ò ‡ÏÓÓÏ
+                //–£—Ä–æ–Ω —Å –∞—Ä–º–æ—Ä–æ–º
                 float dullDamage = trueDullDamage   * leagueFormula(wreckC.dullArmor);
                 float sliceDamage = trueSliceDamage * leagueFormula(wreckC.sliceArmor);
                 float pierceDamage = truePierceDamage * leagueFormula(wreckC.pierceArmor);
 
-                float totalDamage = dullDamage + sliceDamage + pierceDamage; // ÍÓÌÂ˜Ì˚È ƒ‡Ï‡„
+                float totalDamage = dullDamage + sliceDamage + pierceDamage; // –∫–æ–Ω–µ—á–Ω—ã–π –î–∞–º–∞–≥
 
                 //************************//
-                //* –¿——◊®“ ƒŒœ »Ãœ”À‹—¿ *//
+                //* –†–ê–°–°–ß–Å–¢ –î–û–ü –ò–ú–ü–£–õ–¨–°–ê *//
                 //************************//
 
                 float additionalImpulse =
-                        e.getSharpness() > e.getDullness() ? // ÂÒÎË Û‰‡ ·˚Î ÓÒÚ˚Ï, ‡ ÌÂ ÚÛÔ˚Ï, ÚÓ ÌÂ ÓÚ·‡Ò˚‚‡ÂÏ ‰ÓÔÓÎÓÌËÚÂÎ¸ÌÓ.
+                        e.getSharpness() > e.getDullness() ? // –µ—Å–ª–∏ —É–¥–∞—Ä –±—ã–ª –æ—Å—Ç—Ä—ã–º, –∞ –Ω–µ —Ç—É–ø—ã–º, —Ç–æ –Ω–µ –æ—Ç–±—Ä–∞—Å—ã–≤–∞–µ–º –¥–æ–ø–æ–ª–æ–Ω–∏—Ç–µ–ª—å–Ω–æ.
                         0 :
-                        e.getWreckerBody().getMass() * (impulse * ((weapC.hitImpulse * leagueFormula(wreckC.stability)) / 100) ); // ‰ÓÔÓÎÌËÚÂÎ¸ÌÓÂ ÓÚ·‡Ò˚‚‡ÌËÂ. ÏÓÊÂÚ ·˚Ú¸ ÏÂÌ¸¯Â ÌÛÎˇ
+                        e.getWreckerBody().getMass() * (impulse * ((weapC.hitImpulse * leagueFormula(wreckC.stability)) / 100) ); // –¥–æ–ø–æ–ª–Ω–∏—Ç–µ–ª—å–Ω–æ–µ –æ—Ç–±—Ä–∞—Å—ã–≤–∞–Ω–∏–µ. –º–æ–∂–µ—Ç –±—ã—Ç—å –º–µ–Ω—å—à–µ –Ω—É–ª—è
 
 
                 //*****************//
-                //* –¿——◊®“ —“¿Õ¿ *//
+                //* –†–ê–°–°–ß–Å–¢ –°–¢–ê–ù–ê *//
                 //*****************//
 
                 float dullHitForce = ((impulse * e.getDullness()) / 500);
-                dullHitForce = dullHitForce > 1 ? 1 : dullHitForce;   // ÏÓ˘ÌÓÒÚ¸ ÚÛÔÓ„Ó Û‰‡‡. 0..1
-                float stunChance = dullHitForce * (weapC.stunAbility / 100f) //ÔÓÎÌÓÒÚ¸˛ Á‡‚ËÒËÚ ÓÚ ÒÚ‡Ú˚ ÓÛÊËˇ. 1, ÚÓÎ¸ÍÓ ÂÒÎË stunAbility == 100
-                        * leagueFormula(wreckC.stunResist); // ƒÓ·‡‚ÎˇÂÏ ÂÁËÒÚ˚.
+                dullHitForce = dullHitForce > 1 ? 1 : dullHitForce;   // –º–æ—â–Ω–æ—Å—Ç—å —Ç—É–ø–æ–≥–æ —É–¥–∞—Ä–∞. 0..1
+                float stunChance = dullHitForce * (weapC.stunAbility / 100f) //–ø–æ–ª–Ω–æ—Å—Ç—å—é –∑–∞–≤–∏—Å–∏—Ç –æ—Ç —Å—Ç–∞—Ç—ã –æ—Ä—É–∂–∏—è. 1, —Ç–æ–ª—å–∫–æ –µ—Å–ª–∏ stunAbility == 100
+                        * leagueFormula(wreckC.stunResist); // –î–æ–±–∞–≤–ª—è–µ–º —Ä–µ–∑–∏—Å—Ç—ã.
                 System.out.println("Stun chance: " + stunChance);
-                boolean doStun = random.nextFloat() < stunChance;
+                boolean doStun = rand.nextFloat() < stunChance;
                 float stunDuration = 0;
                 if (doStun){
-                    stunDuration = (weapC.stunAbility / 20) //Ã‡ÍÒËÏ‡Î¸Ì˚È ÒÚ‡Ì ·ÂÁ ÂÁËÒÚ‡ == 5 ÒÂÍÛÌ‰
+                    stunDuration = (weapC.stunAbility / 20) //–ú–∞–∫—Å–∏–º–∞–ª—å–Ω—ã–π —Å—Ç–∞–Ω –±–µ–∑ —Ä–µ–∑–∏—Å—Ç–∞ == 5 —Å–µ–∫—É–Ω–¥
                             * leagueFormula(wreckC.stunResist); //
                 }
 
                 //***********************//
-                //* –¿——◊®“ «¿—“–≈¬¿Õ»ﬂ *//
+                //* –†–ê–°–°–ß–Å–¢ –ó–ê–°–¢–†–ï–í–ê–ù–ò–Ø *//
                 //***********************//
                 boolean stuck = e.getSharpness() > 0.7f && impulse > 200; //TODO
 
 
                 //**************//
-                //* œ–»Ã≈Õ≈Õ»≈ *//
+                //* –ü–†–ò–ú–ï–ù–ï–ù–ò–ï *//
                 //**************//
 
                 if (additionalImpulse > 1) {
                     Vector2 box2dPos = vec1.set(e.getPoint()).scl(1 / GameAssets.box2dScale);
                     Vector2 box2dImpulse = vec2.set(e.getCollisionVelocity()).nor().scl(-additionalImpulse);
-                    e.getWreckerBody().applyForceToCenter(box2dImpulse, true); //œËÏÂÌˇÂÏ ‰ÓÔ ËÏÔÛÎ¸Ò.
+                    e.getWreckerBody().applyForceToCenter(box2dImpulse, true); //–ü—Ä–∏–º–µ–Ω—è–µ–º –¥–æ–ø –∏–º–ø—É–ª—å—Å.
                 }
                 //if (stuck){ //TODO
                 //    System.out.println("Stuck");
@@ -139,11 +151,11 @@ public class DamageSystem extends EntitySystem {
                 //        }
                 //    });
                 //}
-                applyDamageAndDispatch(e.getTargetWrecker(), hc, totalDamage, e);  //œËÏÂÌˇÂÏ ÛÓÌ
+                applyDamageAndDispatch(e.getTargetWrecker(), hc, totalDamage, e, (doStun ? stunDuration : -1));  //–ü—Ä–∏–º–µ–Ω—è–µ–º —É—Ä–æ–Ω
 
 
                 //*********//
-                //* “≈—“€ *//
+                //* –¢–ï–°–¢–´ *//
                 //*********//
 
                 engine.add(new EntityNumber((int) totalDamage, 2, e.getPoint().x, e.getPoint().y));
@@ -154,7 +166,7 @@ public class DamageSystem extends EntitySystem {
                 engine.add(new EntityString(
                         (int)(e.getDullness() * 100) + " / " +
                                 (int) (e.getSliceness() * 100) + " / " +
-                                (int) (e.getSharpness() * 100), 2, e.getPoint().x + (random.nextFloat() * 50 - 25), e.getPoint().y + 25, Color.PINK));
+                                (int) (e.getSharpness() * 100), 2, e.getPoint().x + (rand.nextFloat() * 50 - 25), e.getPoint().y + 25, Color.PINK));
                 engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getCollisionVelocity()).nor().scl(75).add(e.getPoint()), 1, Color.ORANGE));
                 engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getNormal()).scl(75).add(e.getPoint()), 1, Color.BROWN));
                 if ( e.getSharpness() > 0.1f) engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getPiercingDirection()).scl(75).add(e.getPoint()), 1, Color.CYAN));
@@ -163,7 +175,7 @@ public class DamageSystem extends EntitySystem {
     }
 
 
-    private void applyDamageAndDispatch(Entity e, HealthComponent hc, float damage, Event hitEvent){
+    private void applyDamageAndDispatch(Entity e, HealthComponent hc, float damage, Event hitEvent, float stunDuration){
         hc.health -= damage;
         hc.lastDamageDone = System.currentTimeMillis();
         getEngine().dispatch(new DamageEvent(e, damage, hitEvent));
@@ -171,6 +183,11 @@ public class DamageSystem extends EntitySystem {
             hc.health = 0;
             hc.dead = true;
             getEngine().dispatchLater(new DeathEvent(e, hitEvent));
+        }
+
+        if (hitEvent instanceof WeaponWreckerHitEvent){
+            WeaponWreckerHitEvent wwh = (WeaponWreckerHitEvent) hitEvent;
+            model.getSocket().send(new NetHitEvent(e.id, wwh.getWeapon().id, wwh.getPoint().x, wwh.getPoint().y, damage, hc.health, hc.dead, wwh.getSliceness(), wwh.getDullness(), wwh.getSharpness(), stunDuration));
         }
     }
 

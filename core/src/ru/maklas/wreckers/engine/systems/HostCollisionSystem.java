@@ -11,6 +11,7 @@ import ru.maklas.mengine.Subscription;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
+import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.client.entities.EntityString;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PickUpComponent;
@@ -28,7 +29,26 @@ import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
 import static ru.maklas.wreckers.assets.EntityType.*;
 import static ru.maklas.wreckers.assets.GameAssets.leagueFormula;
 
-public class CollisionSystem extends EntitySystem{
+/**
+ * <p>
+ * РЎРёСЃС‚РµРјР° РїСЂРёРЅРёРјР°РµС‚ CollisionEvent'С‹. Рё РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚, РіРµРЅРµСЂРёСЂСѓСЏ:
+ * <li>DetachRequest</li>
+ * <li>HitEvent</li>
+ * <p>
+ * РћС‚РІРµС‡Р°РµС‚ Р·Р° РєРѕР»Р»РёР·РёСЋ С‚РµР», СЂР°Р·РґРµР»СЏСЏ РЅР° РєРѕР»Р»РёР·РёСЋ:
+ * <li>РРіСЂРѕРєР° СЃ РѕСЂСѓР¶РёРµРј</li>
+ * <li>РРіСЂРѕРєР° СЃ РёРіСЂРѕРєРѕРј</li>
+ * <li>РћСЂСѓР¶РёСЏ СЃ РѕСЂСѓР¶РёРµРј</li>
+ *
+ * РќРµ РїСЂРµРґРїСЂРёРЅРёРјР°РµС‚ РЅРёРєР°РєРёС… РґРµР№СЃС‚РІРёР№ СЃ Entity. РўРѕР»СЊРєРѕ РґРёСЃРїР°С‚С‡РёС‚
+ */
+public class HostCollisionSystem extends EntitySystem{
+
+    private final GameModel model;
+
+    public HostCollisionSystem(GameModel model) {
+        this.model = model;
+    }
 
     @Override
     public void onAddedToEngine(final Engine engine) {
@@ -57,8 +77,7 @@ public class CollisionSystem extends EntitySystem{
         });
     }
 
-    // Контакт и импульс нельзя передавать далее
-    @SuppressWarnings("all")
+    // РљРѕРЅС‚Р°РєС‚ Рё РёРјРїСѓР»СЊСЃ РЅРµР»СЊР·СЏ РїРµСЂРµРґР°РІР°С‚СЊ РґР°Р»РµРµ
     private void handleWeaponToWeapon(final Entity weaponA, EntityType typeA, Entity weaponB, EntityType typeB, Contact contact, ContactImpulse impulse){
         final float impulseAdjustment = 0.12f;
         float impulseForce = impulse.getNormalImpulses()[0] * impulseAdjustment;
@@ -104,7 +123,7 @@ public class CollisionSystem extends EntitySystem{
         }
     }
 
-    // Контакт и импульс нельзя передавать далее
+    // РљРѕРЅС‚Р°РєС‚ Рё РёРјРїСѓР»СЊСЃ РЅРµР»СЊР·СЏ РїРµСЂРµРґР°РІР°С‚СЊ РґР°Р»РµРµ
     private void handleWeaponToPlayer(final Entity weapon, EntityType weaponType, final Entity player, EntityType playerType, Contact contact, ContactImpulse impulse, boolean weaponIsA){
         //*********************//
         //* FIXTURE CONDITION *//
@@ -139,7 +158,7 @@ public class CollisionSystem extends EntitySystem{
         float sharpness;
 
 
-        final Vector2 playerNormal = calculatePlayerNormal(manifold, weaponIsA, playerFixture, collisionPoint); //Вектор нормали игрока в точке
+        final Vector2 playerNormal = calculatePlayerNormal(manifold, weaponIsA, playerFixture, collisionPoint); //Р’РµРєС‚РѕСЂ РЅРѕСЂРјР°Р»Рё РёРіСЂРѕРєР° РІ С‚РѕС‡РєРµ
         final Vector2 piercingDirection = new Vector2(1, 0);
         final Vector2 weaponStuckPoint = new Vector2(1, 0);
         dullness = calculateDullness(collisionVelocity, playerNormal);
@@ -184,12 +203,12 @@ public class CollisionSystem extends EntitySystem{
     private float calculateSharpness(WeaponPiercingFD weaponFD, Fixture weaponFixture, Vector2 collisionVelocity) {
         Vector2 worldPierceDirection = new Vector2();
         weaponFD.getWorldDirection(weaponFixture, worldPierceDirection);
-        float angle = worldPierceDirection.angle(collisionVelocity); // будут ценится значения ~0 и ~180
-        angle = angle < 0 ? -angle : angle; // берем модуль 0..180
-        angle -= 90; // -90..90 Ценятся ~-90 и ~90
-        angle = angle < 0 ? -angle : angle; // снова берем модуль 0..90. где 90 - топ
+        float angle = worldPierceDirection.angle(collisionVelocity); // Р±СѓРґСѓС‚ С†РµРЅРёС‚СЃСЏ Р·РЅР°С‡РµРЅРёСЏ ~0 Рё ~180
+        angle = angle < 0 ? -angle : angle; // Р±РµСЂРµРј РјРѕРґСѓР»СЊ 0..180
+        angle -= 90; // -90..90 Р¦РµРЅСЏС‚СЃСЏ ~-90 Рё ~90
+        angle = angle < 0 ? -angle : angle; // СЃРЅРѕРІР° Р±РµСЂРµРј РјРѕРґСѓР»СЊ 0..90. РіРґРµ 90 - С‚РѕРї
         angle /= 90f; //0..1
-        return angle > 0.6f ? angle : 0; //Отсеиваем тупые удары
+        return angle > 0.6f ? angle : 0; //РћС‚СЃРµРёРІР°РµРј С‚СѓРїС‹Рµ СѓРґР°СЂС‹
     }
 
     private Vector2 calculatePlayerNormal(WorldManifold manifold, boolean weaponIsA, Fixture playerFixture, Vector2 collisionPoint) {
@@ -205,11 +224,11 @@ public class CollisionSystem extends EntitySystem{
         float angle = collisionVelocity.angle(box2dPlayerNormal);
         angle = angle < 0 ? -angle : angle; // abs(angle) 0..180
         angle -= 90; // -90..90
-        angle = angle < 0 ? -angle : angle; //0..90 где 0 - абсолютно режущий удар, а 90 - абсолютно тупой
+        angle = angle < 0 ? -angle : angle; //0..90 РіРґРµ 0 - Р°Р±СЃРѕР»СЋС‚РЅРѕ СЂРµР¶СѓС‰РёР№ СѓРґР°СЂ, Р° 90 - Р°Р±СЃРѕР»СЋС‚РЅРѕ С‚СѓРїРѕР№
         return angle / 90f;
     }
 
-    // Контакт и импульс нельзя передавать далее
+    // РљРѕРЅС‚Р°РєС‚ Рё РёРјРїСѓР»СЊСЃ РЅРµР»СЊР·СЏ РїРµСЂРµРґР°РІР°С‚СЊ РґР°Р»РµРµ
     private void handlePlayerToPlayer(Entity playerA, EntityType typeA, Entity playerB, EntityType typeB, Contact contact, ContactImpulse impulse){
 
     }

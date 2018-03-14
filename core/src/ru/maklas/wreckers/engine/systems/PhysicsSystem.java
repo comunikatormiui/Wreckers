@@ -16,6 +16,12 @@ import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
 
+/**
+ * Стандартная система для физики. Сопоставляет body.transform() с entity.x, y, angle.
+ * Убеждается что при добавлении Entity в Engine, у body будет Entity в userData,
+ * а у каждого Fixture будет FixtureData или кинет RuntimeException
+ * При удалении из движка Entity, удаляет и Body, потому не нужно удалять Body самостоятельно.
+ */
 public class PhysicsSystem extends CollisionEntitySystem implements EntityListener {
 
     private final World world;

@@ -9,7 +9,7 @@ import ru.maklas.mengine.Subscription;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
-import ru.maklas.wreckers.client.ClientGameModel;
+import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.events.DamageEvent;
@@ -23,7 +23,7 @@ public class EntityPlayer extends GameEntity {
 
     private static final int playerMass = 100;
 
-    public EntityPlayer(int id, float x, float y, float health, ClientGameModel model, EntityType eType) {
+    public EntityPlayer(int id, float x, float y, float health, GameModel model, EntityType eType) {
         super(id, eType, x, y, GameAssets.playerZ);
 
         float bodyRadius = 40;

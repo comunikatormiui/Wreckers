@@ -106,14 +106,14 @@ public abstract class State {
     /**
      * Determines whether to update this State.
      */
-    public void setUpdatable(boolean updatable){
+    public final void setUpdatable(boolean updatable){
         this.updatable = updatable;
     }
 
     /**
      * Determines whether to render this State.
      */
-    public void setRender(boolean enable){
+    public final void setRender(boolean enable){
         this.render = enable;
     }
 

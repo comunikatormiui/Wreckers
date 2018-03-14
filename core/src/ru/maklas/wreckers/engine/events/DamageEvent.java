@@ -1,14 +1,15 @@
 package ru.maklas.wreckers.engine.events;
 
+import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Entity;
 
 public class DamageEvent {
 
     Entity target;
     float damage;
-    Event hitEvent;
+    @Nullable Event hitEvent;
 
-    public DamageEvent(Entity target, float damage, Event hitEvent) {
+    public DamageEvent(Entity target, float damage, @Nullable Event hitEvent) {
         this.target = target;
         this.damage = damage;
         this.hitEvent = hitEvent;
@@ -22,6 +23,7 @@ public class DamageEvent {
         return damage;
     }
 
+    @Nullable
     public Event getHitEvent() {
         return hitEvent;
     }

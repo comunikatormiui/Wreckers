@@ -6,6 +6,9 @@ import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.StatusEffectComponent;
 import ru.maklas.wreckers.engine.others.StatusEffect;
 
+/**
+ * Система эффектов. Управляет эффектами игроков, обновляет.
+ */
 public class StatusEffectSystem extends EntitySystem implements EntityListener {
 
     ImmutableArray<Entity> entities;

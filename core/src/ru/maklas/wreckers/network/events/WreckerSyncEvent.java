@@ -41,7 +41,7 @@ public class WreckerSyncEvent implements Copyable {
     }
 
     public int getId(){
-        return pos.getEntityId();
+        return pos.getId();
     }
     
     

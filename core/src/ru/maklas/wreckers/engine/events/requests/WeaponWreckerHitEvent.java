@@ -53,6 +53,9 @@ public class WeaponWreckerHitEvent implements Event {
         return targetWrecker;
     }
 
+    /**
+     * Engine scale
+     */
     public Vector2 getPoint() {
         return point;
     }

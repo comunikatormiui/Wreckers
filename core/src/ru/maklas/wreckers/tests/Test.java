@@ -2,10 +2,9 @@ package ru.maklas.wreckers.tests;
 
 
 import com.badlogic.gdx.math.Vector2;
-import ru.maklas.wreckers.engine.systems.CollisionSystem;
+import ru.maklas.wreckers.engine.systems.HostCollisionSystem;
 import ru.maklas.wreckers.libs.ClassUtils;
 import ru.maklas.wreckers.libs.Utils;
-import ru.maklas.wreckers.network.events.BodySyncEvent;
 
 /**
  * Created by maklas on 04-Jan-18.
@@ -19,10 +18,9 @@ public class Test {
     public static void main(String[] args){
 
         new EventMaker()
-                .name("WreckerSyncEvent")
-                .field(BodySyncEvent.class, "pos")
-                .float_("motorX")
-                .float_("motorY")
+                .name("NetGrabZoneChange")
+                .int_("entityId")
+                .bool("enable")
                 .build();
 
         if (true){
@@ -33,7 +31,7 @@ public class Test {
         Vector2 playerNorm = new Vector2(-1.1f, 0).nor();
         System.out.println(vel.angle(playerNorm));
 
-        float dullPercent = CollisionSystem.calculateDullness(vel, playerNorm);
+        float dullPercent = HostCollisionSystem.calculateDullness(vel, playerNorm);
         float sharpPercent = 1 - dullPercent;
         System.out.println("Sharp:  " + Utils.floatFormatted(sharpPercent  * 100, 2) + '%');
         System.out.println("Direct: " + Utils.floatFormatted(dullPercent * 100, 2) + '%');

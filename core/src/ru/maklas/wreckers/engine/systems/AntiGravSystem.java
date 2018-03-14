@@ -10,9 +10,17 @@ import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.engine.events.AttachEvent;
 import ru.maklas.wreckers.libs.Utils;
 
+/**
+ * <p>
+ *     Работает с AntiGravComponent. Обновляет массу Entity при её изменении.
+ *     При включенном режиме, добавляет Entity вертикальное направление противоположное гравитации
+ *     для поддержания стабильной высоты. Так же вращает Entity в нужном направлении чтобы Entity стремился
+ *     к вертикальному положению в пространстве. Иногда пошатывает Entity чтобы выглядело аутентично.
+ * </p>
+ */
 public class AntiGravSystem extends EntitySystem {
 
-    ImmutableArray<Entity> entities;
+    private ImmutableArray<Entity> entities;
 
     @Override
     public void onAddedToEngine(Engine engine) {

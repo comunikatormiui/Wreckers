@@ -5,24 +5,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
-import ru.maklas.wreckers.client.ClientGameModel;
+import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.client.entities.*;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
-import ru.maklas.wreckers.engine.components.GrabZoneComponent;
-import ru.maklas.wreckers.engine.components.PickUpComponent;
-import ru.maklas.wreckers.engine.components.StatusEffectComponent;
-import ru.maklas.wreckers.engine.events.CollisionEvent;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
-import ru.maklas.wreckers.engine.events.requests.AttachRequest;
-import ru.maklas.wreckers.engine.others.DisarmStatusEffect;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
@@ -35,7 +28,7 @@ public class MainMenuState extends State implements GameController {
     World world;
     PhysicsDebugSystem debugSystem;
     OrthographicCamera cam;
-    ClientGameModel model;
+    GameModel model;
     GameUI ui;
 
     @Override
@@ -49,16 +42,16 @@ public class MainMenuState extends State implements GameController {
 
         engine.add(new PhysicsSystem(world));
         engine.add(new RenderingSystem(batch, cam));
-        engine.add(new CollisionSystem());
-        engine.add(new DamageSystem());
+        engine.add(new HostCollisionSystem(model));
+        engine.add(new HostDamageSystem(model));
         engine.add(new TTLSystem());
         engine.add(new AntiGravSystem());
-        engine.add(new PickUpSystem(world));
+        engine.add(new HostPickUpSystem(model));
         engine.add(new MotorSystem());
         engine.add(new StatusEffectSystem());
 
 
-        model = new ClientGameModel();
+        model = new GameModel();
         model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
         model.setEngine(engine);
         model.setFixturer(new FDefBuilder());
@@ -66,73 +59,7 @@ public class MainMenuState extends State implements GameController {
         model.setWorld(world);
 
 
-        world.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-                // Sensor Overlap
-                Fixture fixtureA = contact.getFixtureA();
-                Fixture fixtureB = contact.getFixtureB();
-                if (fixtureA.isSensor() && fixtureB.isSensor()){
-                    handleBothSensors(contact, fixtureA, fixtureB);
-                }
-            }
-
-            @Override
-            public void endContact(Contact contact) {
-
-            }
-
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {
-
-            }
-
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {
-                {   //COLLISION EVENT
-                    Entity a = (Entity) contact.getFixtureA().getBody().getUserData();
-                    Entity b = (Entity) contact.getFixtureB().getBody().getUserData();
-                    CollisionEvent event = new CollisionEvent(a, b, contact, impulse, true);
-                    engine.dispatch(event);
-                }
-            }
-
-            @SuppressWarnings("all")
-            private void handleBothSensors(Contact contact, final Fixture fixtureA, final Fixture fixtureB) {
-                FixtureData udA;
-                FixtureData udB;
-                Entity eA = (Entity) fixtureA.getBody().getUserData();
-                Entity eB = (Entity) fixtureB.getBody().getUserData();
-                try {
-                    udA = (FixtureData) fixtureA.getUserData();
-                    udB = (FixtureData) fixtureB.getUserData();
-                } catch (Exception e) {
-                    System.err.println(eA + " OR " + eB + " have no fixture data on some of their fixtures");
-                    e.printStackTrace();
-                    return;
-                }
-                FixtureType type1 = udA.getFixtureType();
-                FixtureType type2 = udB.getFixtureType();
-
-                if (type1 == FixtureType.PICKUP_SENSOR && type2 == FixtureType.GRABBER_SENSOR){
-                    final PickUpComponent wPick = eA.get(Mappers.pickUpM);
-                    final GrabZoneComponent pPick = eB.get(Mappers.grabM);
-                    StatusEffectComponent secB = eB.get(Mappers.effectM);
-                    boolean grabberHasNoDisarmStatus = secB == null || !secB.contains(DisarmStatusEffect.class);
-                    if (wPick.pickUpZoneEnabled() && pPick.enabled() && grabberHasNoDisarmStatus){
-                        engine.dispatchLater(new AttachRequest(eB, pPick, eA, wPick));
-                    }
-                } else if (type1 == FixtureType.GRABBER_SENSOR && type2 == FixtureType.PICKUP_SENSOR){
-                    final PickUpComponent wPick = eB.get(Mappers.pickUpM);
-                    final GrabZoneComponent pPick = eA.get(Mappers.grabM);
-                    StatusEffectComponent secA = eA.get(Mappers.effectM);
-                    boolean grabberHasNoDisarmStatus = secA == null || !secA.contains(DisarmStatusEffect.class);
-                    if (wPick.pickUpZoneEnabled() && pPick.enabled() && grabberHasNoDisarmStatus){
-                        engine.dispatchLater(new AttachRequest(eA, pPick, eB, wPick));
-                    }
-                }
-            }
-        });
+        world.setContactListener(new HostContactListener(engine, model));
         debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale);
 
 

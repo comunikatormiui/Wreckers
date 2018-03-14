@@ -23,8 +23,8 @@ public abstract class StatusEffect implements Comparable<StatusEffect>{
     }
 
     /**
-     * Может ли этот эффект быть применён к данному Entity
-     * @param effects - Массив текущих применённых эффектов на этом Entity
+     * РњРѕР¶РµС‚ Р»Рё СЌС‚РѕС‚ СЌС„С„РµРєС‚ Р±С‹С‚СЊ РїСЂРёРјРµРЅС‘РЅ Рє РґР°РЅРЅРѕРјСѓ Entity
+     * @param effects - РњР°СЃСЃРёРІ С‚РµРєСѓС‰РёС… РїСЂРёРјРµРЅС‘РЅРЅС‹С… СЌС„С„РµРєС‚РѕРІ РЅР° СЌС‚РѕРј Entity
      */
     public abstract boolean canBeApplied(Entity e, ImmutableArray<StatusEffect> effects);
 

@@ -4,15 +4,15 @@ import ru.maklas.mengine.Component;
 
 public class WeaponComponent implements Component{
 
-    public float dullDamage;        // Публичный модификатор урона прямых ударов. Нормальные значения - 20..100
-    public float sliceDamage;       // Публичный модификатор урона краем оружия.  Нормальные значения - 20..100
-    public float pierceDamage;       // Публичный модификатор колющего урона.     Нормальные значения - 20..100
-    public float dullAdjustment;    // Скрытый модификатор атаки
-    public float sliceAdjustment;   // Скрытый модификатор атаки
-    public float pierceAdjustment;  // Скрытый модификатор атаки
-    public float hitImpulse;    //Дополнительное отбрасывание.     Нормальные значения - 0..80
-    public float disarmAbility; //Влияет на вероятность выбить оружие у врага. Нормальные значения - 0..100
-    public float stunAbility; //Влияет на шанс оглушить и время действия оглушения. Нормальные значения - 0..100
+    public float dullDamage;        // РџСѓР±Р»РёС‡РЅС‹Р№ РјРѕРґРёС„РёРєР°С‚РѕСЂ СѓСЂРѕРЅР° РїСЂСЏРјС‹С… СѓРґР°СЂРѕРІ. РќРѕСЂРјР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ - 20..100
+    public float sliceDamage;       // РџСѓР±Р»РёС‡РЅС‹Р№ РјРѕРґРёС„РёРєР°С‚РѕСЂ СѓСЂРѕРЅР° РєСЂР°РµРј РѕСЂСѓР¶РёСЏ.  РќРѕСЂРјР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ - 20..100
+    public float pierceDamage;       // РџСѓР±Р»РёС‡РЅС‹Р№ РјРѕРґРёС„РёРєР°С‚РѕСЂ РєРѕР»СЋС‰РµРіРѕ СѓСЂРѕРЅР°.     РќРѕСЂРјР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ - 20..100
+    public float dullAdjustment;    // РЎРєСЂС‹С‚С‹Р№ РјРѕРґРёС„РёРєР°С‚РѕСЂ Р°С‚Р°РєРё
+    public float sliceAdjustment;   // РЎРєСЂС‹С‚С‹Р№ РјРѕРґРёС„РёРєР°С‚РѕСЂ Р°С‚Р°РєРё
+    public float pierceAdjustment;  // РЎРєСЂС‹С‚С‹Р№ РјРѕРґРёС„РёРєР°С‚РѕСЂ Р°С‚Р°РєРё
+    public float hitImpulse;    //Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕС‚Р±СЂР°СЃС‹РІР°РЅРёРµ.     РќРѕСЂРјР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ - 0..80
+    public float disarmAbility; //Р’Р»РёСЏРµС‚ РЅР° РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ РІС‹Р±РёС‚СЊ РѕСЂСѓР¶РёРµ Сѓ РІСЂР°РіР°. РќРѕСЂРјР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ - 0..100
+    public float stunAbility; //Р’Р»РёСЏРµС‚ РЅР° С€Р°РЅСЃ РѕРіР»СѓС€РёС‚СЊ Рё РІСЂРµРјСЏ РґРµР№СЃС‚РІРёСЏ РѕРіР»СѓС€РµРЅРёСЏ. РќРѕСЂРјР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ - 0..100
 
     public WeaponComponent(float dullDamage, float sliceDamage, float pierceDamage, float dullAdjustment, float sliceAdjustment, float pierceAdjustment, float hitImpulse, float disarmAbility, float stunAbility) {
         this.dullDamage = dullDamage;

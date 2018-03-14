@@ -9,19 +9,22 @@ import ru.maklas.wreckers.game.BodyBuilder;
 import ru.maklas.wreckers.game.FDefBuilder;
 import ru.maklas.wreckers.game.ShapeBuilder;
 
-public class ClientGameModel {
+public class GameModel {
 
     Engine engine;
     World world;
-    Entity player;
     Socket socket;
+    boolean host;
+    int skipFrameForUpdate;
 
     ShapeBuilder shaper;
     FDefBuilder fixturer;
     BodyBuilder builder;
-    private EntityPlayer opponent;
 
-    public ClientGameModel() {
+    Entity player;
+    EntityPlayer opponent;
+
+    public GameModel() {
 
     }
 
@@ -88,5 +91,52 @@ public class ClientGameModel {
 
     public void setBuilder(BodyBuilder builder) {
         this.builder = builder;
+    }
+
+    public boolean isHost() {
+        return host;
+    }
+
+    public void setHost(boolean host) {
+        this.host = host;
+    }
+
+    public int getSkipFrameForUpdate() {
+        return skipFrameForUpdate;
+    }
+
+    /**
+     * устанавливает через сколько кадров произройдет апдейт. Напирмер:
+     * 2 будет означать что скипнется текущий фрейм, затем следующий.
+     * И только на после-следующий кадр будет произведен апдейт.
+     * В сумме пропустится времени: 0.016 * 2 = 0.032 секунды
+     * количество пропущенного времени с момента триггера метода:
+     * <p>
+     *     <li>  1: 0.016</li>
+     *     <li>  2: 0.032</li>
+     *     <li>  5: 0.08</li>
+     *     <li>10: 0.16</li>
+     *     <li>15: 0.24</li>
+     *     <li>20: 0.32</li>
+     *     <li>30: 0.48</li>
+     *     <li>60: 1</li>
+     * </p>
+     *
+     * @param skipFrameForUpdate
+     */
+    public void setSkipFrameForUpdate(int skipFrameForUpdate) {
+        this.skipFrameForUpdate = skipFrameForUpdate;
+    }
+
+    public void decSkipFrames(){
+        this.skipFrameForUpdate--;
+    }
+
+    public void setUpdateThisFrame(){
+        this.skipFrameForUpdate = 0;
+    }
+
+    public boolean timeToUpdate(){
+        return skipFrameForUpdate <= 0;
     }
 }
