@@ -1,6 +1,5 @@
 package ru.maklas.wreckers.desktop;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import ru.maklas.wreckers.Wreckers;
@@ -12,8 +11,8 @@ public class Host {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width  = (int) (640 * 1.5f);
         config.height = (int) (360 * 1.5f);
+        config.title = "Host";
         new LwjglApplication(new Wreckers(new HostState()), config);
-        Gdx.graphics.setTitle("Host");
     }
 
 }

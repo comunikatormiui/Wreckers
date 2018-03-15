@@ -6,7 +6,10 @@ import ru.maklas.mnet.ServerAuthenticator;
 import ru.maklas.mnet.ServerSocket;
 import ru.maklas.mnet.Socket;
 import ru.maklas.mnet.impl.ServerSocketImpl;
+import ru.maklas.mnet.impl.udp.HighPingUDPSocket;
 import ru.maklas.mrudp.ConnectionResponsePackage;
+import ru.maklas.mrudp.JavaUDPSocket;
+import ru.maklas.mrudp.UDPSocket;
 import ru.maklas.wreckers.assets.Images;
 import ru.maklas.wreckers.assets.InetAssets;
 import ru.maklas.wreckers.libs.gsm_lib.GSMBackToFirst;
@@ -78,7 +81,8 @@ public class HostState extends State {
             }
         };
         try {
-            serverSocket = new ServerSocketImpl(InetAssets.defaultPort, InetAssets.defaultBufferSize, singleSocketAuthenticator, InetAssets.serializerProvider());
+            UDPSocket sock = new JavaUDPSocket(InetAssets.defaultPort);
+            serverSocket = new ServerSocketImpl("Server", sock, InetAssets.defaultBufferSize, 7000, 2500, singleSocketAuthenticator, InetAssets.serializerProvider());
             serverSocket.start();
         } catch (Exception e) {
             e.printStackTrace();

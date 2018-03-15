@@ -6,6 +6,9 @@ import ru.maklas.mnet.Handler;
 import ru.maklas.mnet.ServerResponse;
 import ru.maklas.mnet.Socket;
 import ru.maklas.mnet.impl.SocketImpl;
+import ru.maklas.mnet.impl.udp.HighPingUDPSocket;
+import ru.maklas.mrudp.JavaUDPSocket;
+import ru.maklas.mrudp.UDPSocket;
 import ru.maklas.wreckers.Wreckers;
 import ru.maklas.wreckers.assets.InetAssets;
 import ru.maklas.wreckers.libs.gsm_lib.State;
@@ -21,7 +24,8 @@ public class JoinState extends State{
     @Override
     protected void onCreate() {
         try {
-            socket = new SocketImpl("Client", InetAssets.defaultBufferSize, InetAssets.serializerProvider().provide());
+            UDPSocket sock = new JavaUDPSocket();
+            socket = new SocketImpl("Client", sock, 7000, InetAssets.defaultBufferSize, InetAssets.serializerProvider().provide());
             socket.start(InetAssets.defaultClientSocketUpdate);
             socket.connectAsync((int) TimeUnit.SECONDS.toMillis(10), InetAddress.getLocalHost(), InetAssets.defaultPort, new ConnectionRequest("Client", Wreckers.VERSION), new Handler<ServerResponse>() {
                 @Override

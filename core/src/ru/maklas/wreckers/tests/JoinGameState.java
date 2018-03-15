@@ -44,7 +44,15 @@ public class JoinGameState extends State implements SocketProcessor {
         cam = new OrthographicCamera(1280, 720);
         engine = new Engine();
         World world = new World(new Vector2(0, -9.8f), true);
+
         model = new GameModel();
+        model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
+        model.setEngine(engine);
+        model.setFixturer(new FDefBuilder());
+        model.setShaper(new ShapeBuilder(GameAssets.box2dScale));
+        model.setWorld(world);
+        model.setSocket(socket);
+        model.setCamera(cam);
 
         engine.add(new RenderingSystem(batch, cam));
         debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale);
@@ -58,13 +66,6 @@ public class JoinGameState extends State implements SocketProcessor {
         engine.add(new PhysicsSystem(world));
         engine.add(new TTLSystem());
 
-        model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
-        model.setEngine(engine);
-        model.setFixturer(new FDefBuilder());
-        model.setShaper(new ShapeBuilder(GameAssets.box2dScale));
-        model.setWorld(world);
-        model.setSocket(socket);
-        model.setCamera(cam);
 
         ContactListener worldListener = new JoinContactListener(engine);
         world.setContactListener(worldListener);

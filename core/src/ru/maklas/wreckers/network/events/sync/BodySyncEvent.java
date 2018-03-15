@@ -17,27 +17,30 @@ public class BodySyncEvent implements Copyable {
     float velX;
     float velY;
     float angle;
+    float angVel;
     
-    public BodySyncEvent (int entityId, float x, float y, float velX, float velY, float angle) {
+    public BodySyncEvent (int entityId, float x, float y, float velX, float velY, float angle, float angVel) {
         this.entityId = entityId;
         this.x = x;
         this.y = y;
         this.velX = velX;
         this.velY = velY;
         this.angle = angle;
+        this.angVel = angVel;
     }
     
     public BodySyncEvent () {
         
     }
     
-    public BodySyncEvent setAndRet(int entityId, float x, float y, float velX, float velY, float angle) {
+    public BodySyncEvent setAndRet(int entityId, float x, float y, float velX, float velY, float angle, float angularVelocity) {
         this.entityId = entityId;
         this.x = x;
         this.y = y;
         this.velX = velX;
         this.velY = velY;
         this.angle = angle;
+        this.angVel = angularVelocity;
         return this;
     }
     
@@ -61,15 +64,24 @@ public class BodySyncEvent implements Copyable {
         return this.velY;
     }
 
+    public float getAngle() {
+        return angle;
+    }
+
+    public float getAngVel() {
+        return angVel;
+    }
+
     public static BodySyncEvent fromBody(int id, @NotNull Body body){
         Vector2 position = body.getPosition();
         Vector2 linearVelocity = body.getLinearVelocity();
-        return new BodySyncEvent(id, position.x, position.y, linearVelocity.x, linearVelocity.y, body.getAngle());
+        return new BodySyncEvent(id, position.x, position.y, linearVelocity.x, linearVelocity.y, body.getAngle(), body.getAngularVelocity());
     }
 
     public void hardApply(Body body) {
         body.setTransform(x, y, angle);
         body.setLinearVelocity(velX, velY);
+        body.setAngularVelocity(angVel);
     }
 
 
@@ -82,11 +94,12 @@ public class BodySyncEvent implements Copyable {
         ", velX=" + velX +
         ", velY=" + velY +
         ", angle=" + angle +
+        ", angVel=" + angVel +
         '}';
     }
 
     @Override
     public Object copy() {
-        return new BodySyncEvent(entityId, x, y, velX, velY, angle);
+        return new BodySyncEvent(entityId, x, y, velX, velY, angle, angVel);
     }
 }

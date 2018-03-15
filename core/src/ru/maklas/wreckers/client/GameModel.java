@@ -17,6 +17,7 @@ public class GameModel {
     private OrthographicCamera cam;
     boolean host;
     int skipFrameForUpdate;
+    float lastPing;
 
     ShapeBuilder shaper;
     FDefBuilder fixturer;
@@ -104,6 +105,14 @@ public class GameModel {
 
     public OrthographicCamera getCam() {
         return cam;
+    }
+
+    public float getLastPing() {
+        return lastPing;
+    }
+
+    public void setPing(float lastPing) {
+        this.lastPing = lastPing;
     }
 
     public void setCamera(OrthographicCamera camera) {
