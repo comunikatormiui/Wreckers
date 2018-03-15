@@ -10,6 +10,7 @@ import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.engine.components.PickUpComponent;
 import ru.maklas.wreckers.engine.components.SocketComponent;
 import ru.maklas.wreckers.engine.components.WSocket;
+import ru.maklas.wreckers.engine.events.AttachEvent;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.network.events.NetAttachDetachEvent;
 
@@ -42,10 +43,15 @@ public class JoinPickUpSystem extends DefaultPickUpSystem {
                     return;
                 }
 
+                final boolean success;
                 if (e.toAttach()) {
-                    attachLogic(weapon, weaponPC, pickUp, owner, sockC);
+                    success = attachLogic(weapon, weaponPC, pickUp, owner, sockC);
                 } else {
-                    detachLogic(weapon, weaponPC, pickUp, sockC);
+                    success = detachLogic(weapon, weaponPC, pickUp, sockC);
+                }
+
+                if (success){ // Диспатчим внутренний ивент для антиграва
+                    engine.dispatch(new AttachEvent(owner, weapon, e.toAttach()));
                 }
             }
         });
