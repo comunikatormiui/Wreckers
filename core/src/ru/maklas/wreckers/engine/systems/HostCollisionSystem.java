@@ -12,7 +12,7 @@ import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.client.GameModel;
-import ru.maklas.wreckers.client.entities.EntityString;
+import ru.maklas.wreckers.game.entities.EntityString;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PickUpComponent;
 import ru.maklas.wreckers.engine.components.StatusEffectComponent;
@@ -102,7 +102,7 @@ public class HostCollisionSystem extends EntitySystem{
         if (impulseForce * leagueFormula(disarmResist2) > 1) System.out.println(impulseForce * leagueFormula(disarmResist1) * (wc2 == null ? 1 : wc2.disarmAbility) + " : " + impulseForce * leagueFormula(disarmResist2) * (wc1 == null ? 1 : wc1.disarmAbility));
 
         if (disarm1) {
-            getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponA));
+            getEngine().dispatchLater(new DetachRequest(DetachRequest.Type.TARGET_WEAPON, null, weaponA));
             if (owner1 != null){
                 getEngine().add(new EntityString("Disarm!", 1, new Vector2(contact.getWorldManifold().getPoints()[0]).scl(GameAssets.box2dScale).x, new Vector2(contact.getWorldManifold().getPoints()[0]).scl(GameAssets.box2dScale).y, Color.ORANGE));
                 StatusEffectComponent sec = owner1.get(Mappers.effectM);
@@ -113,7 +113,7 @@ public class HostCollisionSystem extends EntitySystem{
             }
         }
         if (disarm2) {
-            getEngine().dispatchLater(new DetachRequest(null, DetachRequest.Type.TARGET_WEAPON, weaponB));
+            getEngine().dispatchLater(new DetachRequest(DetachRequest.Type.TARGET_WEAPON, null, weaponB));
             if (owner2 != null) {
                 StatusEffectComponent sec = owner1.get(Mappers.effectM);
                 if (sec != null) {

@@ -5,6 +5,9 @@ import ru.maklas.mnet.Provider;
 import ru.maklas.mnet.Serializer;
 import ru.maklas.mnet.impl.KryoSerializer;
 import ru.maklas.wreckers.network.events.*;
+import ru.maklas.wreckers.network.events.creation.*;
+import ru.maklas.wreckers.network.events.sync.BodySyncEvent;
+import ru.maklas.wreckers.network.events.sync.WreckerSyncEvent;
 
 public class InetAssets {
 
@@ -16,14 +19,28 @@ public class InetAssets {
 
     public static Kryo newKryo(){
         Kryo kryo = new Kryo();
+
+        //Connection
         kryo.register(ConnectionRequest.class);
         kryo.register(ConnectionResponse.class);
+
+        //Synchronization
         kryo.register(BodySyncEvent.class);
         kryo.register(WreckerSyncEvent.class);
-        kryo.register(EntityCreationEvent.class);
+
+        //Creation
+        kryo.register(WreckerCreationEvent.class);
+        kryo.register(WeaponCreationEvent.class);
+        kryo.register(SwordCreationEvent.class);
+        kryo.register(HammerCreationEvent.class);
+        kryo.register(ScytheCreationEvent.class);
+        kryo.register(PlatformCreationEvent.class);
+
+        //Events
         kryo.register(NetAttachDetachEvent.class);
         kryo.register(NetHitEvent.class);
         kryo.register(NetGrabZoneChange.class);
+
         return kryo;
     }
 

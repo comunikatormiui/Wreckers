@@ -1,4 +1,4 @@
-package ru.maklas.wreckers.client.entities;
+package ru.maklas.wreckers.game.entities;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -17,13 +17,13 @@ import ru.maklas.wreckers.engine.events.DeathEvent;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.FixtureType;
 
-public class EntityPlayer extends GameEntity {
+public class EntityWrecker extends GameEntity {
 
     private Body body;
 
     private static final int playerMass = 100;
 
-    public EntityPlayer(int id, float x, float y, float health, GameModel model, EntityType eType) {
+    public EntityWrecker(int id, float x, float y, float health, GameModel model, EntityType eType) {
         super(id, eType, x, y, GameAssets.playerZ);
 
         float bodyRadius = 40;
@@ -72,8 +72,8 @@ public class EntityPlayer extends GameEntity {
         subscribe(new Subscription<DeathEvent>(DeathEvent.class) {
             @Override
             public void receive(Signal<DeathEvent> signal, DeathEvent deathEvent) {
-                if (deathEvent.getTarget() == EntityPlayer.this){
-                    engine.remove(EntityPlayer.this);
+                if (deathEvent.getTarget() == EntityWrecker.this){
+                    engine.remove(EntityWrecker.this);
                     System.out.println("Died");
                 }
             }
@@ -82,8 +82,8 @@ public class EntityPlayer extends GameEntity {
         subscribe(new Subscription<DamageEvent>(DamageEvent.class) {
             @Override
             public void receive(Signal<DamageEvent> signal, DamageEvent damageEvent) {
-                if (damageEvent.getTarget() == EntityPlayer.this){
-                    System.out.println(EntityPlayer.this.toString() + " Damage: " + damageEvent.getDamage() + " Health left: " + get(Mappers.healthM).health);
+                if (damageEvent.getTarget() == EntityWrecker.this){
+                    System.out.println(EntityWrecker.this.toString() + " Damage: " + damageEvent.getDamage() + " Health left: " + get(Mappers.healthM).health);
                 }
             }
         });

@@ -1,10 +1,10 @@
 package ru.maklas.wreckers.client;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.World;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mnet.Socket;
-import ru.maklas.wreckers.client.entities.EntityPlayer;
 import ru.maklas.wreckers.game.BodyBuilder;
 import ru.maklas.wreckers.game.FDefBuilder;
 import ru.maklas.wreckers.game.ShapeBuilder;
@@ -14,6 +14,7 @@ public class GameModel {
     Engine engine;
     World world;
     Socket socket;
+    private OrthographicCamera cam;
     boolean host;
     int skipFrameForUpdate;
 
@@ -22,7 +23,7 @@ public class GameModel {
     BodyBuilder builder;
 
     Entity player;
-    EntityPlayer opponent;
+    Entity opponent;
 
     public GameModel() {
 
@@ -53,11 +54,11 @@ public class GameModel {
         this.player = player;
     }
 
-    public EntityPlayer getOpponent() {
+    public Entity getOpponent() {
         return opponent;
     }
 
-    public void setOpponent(EntityPlayer opponent) {
+    public void setOpponent(Entity opponent) {
         this.opponent = opponent;
     }
 
@@ -101,6 +102,14 @@ public class GameModel {
         this.host = host;
     }
 
+    public OrthographicCamera getCam() {
+        return cam;
+    }
+
+    public void setCamera(OrthographicCamera camera) {
+        this.cam = camera;
+    }
+
     public int getSkipFrameForUpdate() {
         return skipFrameForUpdate;
     }
@@ -132,11 +141,12 @@ public class GameModel {
         this.skipFrameForUpdate--;
     }
 
-    public void setUpdateThisFrame(){
+    public void updateOnThisFrame(){
         this.skipFrameForUpdate = 0;
     }
 
     public boolean timeToUpdate(){
         return skipFrameForUpdate <= 0;
     }
+
 }

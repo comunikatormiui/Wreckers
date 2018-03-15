@@ -10,12 +10,13 @@ import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.events.AttachEvent;
 import ru.maklas.wreckers.engine.events.requests.AttachRequest;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
+import ru.maklas.wreckers.libs.Log;
 import ru.maklas.wreckers.network.events.NetAttachDetachEvent;
 
 /**
  * <p>
  *     Подписывается и отвечает за ивенты:
- *     <li>GrabZoneChangeRequest - Отвечает а включение/отключение зоны подбора при помощи реквеста.</li>
+ *     <li>GrabZoneChangeRequest - Отвечает а включение/отключение зоны подбора при помощи реквеста (SuperClass).</li>
  *     <li>AttachRequest - Отвечает за присоединение оружия к игроку</li>
  *     <li>DetachRequest - Отвечает за изъятие оружие из сокета</li>
  *
@@ -124,6 +125,26 @@ public class HostPickUpSystem extends DefaultPickUpSystem {
                         engine.dispatch(new AttachEvent(wielderDetachFrom, entityToDetach, false));
                     }
                 }
+            }
+        });
+
+
+        //Получаем это от Join. Просто находим Entity и перенаправляем на локальный DetachEvent
+        subscribe(new Subscription<NetAttachDetachEvent>(NetAttachDetachEvent.class) {
+            @Override
+            public void receive(Signal<NetAttachDetachEvent> signal, NetAttachDetachEvent e) {
+                if (e.toAttach()){ // У Join нет права удалённо прикреплять. Только откреплять.
+                    Log.SERVER.warning("Join tried to attach a weapon. It works the other way");
+                    return;
+                }
+
+                Entity player = engine.getById(e.getPlayerId());
+                Entity weapon = engine.getById(e.getWeaponId());
+                if (player == null || weapon == null){
+                    return;
+                }
+                engine.dispatch(new DetachRequest(DetachRequest.Type.TARGET_ENTITY_AND_WEAPON, player, weapon));
+
             }
         });
     }

@@ -62,11 +62,6 @@ public class HostState extends State {
             }
 
             @Override
-            public void handleUnknownSourceMsg(Object o) {
-
-            }
-
-            @Override
             public void onSocketDisconnected(final Socket socket, String msg) {
                 System.out.println("Socket disconnected with msg: " + msg);
                 Gdx.app.postRunnable(new Runnable() {

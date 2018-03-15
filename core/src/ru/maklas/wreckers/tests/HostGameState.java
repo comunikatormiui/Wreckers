@@ -7,8 +7,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.World;
 import ru.maklas.mengine.Engine;
@@ -20,22 +18,18 @@ import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
 import ru.maklas.wreckers.client.GameModel;
-import ru.maklas.wreckers.client.entities.EntityPlayer;
-import ru.maklas.wreckers.client.entities.EntitySword;
-import ru.maklas.wreckers.client.entities.GameEntity;
 import ru.maklas.wreckers.engine.Mappers;
-import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
-import ru.maklas.wreckers.game.fixtures.FixtureData;
+import ru.maklas.wreckers.game.entities.EntityScythe;
 import ru.maklas.wreckers.libs.Log;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
-import ru.maklas.wreckers.network.events.BodySyncEvent;
-import ru.maklas.wreckers.network.events.EntityCreationEvent;
-import ru.maklas.wreckers.network.events.WreckerSyncEvent;
+import ru.maklas.wreckers.network.events.creation.*;
+import ru.maklas.wreckers.network.events.sync.BodySyncEvent;
+import ru.maklas.wreckers.network.events.sync.WreckerSyncEvent;
 
 public class HostGameState extends State implements SocketProcessor {
 
@@ -43,10 +37,7 @@ public class HostGameState extends State implements SocketProcessor {
     GameModel model;
     OrthographicCamera cam;
     private PhysicsDebugSystem debugSystem;
-
-    Entity platform;
-    Entity player;
-    EntitySword sword;
+    private InputProcessor input;
 
     public HostGameState(Socket socket) {
         this.socket = socket;
@@ -60,17 +51,18 @@ public class HostGameState extends State implements SocketProcessor {
         World world = new World(new Vector2(0, -9.8f), true);
         model = new GameModel();
 
-        engine.add(new PhysicsSystem(world)); // both
-        engine.add(new RenderingSystem(batch, cam)); // both
-        engine.add(new TTLSystem()); //both
-        engine.add(new AntiGravSystem()); //both
-        engine.add(new MotorSystem());//both
-        engine.add(new StatusEffectSystem());//both. Эффекты же будут разные
-        debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale); //both
+        engine.add(new RenderingSystem(batch, cam));
+        debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale);
+        engine.add(new HostCollisionSystem(model));
+        engine.add(new HostDamageSystem(model));
+        engine.add(new HostPickUpSystem(model));
+        engine.add(new HostNetworkSystem(model));
 
-        engine.add(new HostCollisionSystem(model)); //server. У клиента будет похожая, но без активных действий типа detach
-        engine.add(new HostDamageSystem(model)); //server. Расчёт урона только на сервере.
-        engine.add(new HostPickUpSystem(model));//server. У клиента будет меньше проверок. Только действия
+        engine.add(new MotorSystem());
+        engine.add(new AntiGravSystem());
+        engine.add(new StatusEffectSystem());
+        engine.add(new PhysicsSystem(world));
+        engine.add(new TTLSystem());
 
 
         model.setHost(true);
@@ -80,79 +72,66 @@ public class HostGameState extends State implements SocketProcessor {
         model.setShaper(new ShapeBuilder(GameAssets.box2dScale));
         model.setWorld(world);
         model.setSocket(socket);
+        model.setCamera(cam);
 
         ContactListener worldListener = new HostContactListener(engine, model);
         world.setContactListener(worldListener);
 
 
 
-        Body platformBody = model.getBuilder()
-                .newBody()
-                .addFixture(model.getFixturer().newFixture()
-                        .shape(model.getShaper().buildRectangle(0, 0, 2000, 100))
-                        .friction(0.1f)
-                        .density(10)
-                        .bounciness(0.2f)
-                        .mask(EntityType.OBSTACLE)
-                        .build(), new FixtureData(FixtureType.OBSTACLE))
-                .pos(-360, 200)
-                .type(BodyDef.BodyType.StaticBody)
-                .linearDamp(0)
-                .build();
+        { //Set up floor
+            int x = 0;
+            int y = 0;
+            int width = 2000;
+            int height = 100;
+            Entity floor = new ru.maklas.wreckers.game.entities.EntityPlatform(0, x, y, GameAssets.floorZ, width, height, model);
+            PlatformCreationEvent netEvent = new PlatformCreationEvent(3, x, y, width, height);
+            socket.send(netEvent);
+            engine.add(floor);
+        }
 
-        platform = new GameEntity(-2, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
-        player = new EntityPlayer(1, 0,   500, 10000, model, EntityType.PLAYER);
-        sword = new EntitySword(3, -200, 700, 10, model);
-        model.setPlayer(player);
+        { //setUp player
+            Entity player = new ru.maklas.wreckers.game.entities.EntityWrecker(1, 0,   500, 10000, model, EntityType.PLAYER);
+            model.setPlayer(player);
+            WreckerCreationEvent netEvent = WreckerCreationEvent.fromEntity(player, false);
+            socket.send(netEvent);
+            engine.add(player);
+        }
 
-        engine.add(platform).add(player).add(sword);
-        socket.send(EntityCreationEvent.fromEntity(EntityEnum.FLOOR, platform));
-        socket.send(EntityCreationEvent.fromEntity(EntityEnum.WRECKER, player));
-        socket.send(EntityCreationEvent.fromEntity(EntityEnum.WEAPON_SWORD, sword));
+        { //Set up opponent
+            Entity opponent = new ru.maklas.wreckers.game.entities.EntityWrecker(2, 250,   500, 10000, model, EntityType.OPPONENT);
+            model.setOpponent(opponent);
+            WreckerCreationEvent netEvent = WreckerCreationEvent.fromEntity(opponent, true);
+            socket.send(netEvent);
+            engine.add(opponent);
+        }
 
+        { //Set up sword
+            Entity sword = new ru.maklas.wreckers.game.entities.EntitySword(10, -200,   600, GameAssets.swordZ, model);
+            WeaponCreationEvent netEvent = new SwordCreationEvent(sword.id, sword.x, sword.y, 0);
+            socket.send(netEvent);
+            engine.add(sword);
+        }
+
+        { //Set up Hammer
+            Entity hammer = new ru.maklas.wreckers.game.entities.EntityHammer(11, 200,   600, GameAssets.hammerZ, model);
+            WeaponCreationEvent netEvent = new HammerCreationEvent(hammer.id, hammer.x, hammer.y, 0);
+            socket.send(netEvent);
+            engine.add(hammer);
+        }
+
+        { //Set up scythe
+            Entity scythe = new EntityScythe(12, 400,   600, GameAssets.scytheZ, model);
+            WeaponCreationEvent netEvent = new ScytheCreationEvent(scythe.id, scythe.x, scythe.y, 0);
+            socket.send(netEvent);
+            engine.add(scythe);
+        }
+
+        input = new DefaultKeyboardGameInput(model);
     }
 
     @Override
     protected InputProcessor getInput() {
-
-        final Engine engine = model.getEngine();
-        InputAdapter input = new InputAdapter() {
-            @Override
-            public boolean mouseMoved(int screenX, int screenY) {
-                Vector2 realMouse = Utils.toScreen(screenX, screenY, cam);
-                return true;
-            }
-
-            @Override
-            public boolean touchDragged(int screenX, int screenY, int pointer) {
-                Vector2 realMouse = Utils.toScreen(screenX, screenY, cam);
-                return true;
-            }
-
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public boolean keyDown(int keycode) {
-                if (Input.Keys.P == keycode) {
-                    engine.dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
-                } else if (Input.Keys.O == keycode) {
-                    engine.dispatch(new DetachRequest(model.getPlayer(), DetachRequest.Type.FIRST, null));
-                }
-                return true;
-            }
-
-            @Override
-            public boolean keyUp(int keycode) {
-                if (Input.Keys.P == keycode) {
-                    engine.dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
-                }
-                return true;
-            }
-        };
-
         return input;
     }
 
@@ -163,13 +142,6 @@ public class HostGameState extends State implements SocketProcessor {
         handleKeyboardInput();
         model.getEngine().update(dt);
         updateCamera();
-
-        if (model.timeToUpdate()){
-            synchronize();
-            model.setSkipFrameForUpdate(5);
-        } else {
-            model.decSkipFrames();
-        }
     }
 
     private void handleKeyboardInput(){
@@ -195,16 +167,9 @@ public class HostGameState extends State implements SocketProcessor {
         cam.position.set(model.getPlayer().x, model.getPlayer().y, 0);
     }
 
-
-    private void synchronize(){
-        Vector2 motor = player.get(Mappers.motorM).direction;
-        socket.send(new WreckerSyncEvent(BodySyncEvent.fromBody(player.id, player.get(Mappers.physicsM).body), motor.x, motor.y));
-        socket.send(BodySyncEvent.fromBody(sword.id, sword.get(Mappers.physicsM).body));
-    }
-
     @Override
     public void process(Object o, Socket socket, SocketIterator iterator) {
-        Log.SERVER.event(o);
+        if (!((o instanceof BodySyncEvent) || (o instanceof WreckerSyncEvent)))Log.CLIENT.event(o);
         model.getEngine().dispatch(o);
     }
 

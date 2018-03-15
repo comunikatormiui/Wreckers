@@ -9,6 +9,8 @@ import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.engine.components.PickUpComponent;
 import ru.maklas.wreckers.engine.components.SocketComponent;
+import ru.maklas.wreckers.engine.components.WSocket;
+import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.network.events.NetAttachDetachEvent;
 
 public class JoinPickUpSystem extends DefaultPickUpSystem {
@@ -47,5 +49,50 @@ public class JoinPickUpSystem extends DefaultPickUpSystem {
                 }
             }
         });
+
+
+        //Отправляем AttachDetachRequest на сервер. Получаем такой же ивент после валидации и уже тогда открепляем.
+        subscribe(new Subscription<DetachRequest>(DetachRequest.class) {
+            @Override
+            public void receive(Signal<DetachRequest> signal, DetachRequest req) {
+
+                final Entity wielderDetachFrom;
+                final Entity entityToDetach;
+
+                switch (req.getType()){
+                    case FIRST:
+
+                        wielderDetachFrom = req.getWielder();
+                        if (wielderDetachFrom != model.getPlayer()){ //У Join игрока есть возможность детатчить только от себя
+                            return;
+                        }
+                        SocketComponent socketC = wielderDetachFrom.get(Mappers.socketM);
+                        WSocket sock = socketC.firstAttached();
+                        if (sock != null){
+                            entityToDetach = sock.attachedEntity;
+                        } else {
+                            return;
+                        }
+                        break;
+                    case TARGET_ENTITY_AND_WEAPON:
+                        wielderDetachFrom = req.getWielder();
+                        entityToDetach = req.getWeapon();
+                        break;
+                    case TARGET_WEAPON:
+                        entityToDetach = req.getWeapon();
+                        wielderDetachFrom = entityToDetach.get(Mappers.pickUpM).owner;
+                        if (wielderDetachFrom == null){
+                            return;
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException("Unknown type: " + req.getType().name());
+                }
+
+                model.getSocket().send(new NetAttachDetachEvent(wielderDetachFrom.id, entityToDetach.id, false));
+            }
+        });
     }
+
+
 }

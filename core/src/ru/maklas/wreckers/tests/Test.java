@@ -2,9 +2,12 @@ package ru.maklas.wreckers.tests;
 
 
 import com.badlogic.gdx.math.Vector2;
+import ru.maklas.wreckers.engine.components.WreckerComponent;
 import ru.maklas.wreckers.engine.systems.HostCollisionSystem;
 import ru.maklas.wreckers.libs.ClassUtils;
 import ru.maklas.wreckers.libs.Utils;
+import ru.maklas.wreckers.network.events.creation.WeaponCreationEvent;
+import ru.maklas.wreckers.network.events.creation.WreckerCreationEvent;
 
 /**
  * Created by maklas on 04-Jan-18.
@@ -17,7 +20,15 @@ public class Test {
 
     public static void main(String[] args){
 
+        new EventMaker()
+                .name("HammerCreationEvent")
+                .extends_(WeaponCreationEvent.class)
+                .build();
 
+        new EventMaker()
+                .name("ScytheCreationEvent")
+                .extends_(WeaponCreationEvent.class)
+                .build();
 
         if (true){
             return;

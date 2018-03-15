@@ -1,4 +1,4 @@
-package ru.maklas.wreckers.client.entities;
+package ru.maklas.wreckers.game.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;

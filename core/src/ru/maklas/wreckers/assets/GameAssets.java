@@ -19,9 +19,15 @@ public class GameAssets {
 
 
 
+
+
     public static final int playerZ = 10;
     public static final int zombieZ = 9;
     public static final int bulletZ = 8;
+    public static int swordZ = 7;
+    public static int hammerZ = 6;
+    public static int scytheZ = 5;
+    public static int floorZ = 0;
 
     public static void getEntityDirection(float angle, Vector2 direction) {
         direction.set(1, 0).setAngle(angle);

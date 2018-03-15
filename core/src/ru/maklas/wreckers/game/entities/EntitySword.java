@@ -1,4 +1,4 @@
-package ru.maklas.wreckers.client.entities;
+package ru.maklas.wreckers.game.entities;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -13,34 +13,37 @@ import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.FixtureType;
+import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
 
-public class EntityHammer extends WeaponEntity implements AttachAction {
+public class EntitySword extends WeaponEntity implements AttachAction {
 
     Body body;
     World world;
     PickUpComponent pickUpC;
+    Joint lastJoint;
 
-    public EntityHammer(int id, float x, float y, int zOrder, GameModel model) {
+    public EntitySword(int id, float x, float y, int zOrder, GameModel model) {
         super(id, x, y, zOrder, model);
         this.world = model.getWorld();
-        final float scale = 0.13f;
+        final float scale = 0.15f;
         final EntityType eType = EntityType.NEUTRAL_WEAPON;
 
-        PolygonShape handle = new PolygonShape();
-        PolygonShape sharp = new PolygonShape();
+        PolygonShape handleShape = new PolygonShape();
+        PolygonShape bladeShape = new PolygonShape();
 
         Vector2[] pointsHandle = new Vector2[]{
-                new Vector2(8, 245),
-                new Vector2(767, 254),
-                new Vector2(767, 575 - 254),
-                new Vector2(8, 575 - 245)
+                new Vector2(400, 350),
+                new Vector2(516, 235),
+                new Vector2(516, 354 - 235),
+                new Vector2(400, 354 - 350),
         };
 
-        Vector2[] pointsBody = new Vector2[]{
-                new Vector2(762, 8),
-                new Vector2(1045, 8),
-                new Vector2(1045, 575 - 8),
-                new Vector2(762, 575 - 8)
+        Vector2[] pointsSharp = new Vector2[]{
+                new Vector2(516, 235),
+                new Vector2(1377, 217),
+                new Vector2(1500, 178),
+                new Vector2(1377, 354 - 217),
+                new Vector2(516, 354 - 235)
         };
 
 
@@ -50,59 +53,60 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
             point.scl(scale / (GameAssets.box2dScale));
         }
 
-        for (Vector2 point : pointsBody) {
+        for (Vector2 point : pointsSharp) {
             point.scl(scale / (GameAssets.box2dScale));
         }
 
-        handle.set(pointsHandle);
-        sharp.set(pointsBody);
+        handleShape.set(pointsHandle);
+        bladeShape.set(pointsSharp);
 
-        FixtureDef fix = model.getFixturer().newFixture()
-                .bounciness(0.1f)
+        FixtureDef handle = model.getFixturer().newFixture()
+                .bounciness(0.3f)
                 .mask(eType)
-                .friction(1f)
-                .shape(handle)
-                .density(8.770995f) //0.60928726
-                .build();
-
-        FixtureDef fix2 = model.getFixturer().newFixture()
-                .mask(eType)
-                .shape(sharp)
                 .friction(0.2f)
-                .bounciness(0.1f)
-                .density(8.770995f) //1.6709557
+                .shape(handleShape)
+                .density(9.187957f) //0.3768188
                 .build();
+
+        FixtureDef blade = model.getFixturer().newFixture()
+                .mask(eType)
+                .shape(bladeShape)
+                .friction(0.2f)
+                .bounciness(0.3f)
+                .density(9.187957f) //1.2557532
+                .build();
+
 
         body = model.getBuilder().newBody()
                 .pos(x, y)
                 .type(BodyDef.BodyType.DynamicBody)
                 .linearDamp(0.1f)
-                .addFixture(fix, new FixtureData(FixtureType.WEAPON_NO_DAMAGE))
-                .addFixture(fix2, new FixtureData(FixtureType.WEAPON_DAMAGE))
+                .addFixture(handle, new FixtureData(FixtureType.WEAPON_NO_DAMAGE))
+                .addFixture(blade, new WeaponPiercingFD(1, 0, 1490 * scale / GameAssets.box2dScale, 178 * scale / GameAssets.box2dScale))
                 .angularDamp(0.1f)
                 .build();
 
-        System.out.println(id + ": Hammer mass " + body.getMass());
+        System.out.println(id + ": Sword mass " + body.getMass());
 
-        RenderUnit unit = new RenderUnit(Images.hammer);
+        RenderUnit unit = new RenderUnit(Images.sword);
         unit.scaleX = unit.scaleY = scale;
         unit.pivotX = unit.pivotY = 0;
 
 
         add(new PhysicsComponent(body));
         add(new RenderComponent(unit));
-        pickUpC = new PickUpComponent(model.getShaper().buildCircle(8 * scale, 287 * scale, 35), this);
+        pickUpC = new PickUpComponent(model.getShaper().buildCircle(400 * scale, 178 * scale, 35), this);
         add(pickUpC);
         add(new WeaponComponent(
-                50,
-                0,
-                0,
+                35,
+                35,
+                35,
                 1,
                 1,
                 1,
-                100,
-                55,
-                40));
+                25,
+                25,
+                10));
     }
 
     @Override
@@ -111,7 +115,7 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
         rjd.bodyA = ownerBody;
         rjd.bodyB = this.body;
         rjd.localAnchorA.set(socket.localX, socket.localY);
-        rjd.localAnchorB.set(8, 287).scl(0.13f / GameAssets.box2dScale);
+        rjd.localAnchorB.set(300, 178).scl(0.15f / GameAssets.box2dScale);
         return rjd;
     }
 }

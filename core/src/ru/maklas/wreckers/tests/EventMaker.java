@@ -1,6 +1,7 @@
 package ru.maklas.wreckers.tests;
 
 import com.badlogic.gdx.utils.Array;
+import org.jetbrains.annotations.Nullable;
 import ru.maklas.libs.SimpleProfiler;
 
 import java.io.File;
@@ -22,6 +23,8 @@ public class EventMaker {
     private Array<FieldData> fields = new Array<FieldData>();
     private Writer writer;
     private boolean makeSetters = false;
+    private boolean makeAbstract;
+    @Nullable private Class superClass;
 
 
     public EventMaker name(String name){
@@ -127,6 +130,7 @@ public class EventMaker {
 
     private void doImports() {
         writer.println("import ru.maklas.wreckers.libs.Copyable;");
+        if (superClass != null) writer.println("import " + superClass.getCanonicalName() + ";");
         if (containsArrays()) writer.println("import java.util.Arrays;");
 
         Set<FieldData> fieldSet = new HashSet<FieldData>();
@@ -168,15 +172,17 @@ public class EventMaker {
         StringBuilder interfaces = new StringBuilder();
         interfaces.append("Copyable");
 
-        writer.println("public class " + className + " implements " + interfaces.toString() + " {");
+        writer.println("public" + (makeAbstract ? " abstract" : "") + " class " + className + (superClass == null ? "" : " extends " + superClass.getSimpleName()) + " implements " + interfaces.toString() + " {");
         writer.levelUp();
         {
             writer.println();
             doFields();
             writer.println();
             doConstructor();
-            writer.println();
-            doEmptyConstructor();
+            if (fields.size != 0) {
+                writer.println();
+                doEmptyConstructor();
+            }
             writer.println();
             doSetAndRet();
             writer.println();
@@ -282,19 +288,23 @@ public class EventMaker {
         writer.println("@Override");
 
         StringBuilder retBuilder = new StringBuilder();
-        retBuilder.append("new ");
-        retBuilder.append(className);
-        retBuilder.append("(");
-        if (fields.size > 0){
-            retBuilder.append(getParamForCopy(fields.get(0)));
+        if (makeAbstract){
+            retBuilder.append("throw new RuntimeException()");
+        } else {
+            retBuilder.append("new ");
+            retBuilder.append(className);
+            retBuilder.append("(");
+            if (fields.size > 0) {
+                retBuilder.append(getParamForCopy(fields.get(0)));
 
-            for (int i = 1; i < fields.size; i++) {
-                FieldData field = fields.get(i);
-                retBuilder.append(", ");
-                retBuilder.append(getParamForCopy(field));
+                for (int i = 1; i < fields.size; i++) {
+                    FieldData field = fields.get(i);
+                    retBuilder.append(", ");
+                    retBuilder.append(getParamForCopy(field));
+                }
             }
+            retBuilder.append(')');
         }
-        retBuilder.append(')');
         String ret = retBuilder.toString();
 
         method(writer,"public", "Object", "copy", Array.of(FieldData.class), new Array<String>(), ret);
@@ -366,6 +376,16 @@ public class EventMaker {
      */
     public EventMaker includeSetters() {
         makeSetters = true;
+        return this;
+    }
+
+    public EventMaker makeAbstract() {
+        makeAbstract = true;
+        return this;
+    }
+
+    public EventMaker extends_(Class superClass) {
+        this.superClass = superClass;
         return this;
     }
 

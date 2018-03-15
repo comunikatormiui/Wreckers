@@ -25,7 +25,7 @@ public class DetachRequest {
     Entity weapon;
     Type type;
 
-    public DetachRequest(Entity wielder, Type type, Entity weapon) {
+    public DetachRequest(Type type, Entity wielder, Entity weapon) {
         this.wielder = wielder;
         this.weapon = weapon;
         this.type = type;

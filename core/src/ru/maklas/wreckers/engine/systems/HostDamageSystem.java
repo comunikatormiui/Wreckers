@@ -9,9 +9,9 @@ import ru.maklas.mengine.Subscription;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.client.GameModel;
-import ru.maklas.wreckers.client.entities.EntityArrow;
-import ru.maklas.wreckers.client.entities.EntityNumber;
-import ru.maklas.wreckers.client.entities.EntityString;
+import ru.maklas.wreckers.game.entities.EntityArrow;
+import ru.maklas.wreckers.game.entities.EntityNumber;
+import ru.maklas.wreckers.game.entities.EntityString;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.HealthComponent;
 import ru.maklas.wreckers.engine.components.WeaponComponent;
@@ -54,6 +54,7 @@ public class HostDamageSystem extends EntitySystem {
         subscribe(new Subscription<WeaponWreckerHitEvent>(WeaponWreckerHitEvent.class) {
             @Override
             public void receive(Signal<WeaponWreckerHitEvent> signal, final WeaponWreckerHitEvent e) {
+                model.updateOnThisFrame();
                 Entity weapon = e.getWeapon();
                 WreckerComponent wreckC = e.getTargetWrecker().get(Mappers.wreckerM);
                 WeaponComponent weapC = weapon.get(Mappers.weaponM);

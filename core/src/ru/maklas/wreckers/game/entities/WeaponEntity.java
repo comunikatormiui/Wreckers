@@ -1,4 +1,4 @@
-package ru.maklas.wreckers.client.entities;
+package ru.maklas.wreckers.game.entities;
 
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.client.GameModel;

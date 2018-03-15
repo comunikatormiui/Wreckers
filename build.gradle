@@ -24,7 +24,7 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
-        mnetVersion  = '268e6812b7bf643089e9ff6d4d6d5cf2d4862e7a'
+        mnetVersion  = '30999214f2a23fe4abd97218bafcabb84a65fe2c'
         mengineVersion = '6bff2acc735feca9a247f7f8abdcf9da1a7d4b73'
         mLibsVersion = 'b67aaab8c91b1098319ddeb7648429a012c5cd79'
     }
@@ -87,7 +87,6 @@ project(":android") {
 project(":core") {
     apply plugin: "java"
 
-
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
@@ -98,6 +97,7 @@ project(":core") {
         compile "com.github.maklas:MNet:$mnetVersion"
         compile "com.github.maklas:MEngine:$mengineVersion"
         compile "com.github.maklas:MLibs:$mLibsVersion"
+
 
     }
 }

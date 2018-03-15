@@ -121,11 +121,6 @@ public class Server implements LoopedApplication, ServerAuthenticator {
     }
 
     @Override
-    public void handleUnknownSourceMsg(Object o) {
-
-    }
-
-    @Override
     public void onSocketDisconnected(Socket socket, String msg) {
         clients.removeBySocket(socket);
     }

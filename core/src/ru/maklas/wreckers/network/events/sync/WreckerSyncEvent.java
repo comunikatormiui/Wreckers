@@ -1,4 +1,4 @@
-package ru.maklas.wreckers.network.events;
+package ru.maklas.wreckers.network.events.sync;
 
 import ru.maklas.wreckers.libs.Copyable;
 
