@@ -21,13 +21,9 @@ public class Test {
     public static void main(String[] args){
 
         new EventMaker()
-                .name("HammerCreationEvent")
-                .extends_(WeaponCreationEvent.class)
-                .build();
-
-        new EventMaker()
-                .name("ScytheCreationEvent")
-                .extends_(WeaponCreationEvent.class)
+                .name("NetGrabZoneChangeRequest")
+                .int_("playerId")
+                .bool("enable")
                 .build();
 
         if (true){

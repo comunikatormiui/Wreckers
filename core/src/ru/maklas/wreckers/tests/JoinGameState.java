@@ -70,7 +70,7 @@ public class JoinGameState extends State implements SocketProcessor {
         ContactListener worldListener = new JoinContactListener(engine);
         world.setContactListener(worldListener);
 
-        input = new DefaultKeyboardGameInput(model);
+        input = new KeyboardGameInput(new JoinInputController(model));
     }
 
     @Override

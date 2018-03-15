@@ -6,12 +6,12 @@ import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 
-public class DefaultKeyboardGameInput extends InputAdapter {
+public class KeyboardGameInput extends InputAdapter {
 
-    protected final GameModel model;
+    private final InputController input;
 
-    public DefaultKeyboardGameInput(GameModel model) {
-        this.model = model;
+    public KeyboardGameInput(InputController input) {
+        this.input = input;
     }
 
     @Override
@@ -34,9 +34,9 @@ public class DefaultKeyboardGameInput extends InputAdapter {
     @Override
     public boolean keyDown(int keycode) {
         if (Input.Keys.P == keycode) {
-            model.getEngine().dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
+            input.enableGrabZone();
         } else if (Input.Keys.O == keycode) {
-            model.getEngine().dispatch(new DetachRequest(DetachRequest.Type.FIRST, model.getPlayer(), null));
+            input.detachWeapon();
         }
         return true;
     }
@@ -44,7 +44,7 @@ public class DefaultKeyboardGameInput extends InputAdapter {
     @Override
     public boolean keyUp(int keycode) {
         if (Input.Keys.P == keycode) {
-            model.getEngine().dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
+            input.disableGrabZone();
         }
         return true;
     }

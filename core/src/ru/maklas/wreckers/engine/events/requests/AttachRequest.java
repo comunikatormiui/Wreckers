@@ -4,6 +4,9 @@ import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.engine.components.GrabZoneComponent;
 import ru.maklas.wreckers.engine.components.PickUpComponent;
 
+/**
+ * Внутридвижковый ивент. Запрос на аттач оружия
+ */
 public class AttachRequest {
 
     Entity wielder;

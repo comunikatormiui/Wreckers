@@ -2,6 +2,9 @@ package ru.maklas.wreckers.engine.events.requests;
 
 import ru.maklas.mengine.Entity;
 
+/**
+ * Внутридвижковый ивент. Запрос на детач оружия
+ */
 public class DetachRequest {
 
 

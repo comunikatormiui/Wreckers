@@ -40,6 +40,8 @@ public class InetAssets {
         kryo.register(NetAttachDetachEvent.class);
         kryo.register(NetHitEvent.class);
         kryo.register(NetGrabZoneChange.class);
+        kryo.register(NetGrabZoneChangeRequest.class);
+        kryo.register(NetDetachRequest.class);
 
         return kryo;
     }

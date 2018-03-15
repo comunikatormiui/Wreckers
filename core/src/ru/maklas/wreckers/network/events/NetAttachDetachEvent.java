@@ -4,6 +4,7 @@ import ru.maklas.wreckers.libs.Copyable;
 
 /**
  * Created by MaklasEventMaker on 14.03.2018
+ * Ивент заставляющий Join отвязать/привязать Оружие
  */
 public class NetAttachDetachEvent implements Copyable {
     

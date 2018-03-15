@@ -2,7 +2,6 @@ package ru.maklas.wreckers.tests;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,8 +18,6 @@ import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
 import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.Mappers;
-import ru.maklas.wreckers.engine.events.requests.DetachRequest;
-import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
 import ru.maklas.wreckers.game.entities.EntityScythe;
@@ -127,7 +124,7 @@ public class HostGameState extends State implements SocketProcessor {
             engine.add(scythe);
         }
 
-        input = new DefaultKeyboardGameInput(model);
+        input = new KeyboardGameInput(new HostInputController(model));
     }
 
     @Override
