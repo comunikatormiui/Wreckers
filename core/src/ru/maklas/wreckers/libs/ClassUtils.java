@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Predicate;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -149,6 +150,32 @@ public class ClassUtils {
 
     public static boolean isInPackage(Class clazz, String s) {
         return clazz.getName().contains(s);
+    }
+
+
+    /**
+     * Starts main() method in new Process
+     */
+    public static int newProcess(Class klass, String... args) throws IOException,
+            InterruptedException {
+        String javaHome = System.getProperty("java.home");
+        String javaBin = javaHome +
+                File.separator + "bin" +
+                File.separator + "java";
+        String classpath = System.getProperty("java.class.path");
+        String className = klass.getCanonicalName();
+
+        String[] command = new String[4 + args.length];
+        command[0] = javaBin;
+        command[1] = "-cp";
+        command[2] = classpath;
+        command[3] = className;
+        System.arraycopy(args, 0, command, 4, args.length);
+        ProcessBuilder builder = new ProcessBuilder(command);
+
+        Process process = builder.start();
+        process.waitFor();
+        return process.exitValue();
     }
 
 

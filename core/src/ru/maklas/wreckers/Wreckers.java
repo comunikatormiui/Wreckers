@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import ru.maklas.wreckers.client.states.MainMenuState;
 import ru.maklas.wreckers.libs.gsm_lib.GameStateManager;
 import ru.maklas.wreckers.libs.gsm_lib.MultilayerStateManager;
+import ru.maklas.wreckers.libs.gsm_lib.State;
 import ru.maklas.wreckers.tests.HostState;
 import ru.maklas.wreckers.tests.JoinState;
 
@@ -15,11 +16,21 @@ public class Wreckers extends ApplicationAdapter {
     public static final String VERSION = "0.1";
     private SpriteBatch batch;
     private GameStateManager gsm;
-    
+
+    private State firstState;
+    public Wreckers() {
+        firstState = new MainMenuState();
+    }
+
+    public Wreckers(State firstState) {
+        this.firstState = firstState;
+    }
+
     @Override
     public void create () {
         batch = new SpriteBatch();
-        gsm = new MultilayerStateManager(new JoinState(), batch);
+        gsm = new MultilayerStateManager(firstState, batch);
+        firstState = null;
     }
 
     @Override
@@ -36,5 +47,6 @@ public class Wreckers extends ApplicationAdapter {
     @Override
     public void dispose () {
         gsm.dispose();
+        batch.dispose();
     }
 }

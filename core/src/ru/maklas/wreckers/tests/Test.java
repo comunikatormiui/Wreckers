@@ -17,11 +17,7 @@ public class Test {
 
     public static void main(String[] args){
 
-        new EventMaker()
-                .name("NetGrabZoneChange")
-                .int_("entityId")
-                .bool("enable")
-                .build();
+
 
         if (true){
             return;
