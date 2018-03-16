@@ -11,6 +11,8 @@ public class Host {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width  = (int) (640 * 1.5f);
         config.height = (int) (360 * 1.5f);
+        config.y = -1;
+        config.x = 0;
         config.title = "Host";
         new LwjglApplication(new Wreckers(new HostState()), config);
     }
