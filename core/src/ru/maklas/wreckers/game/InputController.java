@@ -8,4 +8,6 @@ public interface InputController {
 
     void detachWeapon();
 
+    void restart();
+
 }

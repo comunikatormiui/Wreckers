@@ -8,12 +8,16 @@ import ru.maklas.mnet.Socket;
 import ru.maklas.wreckers.game.BodyBuilder;
 import ru.maklas.wreckers.game.FDefBuilder;
 import ru.maklas.wreckers.game.ShapeBuilder;
+import ru.maklas.wreckers.libs.gsm_lib.GameStateManager;
+import ru.maklas.wreckers.libs.gsm_lib.State;
 
 public class GameModel {
 
     Engine engine;
     World world;
     Socket socket;
+    private GameStateManager gsm;
+    private State currentState;
     private OrthographicCamera cam;
     boolean host;
     int skipFrameForUpdate;
@@ -95,6 +99,22 @@ public class GameModel {
         this.builder = builder;
     }
 
+    public GameStateManager getGsm() {
+        return gsm;
+    }
+
+    public void setGsm(GameStateManager gsm) {
+        this.gsm = gsm;
+    }
+
+    public State getCurrentState() {
+        return currentState;
+    }
+
+    public void setCurrentState(State currentState) {
+        this.currentState = currentState;
+    }
+
     public boolean isHost() {
         return host;
     }
@@ -157,5 +177,4 @@ public class GameModel {
     public boolean timeToUpdate(){
         return skipFrameForUpdate <= 0;
     }
-
 }

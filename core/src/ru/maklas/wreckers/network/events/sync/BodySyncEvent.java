@@ -72,6 +72,27 @@ public class BodySyncEvent implements Copyable {
         return angVel;
     }
 
+    public void setVelX(float velX) {
+        this.velX = velX;
+    }
+
+    public void setVelY(float velY) {
+        this.velY = velY;
+    }
+
+    public void addVelX(float amount) {
+        this.velX += amount;
+    }
+
+    public void addVelY(float amount) {
+        this.velY += amount;
+    }
+
+    public void setPos(Vector2 pos){
+        this.x = pos.x;
+        this.y = pos.y;
+    }
+
     public static BodySyncEvent fromBody(int id, @NotNull Body body){
         Vector2 position = body.getPosition();
         Vector2 linearVelocity = body.getLinearVelocity();

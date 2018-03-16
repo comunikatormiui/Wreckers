@@ -37,6 +37,8 @@ public class KeyboardGameInput extends InputAdapter {
             input.enableGrabZone();
         } else if (Input.Keys.O == keycode) {
             input.detachWeapon();
+        } else if (Input.Keys.R == keycode){
+            input.restart();
         }
         return true;
     }

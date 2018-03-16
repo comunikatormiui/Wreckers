@@ -25,6 +25,7 @@ public class EventMaker {
     private boolean makeSetters = false;
     private boolean makeAbstract;
     @Nullable private Class superClass;
+    @Nullable private String additionalPath;
 
 
     public EventMaker name(String name){
@@ -99,11 +100,20 @@ public class EventMaker {
             path = file.getPath();
         }
         System.out.println("Location: " + path);
-
     }
 
     private File checkFileNameIsNotTaken() {
-        File file = new File(".\\core\\src\\ru\\maklas\\wreckers\\network\\events\\" + className + ".java");
+        final File file;
+        final String defaultFolder = ".\\core\\src\\ru\\maklas\\wreckers\\network\\events\\";
+        if (additionalPath == null){
+            file = new File(defaultFolder + className + ".java");
+        } else {
+            file = new File(defaultFolder + additionalPath.replaceAll("\\.", "\\") + "\\" + className + ".java");
+        }
+
+
+        final String addition = additionalPath.replaceAll("\\.", File.separator);
+
         if (file.exists()){
             className = className + "1";
             return checkFileNameIsNotTaken();
@@ -125,7 +135,12 @@ public class EventMaker {
     }
 
     private void doPackage(){
-        writer.println("package ru.maklas.wreckers.network.events" + ';');
+        final String defaultPackage = "ru.maklas.wreckers.network.events";
+        if (additionalPath == null) {
+            writer.println("package " + defaultPackage + ';');
+        } else {
+            writer.println("package " + defaultPackage + '.' + additionalPath + ';');
+        }
     }
 
     private void doImports() {
@@ -386,6 +401,14 @@ public class EventMaker {
 
     public EventMaker extends_(Class superClass) {
         this.superClass = superClass;
+        return this;
+    }
+
+    /**
+     * Adds path to the output path. Example: "parent.childFolder"
+     */
+    public EventMaker addPath(String additionalPath) {
+        this.additionalPath = additionalPath;
         return this;
     }
 

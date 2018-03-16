@@ -102,68 +102,33 @@ public abstract class NetworkSystem extends EntitySystem {
     }
 
     protected void bodyUpdate(Body body, BodySyncEvent e){
-        teleportBodyUpdate(body, e);
+        smoothBodyUpdate(body, e);
     }
 
     protected void teleportBodyUpdate(Body body, BodySyncEvent e){
         e.hardApply(body);
     }
 
-    protected void teleportBodyUpdate(Body body, float x, float y, float vX, float vY, float angle){
-        body.setTransform(x, y, angle);
-        body.setLinearVelocity(vX, vY);
-    }
+    private int jumpCounter = 0;
+    final float maxDistance = 100;
+    final float maxDistanceB2d = maxDistance / GameAssets.box2dScale;
+    final float maxDistanceSquared = maxDistanceB2d * maxDistanceB2d;
 
-    protected void changeVelocity(Body body, float vX, float vY, float angle){
-        body.setTransform(body.getPosition(), angle);
-        body.setLinearVelocity(vX, vY);
-    }
-
-    Vector2 tempVec = new Vector2();
     protected void smoothBodyUpdate(Body body, BodySyncEvent e){
-        final float maxDistance = 20f;
-        final float maxDistanceB2d = (maxDistance / GameAssets.box2dScale);
-        final float maxDistanceSquared = maxDistanceB2d * maxDistanceB2d;
-
-
         Vector2 targetPos = Utils.vec1.set(e.getX(), e.getY());
         Vector2 bodyPos = Utils.vec2.set(body.getPosition());
         final float distanceOverMax = (targetPos.dst2(body.getPosition())) / maxDistanceSquared;
-
-
-        if (distanceOverMax >= 4){        // 4..∞ - Гораздо выше нормы. Возможно произошёл телепорт на сервере. Хардово телепортируем.
-            teleportBodyUpdate(body, e);
-
-        } else if (distanceOverMax > 1){  // 1..4 - Выше нормы. Расстояние между телом и ивентом больше чем максимально доступное в 1..2 раза. Рекомендуется телепортировать на половину этого расстояния и придать ускорения.
-            Vector2 middlePos = tempVec.set(bodyPos).lerp(targetPos, 0.5f);
-            teleportBodyUpdate(body, middlePos.x, middlePos.y, e.getVelX() * 2, e.getVelY() * 2, e.getAngle());
-        } else {                          // 0..1 - Норма. Означает что расстояние от текущего положения до ивента сервера незначительно. Достаточно придать немного ускорения.
-            float mul = 1 + distanceOverMax;
-            changeVelocity(body, e.getVelX() * mul, e.getVelY() * mul, e.getAngle());
-        }
-    }
-
-    protected void smoothBodyUpdate2(Body body, BodySyncEvent e){
-        final float maxDistance = 10;
-        final float maxDistanceB2d = (maxDistance / GameAssets.box2dScale);
-        final float maxDistanceSquared = maxDistanceB2d * maxDistanceB2d;
-
-
-        Vector2 targetPos = Utils.vec1.set(e.getX(), e.getY());
-        Vector2 bodyPos = Utils.vec2.set(body.getPosition());
-        final float distanceOverMax = (targetPos.dst2(body.getPosition())) / maxDistanceSquared;
-
 
         if (distanceOverMax < 1){ //0..1 - Норма. небольшие коррекции
-            //TODO: получить направление движения и скорость с которой нужно двигаться.
-            final Vector2 directionToTarget = new Vector2(targetPos).sub(bodyPos);
-            final Vector2 vel = new Vector2(body.getLinearVelocity());
-            final Vector2 velToTarget = new Vector2(directionToTarget).scl(0.1f);
-            final Vector2 newVel = new Vector2(vel).add(velToTarget);
-            body.setLinearVelocity(newVel);
+            final Vector2 directionToTarget = Utils.vec1.set(targetPos).sub(bodyPos); //Расстояние которое необходимо дополнительно пройти за 5 кадров.
+            final Vector2 velocityToTarget = directionToTarget.scl(10);
+            e.addVelX(velocityToTarget.x);
+            e.addVelY(velocityToTarget.y);
+            e.setPos(body.getPosition());
+            teleportBodyUpdate(body, e);
         } else {
             teleportBodyUpdate(body, e);
-            System.err.println("Jump");
+            System.err.println("Jump " + jumpCounter++);
         }
     }
 
@@ -247,7 +212,7 @@ public abstract class NetworkSystem extends EntitySystem {
 
 
     protected void sendSynchWeapon(Entity weapon){
-        syncBody(weapon);
+        sendSyncBody(weapon);
     }
 
     protected void sendSynchWrecker(Entity wrecker){
@@ -261,7 +226,7 @@ public abstract class NetworkSystem extends EntitySystem {
         }
     }
 
-    protected void syncBody(Entity phycisEntity){
+    protected void sendSyncBody(Entity phycisEntity){
         PhysicsComponent pc = phycisEntity.get(Mappers.physicsM);
 
         if (pc != null && pc.body != null){

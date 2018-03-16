@@ -47,4 +47,9 @@ public class JoinInputController implements InputController {
         }
         model.getSocket().send(new NetDetachRequest(player.id, wSocket.attachedEntity.id));
     }
+
+    @Override
+    public void restart() {
+
+    }
 }

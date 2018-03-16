@@ -57,4 +57,8 @@ public class SocketComponent implements Component{
         }
         return null;
     }
+
+    public boolean allEmpty() {
+        return firstAttached() == null;
+    }
 }

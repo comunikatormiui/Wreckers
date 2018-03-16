@@ -34,25 +34,6 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
     public void onAddedToEngine(final Engine engine) {
         engine.addListener(this);
 
-        // После того как оружие было установленно или наоборот изъято, нужно включить у оружия ранжу для подбирания
-        //subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
-        //    @Override
-        //    public void receive(Signal<AttachEvent> signal, AttachEvent e) {
-        //        Entity attachable = e.getAttachable();
-        //        PickUpComponent pickUpC = attachable.get(Mappers.pickUpM);
-        //        if (pickUpC == null){
-        //            return;
-        //        }
-
-        //        if (e.isAttached()){
-        //            destroyPickUpZone(attachable, pickUpC);
-        //        } else {
-        //            createPickUpZone(attachable, pickUpC);
-        //        }
-        //    }
-        //});
-
-
         // Включаем/выключаем зону подбора для игрока.
         subscribe(new Subscription<GrabZoneChangeRequest>(GrabZoneChangeRequest.class) {
             @Override
@@ -201,11 +182,6 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
 
     }
 
-
-    @Override
-    public void update(float dt) {
-        super.update(dt);
-    }
 
     protected void createPickUpZone(Entity attachable, PickUpComponent pickUpC) {
         PhysicsComponent pc = attachable.get(Mappers.physicsM);

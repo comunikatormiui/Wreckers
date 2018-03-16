@@ -21,7 +21,9 @@ import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
 import ru.maklas.wreckers.libs.Log;
 import ru.maklas.wreckers.libs.Utils;
+import ru.maklas.wreckers.libs.gsm_lib.GSMSet;
 import ru.maklas.wreckers.libs.gsm_lib.State;
+import ru.maklas.wreckers.network.events.state_change.NetRestartEvent;
 import ru.maklas.wreckers.network.events.sync.BodySyncEvent;
 import ru.maklas.wreckers.network.events.sync.WreckerSyncEvent;
 
@@ -53,6 +55,8 @@ public class JoinGameState extends State implements SocketProcessor {
         model.setWorld(world);
         model.setSocket(socket);
         model.setCamera(cam);
+        model.setGsm(getGsm());
+        model.setCurrentState(this);
 
         engine.add(new RenderingSystem(batch, cam));
         debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale);
@@ -126,12 +130,19 @@ public class JoinGameState extends State implements SocketProcessor {
 
     @Override
     protected void dispose() {
-
+        model.getEngine().removeAllEntities();
     }
 
     @Override
     public void process(Object o, Socket socket, SocketIterator iterator) {
         if (!((o instanceof BodySyncEvent) || (o instanceof WreckerSyncEvent)))Log.CLIENT.event(o);
+
+
+        if (o instanceof NetRestartEvent){
+            model.getGsm().setCommand(new GSMSet(model.getCurrentState(), new JoinGameState(model.getSocket())));
+            iterator.stop();
+        }
+
         engine.dispatch(o);
     }
 }

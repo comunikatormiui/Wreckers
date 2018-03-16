@@ -55,6 +55,8 @@ public class HostGameState extends State implements SocketProcessor {
         model.setWorld(world);
         model.setSocket(socket);
         model.setCamera(cam);
+        model.setGsm(getGsm());
+        model.setCurrentState(this);
 
         engine.add(new RenderingSystem(batch, cam));
         debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale);
@@ -180,6 +182,6 @@ public class HostGameState extends State implements SocketProcessor {
 
     @Override
     protected void dispose() {
-
+        model.getEngine().removeAllEntities();
     }
 }

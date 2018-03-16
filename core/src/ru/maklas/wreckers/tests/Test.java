@@ -20,11 +20,18 @@ public class Test {
 
     public static void main(String[] args){
 
-        new EventMaker()
-                .name("NetGrabZoneChangeRequest")
-                .int_("playerId")
-                .bool("enable")
+
+
+        new EventMaker().name("NetRetryEvent")
+                .addPath("state_change")
                 .build();
+
+        if (true){
+            return;
+        }
+
+        System.out.println(ClassUtils.countStrings("ru.maklas.wreckers",false,false,false));
+
 
         if (true){
             return;
@@ -45,16 +52,6 @@ public class Test {
         if (true){
             return;
         }
-
-        ClassUtils.StringCountResult stringCountResult =
-                ClassUtils.countStrings(
-                        "ru.maklas.wreckers",
-                        false,
-                        false,
-                        false);
-
-        System.out.println(stringCountResult);
-
 
     }
 }
