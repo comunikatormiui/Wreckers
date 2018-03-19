@@ -17,7 +17,7 @@ import ru.maklas.wreckers.engine.events.requests.DetachRequest;
 import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
-import ru.maklas.wreckers.game.entities.EntityScythe;
+import ru.maklas.wreckers.game.entities.*;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
@@ -51,7 +51,9 @@ public class MainMenuState extends State implements GameController {
         engine.add(new StatusEffectSystem());
 
 
-        model = new GameModel();
+
+        GameModel model = new GameModel();
+        this.model = model;
         model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
         model.setEngine(engine);
         model.setFixturer(new FDefBuilder());
@@ -77,13 +79,13 @@ public class MainMenuState extends State implements GameController {
                 .linearDamp(0)
                 .build();
 
-        final Entity player         = new ru.maklas.wreckers.game.entities.EntityWrecker(1, 0,   500, 10000, model, EntityType.PLAYER);
-        final ru.maklas.wreckers.game.entities.EntityWrecker opponent = new ru.maklas.wreckers.game.entities.EntityWrecker(2, 200, 500, 10000, model, EntityType.OPPONENT);
-        final ru.maklas.wreckers.game.entities.EntitySword sword = new ru.maklas.wreckers.game.entities.EntitySword(3, -200, 700, 10, model);
-        final ru.maklas.wreckers.game.entities.EntitySword sword2 = new ru.maklas.wreckers.game.entities.EntitySword(4, 0, 300, 10, model);
-        final ru.maklas.wreckers.game.entities.EntityHammer hammer = new ru.maklas.wreckers.game.entities.EntityHammer(5, -200, 300, 10, model);
+        final Entity player         = new EntityWrecker(1, 0,   500, 10000, model, EntityType.PLAYER);
+        final EntityWrecker opponent = new EntityWrecker(2, 200, 500, 10000, model, EntityType.OPPONENT);
+        final EntitySword sword = new EntitySword(3, -200, 700, 10, model);
+        final EntitySword sword2 = new EntitySword(4, 0, 300, 10, model);
+        final EntityHammer hammer = new EntityHammer(5, -200, 300, 10, model);
         final Entity scythe = new EntityScythe(6, 370, 300, 10, model);
-        final Entity platform = new ru.maklas.wreckers.game.entities.GameEntity(-2, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
+        final Entity platform = new GameEntity(-2, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
 
         model.setPlayer(player);
         model.setOpponent(opponent);

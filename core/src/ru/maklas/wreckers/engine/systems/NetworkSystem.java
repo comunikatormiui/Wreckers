@@ -17,7 +17,7 @@ import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.MotorComponent;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
-import ru.maklas.wreckers.game.entities.EntityScythe;
+import ru.maklas.wreckers.game.entities.*;
 import ru.maklas.wreckers.libs.Log;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.network.events.creation.*;
@@ -175,7 +175,7 @@ public abstract class NetworkSystem extends EntitySystem {
         subscribe(new Subscription<PlatformCreationEvent>(PlatformCreationEvent.class) {
             @Override
             public void receive(Signal<PlatformCreationEvent> signal, PlatformCreationEvent e) {
-                getEngine().add(new ru.maklas.wreckers.game.entities.EntityPlatform(e.getId(), e.getX(), e.getY(), GameAssets.floorZ, e.getWidth(), e.getHeight(), model));
+                getEngine().add(new EntityPlatform(e.getId(), e.getX(), e.getY(), GameAssets.floorZ, e.getWidth(), e.getHeight(), model));
             }
         });
     }
@@ -193,7 +193,7 @@ public abstract class NetworkSystem extends EntitySystem {
      * Создаёт Wrecker
      */
     protected Entity createWrecker(WreckerCreationEvent e){
-        ru.maklas.wreckers.game.entities.EntityWrecker wrecker = new ru.maklas.wreckers.game.entities.EntityWrecker(e.getId(), e.getX(), e.getY(), e.getHealth(), model, e.isPlayer() ? EntityType.PLAYER : EntityType.OPPONENT);
+        EntityWrecker wrecker = new EntityWrecker(e.getId(), e.getX(), e.getY(), e.getHealth(), model, e.isPlayer() ? EntityType.PLAYER : EntityType.OPPONENT);
         wrecker.get(Mappers.wreckerM).set(e.getStats());
         return wrecker;
     }
@@ -210,11 +210,11 @@ public abstract class NetworkSystem extends EntitySystem {
     }
 
     protected void createSword(SwordCreationEvent e) {
-        getEngine().add(new ru.maklas.wreckers.game.entities.EntitySword(e.getId(), e.getX(), e.getY(), GameAssets.swordZ, model));
+        getEngine().add(new EntitySword(e.getId(), e.getX(), e.getY(), GameAssets.swordZ, model));
     }
 
     protected void createHammer(HammerCreationEvent e) {
-        getEngine().add(new ru.maklas.wreckers.game.entities.EntityHammer(e.getId(), e.getX(), e.getY(), GameAssets.hammerZ, model));
+        getEngine().add(new EntityHammer(e.getId(), e.getX(), e.getY(), GameAssets.hammerZ, model));
     }
 
     protected void createScythe(ScytheCreationEvent e) {

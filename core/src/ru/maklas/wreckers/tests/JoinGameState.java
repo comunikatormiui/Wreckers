@@ -131,6 +131,7 @@ public class JoinGameState extends State implements SocketProcessor {
     @Override
     protected void dispose() {
         model.getEngine().removeAllEntities();
+        model.getWorld().dispose();
     }
 
     @Override

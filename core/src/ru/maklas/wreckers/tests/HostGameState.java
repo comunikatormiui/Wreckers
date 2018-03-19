@@ -20,7 +20,7 @@ import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.systems.*;
 import ru.maklas.wreckers.game.*;
-import ru.maklas.wreckers.game.entities.EntityScythe;
+import ru.maklas.wreckers.game.entities.*;
 import ru.maklas.wreckers.libs.Log;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.libs.gsm_lib.State;
@@ -46,7 +46,9 @@ public class HostGameState extends State implements SocketProcessor {
         cam = new OrthographicCamera(1280, 720);
         Engine engine = new Engine();
         World world = new World(new Vector2(0, -9.8f), true);
+        GameModel model = this.model;
         model = new GameModel();
+        this.model = model;
         model.setHost(true);
         model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
         model.setEngine(engine);
@@ -83,14 +85,14 @@ public class HostGameState extends State implements SocketProcessor {
             int y = 0;
             int width = 2000;
             int height = 100;
-            Entity floor = new ru.maklas.wreckers.game.entities.EntityPlatform(0, x, y, GameAssets.floorZ, width, height, model);
+            Entity floor = new EntityPlatform(0, x, y, GameAssets.floorZ, width, height, model);
             PlatformCreationEvent netEvent = new PlatformCreationEvent(3, x, y, width, height);
             socket.send(netEvent);
             engine.add(floor);
         }
 
         { //setUp player
-            Entity player = new ru.maklas.wreckers.game.entities.EntityWrecker(1, 0,   500, 10000, model, EntityType.PLAYER);
+            Entity player = new EntityWrecker(1, 0,   500, 10000, model, EntityType.PLAYER);
             model.setPlayer(player);
             WreckerCreationEvent netEvent = WreckerCreationEvent.fromEntity(player, false);
             socket.send(netEvent);
@@ -98,7 +100,7 @@ public class HostGameState extends State implements SocketProcessor {
         }
 
         { //Set up opponent
-            Entity opponent = new ru.maklas.wreckers.game.entities.EntityWrecker(2, 250,   500, 10000, model, EntityType.OPPONENT);
+            Entity opponent = new EntityWrecker(2, 250,   500, 10000, model, EntityType.OPPONENT);
             model.setOpponent(opponent);
             WreckerCreationEvent netEvent = WreckerCreationEvent.fromEntity(opponent, true);
             socket.send(netEvent);
@@ -106,14 +108,14 @@ public class HostGameState extends State implements SocketProcessor {
         }
 
         { //Set up sword
-            Entity sword = new ru.maklas.wreckers.game.entities.EntitySword(10, -200,   600, GameAssets.swordZ, model);
+            Entity sword = new EntitySword(10, -200,   600, GameAssets.swordZ, model);
             WeaponCreationEvent netEvent = new SwordCreationEvent(sword.id, sword.x, sword.y, 0);
             socket.send(netEvent);
             engine.add(sword);
         }
 
         { //Set up Hammer
-            Entity hammer = new ru.maklas.wreckers.game.entities.EntityHammer(11, 200,   600, GameAssets.hammerZ, model);
+            Entity hammer = new EntityHammer(11, 200,   600, GameAssets.hammerZ, model);
             WeaponCreationEvent netEvent = new HammerCreationEvent(hammer.id, hammer.x, hammer.y, 0);
             socket.send(netEvent);
             engine.add(hammer);
@@ -183,5 +185,6 @@ public class HostGameState extends State implements SocketProcessor {
     @Override
     protected void dispose() {
         model.getEngine().removeAllEntities();
+        model.getWorld().dispose();
     }
 }

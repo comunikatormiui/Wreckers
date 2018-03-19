@@ -8,7 +8,7 @@ import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.game.FixtureType;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 
-public class EntityPlatform extends ru.maklas.wreckers.game.entities.GameEntity {
+public class EntityPlatform extends GameEntity {
 
 
     public EntityPlatform(int id, float x, float y, int zOrder, float width, float height, GameModel model) {
@@ -18,7 +18,7 @@ public class EntityPlatform extends ru.maklas.wreckers.game.entities.GameEntity 
                 .newBody()
                 .addFixture(model.getFixturer().newFixture()
                         .shape(model.getShaper().buildRectangle(0, 0, width, height))
-                        .friction(0.1f)
+                        .friction(0.7f)
                         .density(10)
                         .bounciness(0.2f)
                         .mask(EntityType.OBSTACLE)

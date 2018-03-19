@@ -15,7 +15,7 @@ import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.FixtureType;
 import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
 
-public class EntityScythe extends ru.maklas.wreckers.game.entities.WeaponEntity implements AttachAction {
+public class EntityScythe extends WeaponEntity implements AttachAction {
 
 
     Body body;
