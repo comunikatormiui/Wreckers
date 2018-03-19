@@ -46,8 +46,7 @@ public class HostGameState extends State implements SocketProcessor {
         cam = new OrthographicCamera(1280, 720);
         Engine engine = new Engine();
         World world = new World(new Vector2(0, -9.8f), true);
-        GameModel model = this.model;
-        model = new GameModel();
+        GameModel model = new GameModel();
         this.model = model;
         model.setHost(true);
         model.setBuilder(new BodyBuilder(world, GameAssets.box2dScale));
