@@ -62,13 +62,13 @@ public class JoinGameState extends State implements SocketProcessor {
         debugSystem = new PhysicsDebugSystem(world, cam, GameAssets.box2dScale);
         engine.add(new JoinDamageSystem());
         engine.add(new JoinPickUpSystem(model));
-        engine.add(new JoinNetworkSystem(model));
 
         engine.add(new MotorSystem());
         engine.add(new AntiGravSystem());
         engine.add(new StatusEffectSystem());
         engine.add(new PhysicsSystem(world));
         engine.add(new TTLSystem());
+        engine.add(new JoinNetworkSystem(model));
 
 
         ContactListener worldListener = new JoinContactListener(engine);

@@ -1,6 +1,7 @@
 package ru.maklas.wreckers.engine.systems;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import ru.maklas.mengine.Engine;
@@ -17,6 +18,7 @@ import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.MotorComponent;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
 import ru.maklas.wreckers.game.entities.EntityScythe;
+import ru.maklas.wreckers.libs.Log;
 import ru.maklas.wreckers.libs.Utils;
 import ru.maklas.wreckers.network.events.creation.*;
 import ru.maklas.wreckers.network.events.sync.BodySyncEvent;
@@ -109,26 +111,35 @@ public abstract class NetworkSystem extends EntitySystem {
         e.hardApply(body);
     }
 
-    private int jumpCounter = 0;
     final float maxDistance = 100;
     final float maxDistanceB2d = maxDistance / GameAssets.box2dScale;
     final float maxDistanceSquared = maxDistanceB2d * maxDistanceB2d;
+    final float angleThreshold = 20;
+    final float radAngleThreshold = angleThreshold * MathUtils.degreesToRadians;
 
     protected void smoothBodyUpdate(Body body, BodySyncEvent e){
         Vector2 targetPos = Utils.vec1.set(e.getX(), e.getY());
         Vector2 bodyPos = Utils.vec2.set(body.getPosition());
         final float distanceOverMax = (targetPos.dst2(body.getPosition())) / maxDistanceSquared;
 
+        //Position
         if (distanceOverMax < 1){ //0..1 - Норма. небольшие коррекции
             final Vector2 directionToTarget = Utils.vec1.set(targetPos).sub(bodyPos); //Расстояние которое необходимо дополнительно пройти за 5 кадров.
-            final Vector2 velocityToTarget = directionToTarget.scl(10);
-            e.addVelX(velocityToTarget.x);
-            e.addVelY(velocityToTarget.y);
-            e.setPos(body.getPosition());
-            teleportBodyUpdate(body, e);
+            final Vector2 velocityToTarget = directionToTarget.scl(12);
+
+            body.setLinearVelocity(e.getVelX() + velocityToTarget.x, e.getVelY() + velocityToTarget.y);
         } else {
-            teleportBodyUpdate(body, e);
-            System.err.println("Jump " + jumpCounter++);
+            body.getTransform().setPosition(Utils.vec1.set(e.getX(), e.getY()));
+            body.setLinearVelocity(e.getVelX(), e.getVelY());
+        }
+
+
+        final float angleDt = e.getAngle() - body.getAngle();
+        if (Math.abs(angleDt) < radAngleThreshold){ //Угол отличается незначительно
+            body.setAngularVelocity(e.getAngVel() + (angleDt * 12));
+        } else {
+            body.setTransform(body.getPosition(), e.getAngle());
+            body.setAngularVelocity(e.getAngVel());
         }
     }
 

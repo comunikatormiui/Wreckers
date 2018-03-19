@@ -64,6 +64,9 @@ public class BodySyncEvent implements Copyable {
         return this.velY;
     }
 
+    /**
+     * Угол тела в радианах
+     */
     public float getAngle() {
         return angle;
     }
@@ -105,6 +108,25 @@ public class BodySyncEvent implements Copyable {
         body.setAngularVelocity(angVel);
     }
 
+    public void setAngle(float angle) {
+        this.angle = angle;
+    }
+
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setAngVel(float angVel) {
+        this.angVel = angVel;
+    }
 
     @Override
     public String toString() {

@@ -63,13 +63,13 @@ public class HostGameState extends State implements SocketProcessor {
         engine.add(new HostCollisionSystem(model));
         engine.add(new HostDamageSystem(model));
         engine.add(new HostPickUpSystem(model));
-        engine.add(new HostNetworkSystem(model));
 
         engine.add(new MotorSystem());
         engine.add(new AntiGravSystem());
         engine.add(new StatusEffectSystem());
         engine.add(new PhysicsSystem(world));
         engine.add(new TTLSystem());
+        engine.add(new HostNetworkSystem(model));
 
 
 

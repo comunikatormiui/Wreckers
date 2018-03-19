@@ -49,6 +49,17 @@ public class EntitySword extends WeaponEntity implements AttachAction {
 
 
 
+
+        //Выравниваем центр масс в Origin
+        for (Vector2 point : pointsHandle) {
+            point.sub(832.3517f, 177.01413f);
+        }
+
+        for (Vector2 point : pointsSharp) {
+            point.sub(832.3517f, 177.01413f);
+        }
+
+        //Скалируем
         for (Vector2 point : pointsHandle) {
             point.scl(scale / (GameAssets.box2dScale));
         }
@@ -91,11 +102,13 @@ public class EntitySword extends WeaponEntity implements AttachAction {
         RenderUnit unit = new RenderUnit(Images.sword);
         unit.scaleX = unit.scaleY = scale;
         unit.pivotX = unit.pivotY = 0;
+        unit.localX = - 832.3517f * scale;
+        unit.localY = - 177.01413f * scale;
 
 
         add(new PhysicsComponent(body));
         add(new RenderComponent(unit));
-        pickUpC = new PickUpComponent(model.getShaper().buildCircle(400 * scale, 178 * scale, 35), this);
+        pickUpC = new PickUpComponent(model.getShaper().buildCircle((400 - 832.3517f) * scale, (178 - 177.01413f) * scale, 35), this);
         add(pickUpC);
         add(new WeaponComponent(
                 35,
@@ -107,6 +120,9 @@ public class EntitySword extends WeaponEntity implements AttachAction {
                 25,
                 25,
                 10));
+
+
+        System.err.println("Sword: MassCenter: " + body.getMassData().center);
     }
 
     @Override
@@ -115,7 +131,7 @@ public class EntitySword extends WeaponEntity implements AttachAction {
         rjd.bodyA = ownerBody;
         rjd.bodyB = this.body;
         rjd.localAnchorA.set(socket.localX, socket.localY);
-        rjd.localAnchorB.set(300, 178).scl(0.15f / GameAssets.box2dScale);
+        rjd.localAnchorB.set(300, 178).sub(832.3517f, 177.01413f).scl(0.15f / GameAssets.box2dScale);
         return rjd;
     }
 }
