@@ -27,6 +27,7 @@ allprojects {
         mnetVersion  = '30999214f2a23fe4abd97218bafcabb84a65fe2c'
         mengineVersion = '6bff2acc735feca9a247f7f8abdcf9da1a7d4b73'
         mLibsVersion = 'b67aaab8c91b1098319ddeb7648429a012c5cd79'
+        mBodyMakerVersion = '36ae2a62bbd81f5032d9b5fc072d8b690bb9bb9b'
     }
 
     repositories {
@@ -97,6 +98,7 @@ project(":core") {
         compile "com.github.maklas:MNet:$mnetVersion"
         compile "com.github.maklas:MEngine:$mengineVersion"
         compile "com.github.maklas:MLibs:$mLibsVersion"
+        compile "com.github.maklas:MBodyMaker:$mBodyMakerVersion"
 
 
     }

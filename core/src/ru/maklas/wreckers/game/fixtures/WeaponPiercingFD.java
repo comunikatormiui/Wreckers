@@ -14,8 +14,8 @@ public class WeaponPiercingFD extends WeaponDamageFixtureData {
         this.stuckPoint.set(stuckPoint);
     }
 
-    public WeaponPiercingFD(float x, float y, float stuckX, float stuckY) {
-        this.pierceDirection.set(x, y).nor();
+    public WeaponPiercingFD(float dirX, float dirY, float stuckX, float stuckY) {
+        this.pierceDirection.set(dirX, dirY).nor();
         this.stuckPoint.set(stuckX, stuckY);
     }
 

@@ -1,8 +1,13 @@
 package ru.maklas.wreckers.game.entities;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
+import ru.maklas.bodymaker.impl.save_beans.BodyPoly;
+import ru.maklas.bodymaker.impl.save_beans.FixShape;
+import ru.maklas.bodymaker.impl.save_beans.NamedPoint;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
@@ -15,6 +20,8 @@ import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.FixtureType;
 import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
 
+import java.util.logging.FileHandler;
+
 public class EntityScythe extends WeaponEntity implements AttachAction {
 
 
@@ -22,73 +29,38 @@ public class EntityScythe extends WeaponEntity implements AttachAction {
     World world;
     PickUpComponent pickUpC;
     final float scale = 0.65f;
+    float handleX;
+    float handleY;
 
     public EntityScythe(int id, float x, float y, int zOrder, GameModel model) {
         super(id, x, y, zOrder, model);
         this.world = model.getWorld();
         final EntityType eType = EntityType.NEUTRAL_WEAPON;
 
-        PolygonShape handle = new PolygonShape();
-        PolygonShape sharp = new PolygonShape();
-        PolygonShape sharp2 = new PolygonShape();
-        PolygonShape sharp3 = new PolygonShape();
+        BodyPoly bodyPoly = BodyPoly.fromJson(Gdx.files.internal("scythe.json").readString());
 
-        Vector2[] pointsHandle = new Vector2[]{
-                new Vector2(34, 226),
-                new Vector2(108, 74),
-                new Vector2(124, 84),
-                new Vector2(95, 159),
-                new Vector2(49, 235),
-                new Vector2(34, 226)
-        };
+        NamedPoint mass_center = bodyPoly.getMassCenter();
+        NamedPoint centerWannaBe = bodyPoly.findPoint("centerWannaBe");
+        NamedPoint peak = bodyPoly.findPoint("peak");
+        NamedPoint origin = bodyPoly.findPoint("Origin");
 
-        Vector2[] pointsSharp1 = new Vector2[]{
-                new Vector2(108, 74),
-                new Vector2(101, 11),
-                new Vector2(152, 23),
-                new Vector2(221, 64),
-                new Vector2(194, 106)
-        };
+        RenderUnit unit = new RenderUnit(Images.scythe);
+        unit.scaleX = unit.scaleY = scale;
+        unit.pivotX = mass_center.x / unit.width;
+        unit.pivotY = mass_center.y / unit.height;
 
-        Vector2[] pointsSharp2 = new Vector2[]{
-                new Vector2(194, 106),
-                new Vector2(240, 108),
-                new Vector2(243, 166),
-                new Vector2(217, 198)
-        };
-
-        Vector2[] pointsSharp3 = new Vector2[]{
-                new Vector2(220, 146),
-                new Vector2(194, 106),
-                new Vector2(221, 64)
-        };
+        bodyPoly
+                .mov(-mass_center.x, -mass_center.y) // теперь координаты (0, 0) совпадают с координатами центра массы
+                .scale(scale/GameAssets.box2dScale); // Подгоняем размер.
 
 
-        Vector2 v = new Vector2(1, -1);
 
-        for (Vector2 point : pointsHandle) {
-            point
-                    .scl(v)
-                    .add(0, 256)
-                    .scl(scale / (GameAssets.box2dScale));
-        }
+        PolygonShape handle     = bodyPoly.findShape("handle").toPolygonShape();
+        PolygonShape hammerSide = bodyPoly.findShape("hammerSide").toPolygonShape();
+        PolygonShape blade      = bodyPoly.findShape("blade").toPolygonShape();
+        PolygonShape blade2     = bodyPoly.findShape("blade2").toPolygonShape();
+        PolygonShape edge       = bodyPoly.findShape("edge").toPolygonShape();
 
-        for (Vector2 point : pointsSharp1) {
-            point.scl(v).add(0, 256).scl(scale / (GameAssets.box2dScale));
-        }
-
-        for (Vector2 point : pointsSharp2) {
-            point.scl(v).add(0, 256).scl(scale / (GameAssets.box2dScale));
-        }
-
-        for (Vector2 point : pointsSharp3) {
-            point.scl(v).add(0, 256).scl(scale / (GameAssets.box2dScale));
-        }
-
-        handle.set(pointsHandle);
-        sharp.set(pointsSharp1);
-        sharp2.set(pointsSharp2);
-        sharp3.set(pointsSharp3);
 
         FixtureDef fix = model.getFixturer().newFixture()
                 .bounciness(0.1f)
@@ -100,15 +72,15 @@ public class EntityScythe extends WeaponEntity implements AttachAction {
 
         FixtureDef fix2 = model.getFixturer().newFixture()
                 .mask(eType)
-                .shape(sharp)
+                .shape(hammerSide)
                 .friction(0.2f)
                 .bounciness(0.1f)
-                .density(8)
+                .density(1)
                 .build();
 
         FixtureDef fix3 = model.getFixturer().newFixture()
                 .mask(eType)
-                .shape(sharp2)
+                .shape(blade)
                 .friction(0.2f)
                 .bounciness(0.1f)
                 .density(1)
@@ -116,7 +88,15 @@ public class EntityScythe extends WeaponEntity implements AttachAction {
 
         FixtureDef fix4 = model.getFixturer().newFixture()
                 .mask(eType)
-                .shape(sharp3)
+                .shape(blade2)
+                .friction(0.2f)
+                .bounciness(0.1f)
+                .density(1)
+                .build();
+
+        FixtureDef fix5 = model.getFixturer().newFixture()
+                .mask(eType)
+                .shape(edge)
                 .friction(0.2f)
                 .bounciness(0.1f)
                 .density(1)
@@ -128,21 +108,19 @@ public class EntityScythe extends WeaponEntity implements AttachAction {
                 .linearDamp(0.1f)
                 .addFixture(fix, new FixtureData(FixtureType.WEAPON_NO_DAMAGE))
                 .addFixture(fix2, new FixtureData(FixtureType.WEAPON_DAMAGE))
-                .addFixture(fix3, new WeaponPiercingFD(0.5f, -2f, 217 * scale / GameAssets.box2dScale, 60 * scale / GameAssets.box2dScale))
+                .addFixture(fix3, new FixtureData(FixtureType.WEAPON_DAMAGE))
                 .addFixture(fix4, new FixtureData(FixtureType.WEAPON_DAMAGE))
+                .addFixture(fix5, new WeaponPiercingFD(0.5f, -2f, 217 * scale / GameAssets.box2dScale, 60 * scale / GameAssets.box2dScale))
                 .angularDamp(0.1f)
                 .build();
 
         System.out.println(id + ": Scythe mass " + body.getMass());
 
-        RenderUnit unit = new RenderUnit(Images.scythe);
-        unit.scaleX = unit.scaleY = scale;
-        unit.pivotX = unit.pivotY = 0;
-
-
         add(new PhysicsComponent(body));
         add(new RenderComponent(unit));
-        pickUpC = new PickUpComponent(model.getShaper().buildCircle(38 * scale, 20 * scale, 35), this);
+        handleX = origin.x * GameAssets.box2dScale + 30 * scale;
+        handleY = origin.y * GameAssets.box2dScale + 30 * scale;
+        pickUpC = new PickUpComponent(model.getShaper().buildCircle(handleX, handleY, 35), this);
         add(pickUpC);
         add(new WeaponComponent(
                 10,
@@ -162,7 +140,7 @@ public class EntityScythe extends WeaponEntity implements AttachAction {
         rjd.bodyA = ownerBody;
         rjd.bodyB = this.body;
         rjd.localAnchorA.set(socket.localX, socket.localY);
-        rjd.localAnchorB.set(38, 20).scl(scale / GameAssets.box2dScale);
+        rjd.localAnchorB.set(handleX, handleY).scl(1 / GameAssets.box2dScale);
         return rjd;
     }
 }
