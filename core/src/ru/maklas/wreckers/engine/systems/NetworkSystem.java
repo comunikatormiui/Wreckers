@@ -9,6 +9,7 @@ import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.EntitySystem;
 import ru.maklas.mengine.Subscription;
 import ru.maklas.mengine.utils.Signal;
+import ru.maklas.mnet.NetBatch;
 import ru.maklas.mnet.PingListener;
 import ru.maklas.mnet.Socket;
 import ru.maklas.wreckers.assets.EntityType;
@@ -222,8 +223,12 @@ public abstract class NetworkSystem extends EntitySystem {
     }
 
 
-    protected void sendSynchWeapon(Entity weapon){
+    protected void sendSynchWeapon(Entity weapon) {
         sendSyncBody(weapon);
+    }
+
+    protected void sendSynchWeapon(NetBatch batch, Entity weapon){
+        sendSyncBody(batch, weapon);
     }
 
     protected void sendSynchWrecker(Entity wrecker){
@@ -243,6 +248,15 @@ public abstract class NetworkSystem extends EntitySystem {
         if (pc != null && pc.body != null){
             BodySyncEvent syncEvent = BodySyncEvent.fromBody(phycisEntity.id, pc.body);
             model.getSocket().send(syncEvent);
+        }
+    }
+
+    protected void sendSyncBody(NetBatch batch, Entity phycisEntity){
+        PhysicsComponent pc = phycisEntity.get(Mappers.physicsM);
+
+        if (pc != null && pc.body != null){
+            BodySyncEvent syncEvent = BodySyncEvent.fromBody(phycisEntity.id, pc.body);
+            batch.add(syncEvent);
         }
     }
 

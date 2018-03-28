@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.utils.ImmutableArray;
+import ru.maklas.mnet.NetBatch;
 import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.SocketComponent;
@@ -60,10 +61,15 @@ public class HostNetworkSystem extends NetworkSystem {
         }
     }
 
+    NetBatch batch = new NetBatch();
     private void syncAllWeapons(){
+
         for (Entity weapon : weapons) {
-            sendSynchWeapon(weapon);
+            sendSynchWeapon(batch, weapon);
         }
+        System.out.println(batch.size());
+        model.getSocket().sendBatch(batch);
+        batch.clear();
     }
 
 
