@@ -1,6 +1,5 @@
 package ru.maklas.wreckers.tests;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import ru.maklas.mnet.ServerAuthenticator;
 import ru.maklas.mnet.ServerSocket;
@@ -15,8 +14,6 @@ import ru.maklas.wreckers.libs.gsm_lib.State;
 import ru.maklas.wreckers.network.events.ConnectionResponse;
 
 import java.net.InetAddress;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 public class HostState extends State {
 
@@ -28,20 +25,7 @@ public class HostState extends State {
         ServerAuthenticator singleSocketAuthenticator = new ServerAuthenticator() {
             @Override
             public ConnectionResponsePackage<?> validateNewConnection(InetAddress address, int port, Object request) {
-                FutureTask<Boolean> allow = new FutureTask<Boolean>(new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                        return socket == null;
-                    }
-                });
-                Gdx.app.postRunnable(allow);
-                boolean b = false;
-                try {
-                    b = allow.get();
-                } catch (Exception ignore) {
-                }
-
-                if (b) {
+                if (socket == null) {
                     return ConnectionResponsePackage.accept(new ConnectionResponse(true, ""));
                 } else {
                     return ConnectionResponsePackage.accept(new ConnectionResponse(false, "Busy"));
@@ -50,32 +34,26 @@ public class HostState extends State {
 
             @Override
             public void registerNewConnection(final Socket socket, ConnectionResponsePackage<?> sentResponsePackage, Object request) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        HostState.this.socket = socket;
-                        socket.start(InetAssets.defaultServerSocketUpdate);
-                        if (getGsm().getCurrentState() == HostState.this){
-                            pushState(new HostGameState(socket), false, false);
-                        }
+                if (HostState.this.socket == null) {
+                    HostState.this.socket = socket;
+                    socket.start(InetAssets.defaultServerSocketUpdate);
+                    if (getGsm().getCurrentState() == HostState.this) {
+                        pushState(new HostGameState(socket), true, false);
                     }
-                });
+                } else {
+                    socket.disconnect();
+                }
             }
 
             @Override
             public void onSocketDisconnected(final Socket socket, String msg) {
                 System.out.println("Socket disconnected with msg: " + msg);
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (socket == HostState.this.socket) {
-                            HostState.this.socket = null;
-                            if (getGsm().getCurrentState() != HostState.this){
-                                getGsm().setCommand(new GSMBackToFirst());
-                            }
-                        }
+                if (socket == HostState.this.socket) {
+                    HostState.this.socket = null;
+                    if (getGsm().getCurrentState() != HostState.this){
+                        getGsm().setCommand(new GSMBackToFirst());
                     }
-                });
+                };
             }
         };
         try {
@@ -90,7 +68,7 @@ public class HostState extends State {
 
     @Override
     protected void update(float dt) {
-
+        serverSocket.processNewConnections();
     }
 
     @Override
