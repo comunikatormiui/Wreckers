@@ -52,9 +52,7 @@ public class HostCollisionSystem extends EntitySystem{
 
     @Override
     public void onAddedToEngine(final Engine engine) {
-        subscribe(new Subscription<CollisionEvent>(CollisionEvent.class) {
-            @Override
-            public void receive(Signal<CollisionEvent> signal, CollisionEvent e) {
+        subscribe(CollisionEvent.class, e -> {
                 EntityType typeA = fromType(e.getA().type);
                 EntityType typeB = fromType(e.getB().type);
                 if (e.getImpulse().getCount() == 0){
@@ -73,8 +71,12 @@ public class HostCollisionSystem extends EntitySystem{
                 } else if (isPlayerOrOpponent(typeB) && isWeapon(typeA)){
                     handleWeaponToPlayer(e.getA(), typeA, e.getB(), typeB, e.getContact(), e.getImpulse(), true);
                 }
-            }
-        });
+            });
+    }
+
+    @Override
+    public void update(float dt) {
+
     }
 
     // Контакт и импульс нельзя передавать далее

@@ -2,8 +2,8 @@ package ru.maklas.wreckers.server;
 
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.NotNull;
-import ru.maklas.mnet.Socket;
-import ru.maklas.mnet.SocketProcessor;
+import ru.maklas.mnet2.Socket;
+import ru.maklas.mnet2.SocketProcessor;
 import ru.maklas.wreckers.assets.DCAssets;
 
 import java.net.InetAddress;
@@ -129,9 +129,8 @@ public class ClientBase implements Iterable<Client> {
     public void disconnectAll(String msg) {
         Client[] clients = this.clients.toArray(Client.class);
         for (Client client : clients) {
-            client.getSocket().disconnect(msg);
+            client.getSocket().close(msg);
         }
-
     }
 
     public Client getSafe(int i) {
@@ -146,10 +145,11 @@ public class ClientBase implements Iterable<Client> {
         Array.ArrayIterator<Client> iter = this.processingIterator;
         iter.reset();
         for (;iter.hasNext();){
-            boolean interrupted = iter.next().getSocket().receive(processor);
-            if (interrupted){
-                break;
-            }
+            iter.next().getSocket().update(processor);
+            //TODO
+            //if (interrupted){
+            //    break;
+            //}
         }
     }
 

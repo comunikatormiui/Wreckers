@@ -69,23 +69,17 @@ public class EntityWrecker extends GameEntity {
     @Override
     protected void addedToEngine(final Engine engine) {
         add(new StatusEffectComponent(engine, this));
-        subscribe(new Subscription<DeathEvent>(DeathEvent.class) {
-            @Override
-            public void receive(Signal<DeathEvent> signal, DeathEvent deathEvent) {
-                if (deathEvent.getTarget() == EntityWrecker.this){
+        subscribe(DeathEvent.class, e -> {
+                if (e.getTarget() == EntityWrecker.this){
                     engine.remove(EntityWrecker.this);
                     System.out.println("Died");
                 }
-            }
         });
 
-        subscribe(new Subscription<DamageEvent>(DamageEvent.class) {
-            @Override
-            public void receive(Signal<DamageEvent> signal, DamageEvent damageEvent) {
-                if (damageEvent.getTarget() == EntityWrecker.this){
-                    System.out.println(EntityWrecker.this.toString() + " Damage: " + damageEvent.getDamage() + " Health left: " + get(Mappers.healthM).health);
+        subscribe(DamageEvent.class, e-> {
+                if (e.getTarget() == EntityWrecker.this){
+                    System.out.println(EntityWrecker.this.toString() + " Damage: " + e.getDamage() + " Health left: " + get(Mappers.healthM).health);
                 }
-            }
         });
     }
 }

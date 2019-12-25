@@ -99,7 +99,7 @@ public class MainMenuState extends State implements GameController {
         engine.add(platform);
 
 
-        engine.dispatch(new GrabZoneChangeRequest(true, opponent));
+        //engine.dispatch(new GrabZoneChangeRequest(true, opponent));
     }
 
     @Override

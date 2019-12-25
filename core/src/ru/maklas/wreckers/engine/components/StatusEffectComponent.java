@@ -1,11 +1,11 @@
 package ru.maklas.wreckers.engine.components;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ImmutableArray;
 import org.jetbrains.annotations.NotNull;
 import ru.maklas.mengine.Component;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.utils.ImmutableArray;
 import ru.maklas.wreckers.engine.others.DisarmStatusEffect;
 import ru.maklas.wreckers.engine.others.StatusEffect;
 
@@ -40,7 +40,7 @@ public class StatusEffectComponent implements Component {
             effectUpdateArray.add(effect);
             effectUpdateArray.sort();
         } else {
-            engine.execureAfterUpdate(new Runnable() {
+            engine.executeAfterUpdate(new Runnable() {
                 @Override
                 public void run() {
                     effectUpdateArray.add(effect);
@@ -63,7 +63,7 @@ public class StatusEffectComponent implements Component {
             if (!isUpdating){
                 effectUpdateArray.removeValue(effect, true);
             } else {
-                engine.execureAfterUpdate(new Runnable() {
+                engine.executeAfterUpdate(new Runnable() {
                     @Override
                     public void run() {
                         effectUpdateArray.removeValue(effect, true);
@@ -81,7 +81,7 @@ public class StatusEffectComponent implements Component {
         StatusEffect[] effectsArray = effects.toArray(StatusEffect.class);
         effects.clear();
         if (isUpdating){
-            engine.execureAfterUpdate(new Runnable() {
+            engine.executeAfterUpdate(new Runnable() {
                 @Override
                 public void run() {
                     effectUpdateArray.clear();

@@ -1,13 +1,10 @@
 package ru.maklas.wreckers.game.entities;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
-import ru.maklas.bodymaker.impl.save_beans.BodyPoly;
-import ru.maklas.bodymaker.impl.save_beans.FixShape;
-import ru.maklas.bodymaker.impl.save_beans.NamedPoint;
+import ru.maklas.bodymaker.runtime.save_beans.BodyPoly;
+import ru.maklas.bodymaker.runtime.save_beans.NamedPoint;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
@@ -16,11 +13,9 @@ import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.components.*;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
-import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.FixtureType;
+import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
-
-import java.util.logging.FileHandler;
 
 public class EntityScythe extends WeaponEntity implements AttachAction {
 

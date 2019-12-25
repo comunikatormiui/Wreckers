@@ -51,9 +51,7 @@ public class HostDamageSystem extends EntitySystem {
 
     @Override
     public void onAddedToEngine(final Engine engine) {
-        subscribe(new Subscription<WeaponWreckerHitEvent>(WeaponWreckerHitEvent.class) {
-            @Override
-            public void receive(Signal<WeaponWreckerHitEvent> signal, final WeaponWreckerHitEvent e) {
+        subscribe(WeaponWreckerHitEvent.class, e -> {
                 model.updateOnThisFrame();
                 Entity weapon = e.getWeapon();
                 WreckerComponent wreckC = e.getTargetWrecker().get(Mappers.wreckerM);
@@ -135,7 +133,7 @@ public class HostDamageSystem extends EntitySystem {
                 }
                 //if (stuck){ //TODO
                 //    System.out.println("Stuck");
-                //    engine.execureAfterUpdate(new Runnable() {
+                //    engine.executeAfterUpdate(new Runnable() {
                 //        @Override
                 //        public void run() {
                 //            WeldJointDef wjd = new WeldJointDef();
@@ -150,7 +148,7 @@ public class HostDamageSystem extends EntitySystem {
                 //            System.out.println("WJD: " + e.getWeaponBody().getWorldPoint(wjd.localAnchorA));
                 //            System.out.println("WJD: " + e.getWreckerBody().getWorldPoint(wjd.localAnchorB));
                 //        }
-                //    });
+                //);
                 //}
                 applyDamageAndDispatch(e.getTargetWrecker(), hc, totalDamage, e, (doStun ? stunDuration : -1));  //Применяем урон
 
@@ -171,10 +169,13 @@ public class HostDamageSystem extends EntitySystem {
                 engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getCollisionVelocity()).nor().scl(75).add(e.getPoint()), 1, Color.ORANGE));
                 engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getNormal()).scl(75).add(e.getPoint()), 1, Color.BROWN));
                 if ( e.getSharpness() > 0.1f) engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getPiercingDirection()).scl(75).add(e.getPoint()), 1, Color.CYAN));
-            }
-        });
+            });
     }
 
+    @Override
+    public void update(float dt) {
+
+    }
 
     private void applyDamageAndDispatch(Entity e, HealthComponent hc, float damage, Event hitEvent, float stunDuration){
         hc.health -= damage;

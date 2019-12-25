@@ -9,9 +9,9 @@ import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.EntitySystem;
 import ru.maklas.mengine.Subscription;
 import ru.maklas.mengine.utils.Signal;
-import ru.maklas.mnet.NetBatch;
-import ru.maklas.mnet.PingListener;
-import ru.maklas.mnet.Socket;
+import ru.maklas.mnet2.NetBatch;
+import ru.maklas.mnet2.PingListener;
+import ru.maklas.mnet2.Socket;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.client.GameModel;
@@ -51,17 +51,12 @@ public abstract class NetworkSystem extends EntitySystem {
 
     public NetworkSystem(GameModel model) {
         this.model = model;
-        pl = new PingListener() {
+        pl = (socket, ping) -> Gdx.app.postRunnable(new Runnable() {
             @Override
-            public void onPingUpdated(Socket socket, final float newPing) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        NetworkSystem.this.model.setPing(newPing);
-                    }
-                });
+            public void run() {
+                NetworkSystem.this.model.setPing(ping);
             }
-        };
+        });
     }
 
     @Override
@@ -78,29 +73,22 @@ public abstract class NetworkSystem extends EntitySystem {
     }
 
     protected void subscribeToBodyUpdate(){
-        subscribe(new Subscription<BodySyncEvent>(BodySyncEvent.class) {
-            @Override
-            public void receive(Signal<BodySyncEvent> signal, BodySyncEvent e) {
-                Entity entity = getEngine().getById(e.getId());
+        subscribe(BodySyncEvent.class, e -> {
+                Entity entity = getEngine().findById(e.getId());
                 if (entity != null){
                     bodyUpdate(entity.get(Mappers.physicsM).body, e);
                 }
-            }
         });
     }
 
     protected void subscribeToWreckerUpdate(){
-        subscribe(new Subscription<WreckerSyncEvent>(WreckerSyncEvent.class) {
-            @Override
-            public void receive(Signal<WreckerSyncEvent> signal, WreckerSyncEvent e) {
+        subscribe(WreckerSyncEvent.class,  e -> {
 
-                Entity entity = getEngine().getById(e.getId());
+                Entity entity = getEngine().findById(e.getId());
                 if (entity != null){
                     entity.get(Mappers.motorM).direction.set(e.getMotorX(), e.getMotorY());
                     bodyUpdate(entity.get(Mappers.physicsM).body, e.getPos());
                 }
-
-            }
         });
     }
 
@@ -145,40 +133,17 @@ public abstract class NetworkSystem extends EntitySystem {
     }
 
     private void subscribeToEntityCreationEvents(){
-        subscribe(new Subscription<WreckerCreationEvent>(WreckerCreationEvent.class) {
-            @Override
-            public void receive(Signal<WreckerCreationEvent> signal, WreckerCreationEvent e) {
-                onWreckerEvent(e);
-            }
-        });
+        subscribe(WreckerCreationEvent.class, this::onWreckerEvent);
         
-        subscribe(new Subscription<SwordCreationEvent>(SwordCreationEvent.class) {
-            @Override
-            public void receive(Signal<SwordCreationEvent> signal, SwordCreationEvent e) {
-                createSword(e);
-            }
-        });
+        subscribe(SwordCreationEvent.class, this::createSword);
 
-        subscribe(new Subscription<HammerCreationEvent>(HammerCreationEvent.class) {
-            @Override
-            public void receive(Signal<HammerCreationEvent> signal, HammerCreationEvent e) {
-                createHammer(e);
-            }
-        });
+        subscribe(HammerCreationEvent.class, this::createHammer);
 
-        subscribe(new Subscription<ScytheCreationEvent>(ScytheCreationEvent.class) {
-            @Override
-            public void receive(Signal<ScytheCreationEvent> signal, ScytheCreationEvent e) {
-                createScythe(e);
-            }
-        });
+        subscribe(ScytheCreationEvent.class, this::createScythe);
 
-        subscribe(new Subscription<PlatformCreationEvent>(PlatformCreationEvent.class) {
-            @Override
-            public void receive(Signal<PlatformCreationEvent> signal, PlatformCreationEvent e) {
+        subscribe(PlatformCreationEvent.class, e -> {
                 getEngine().add(new EntityPlatform(e.getId(), e.getX(), e.getY(), GameAssets.floorZ, e.getWidth(), e.getHeight(), model));
-            }
-        });
+            });
     }
 
     /**

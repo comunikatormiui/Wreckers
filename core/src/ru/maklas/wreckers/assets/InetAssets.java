@@ -1,9 +1,9 @@
 package ru.maklas.wreckers.assets;
 
 import com.esotericsoftware.kryo.Kryo;
-import ru.maklas.mnet.Provider;
-import ru.maklas.mnet.Serializer;
-import ru.maklas.mnet.impl.KryoSerializer;
+import ru.maklas.mnet2.Supplier;
+import ru.maklas.mnet2.serialization.KryoSerializer;
+import ru.maklas.mnet2.serialization.Serializer;
 import ru.maklas.wreckers.network.events.*;
 import ru.maklas.wreckers.network.events.creation.*;
 import ru.maklas.wreckers.network.events.state_change.NetRestartEvent;
@@ -51,13 +51,8 @@ public class InetAssets {
         return kryo;
     }
 
-    private static Provider<Serializer> provider = new Provider<Serializer>() {
-        @Override
-        public Serializer provide() {
-            return new KryoSerializer(newKryo(), 512);
-        }
-    };
-    public static Provider<Serializer> serializerProvider(){
+    private static Supplier<Serializer> provider = () -> new KryoSerializer(newKryo(), 512);
+    public static Supplier<Serializer> serializerProvider(){
         return provider;
     }
 

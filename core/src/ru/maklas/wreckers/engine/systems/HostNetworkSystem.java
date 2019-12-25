@@ -3,8 +3,8 @@ package ru.maklas.wreckers.engine.systems;
 import org.jetbrains.annotations.NotNull;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.utils.ImmutableArray;
-import ru.maklas.mnet.NetBatch;
+import com.badlogic.gdx.utils.ImmutableArray;
+import ru.maklas.mnet2.NetBatch;
 import ru.maklas.wreckers.client.GameModel;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.SocketComponent;
@@ -27,7 +27,6 @@ public class HostNetworkSystem extends NetworkSystem {
 
     @Override
     public void update(float dt) {
-        super.update(dt);
         if (model.timeToUpdate()){
             sync();
             model.setSkipFrameForUpdate(5);
@@ -68,7 +67,7 @@ public class HostNetworkSystem extends NetworkSystem {
             sendSynchWeapon(batch, weapon);
         }
         System.out.println(batch.size());
-        model.getSocket().sendBatch(batch);
+        model.getSocket().send(batch);
         batch.clear();
     }
 

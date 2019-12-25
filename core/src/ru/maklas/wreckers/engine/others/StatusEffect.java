@@ -3,7 +3,7 @@ package ru.maklas.wreckers.engine.others;
 import org.jetbrains.annotations.NotNull;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.utils.ImmutableArray;
+import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.wreckers.engine.components.StatusEffectComponent;
 
 public abstract class StatusEffect implements Comparable<StatusEffect>{

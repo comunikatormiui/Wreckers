@@ -2,7 +2,7 @@ package ru.maklas.wreckers.engine.systems;
 
 import com.badlogic.gdx.math.Vector2;
 import ru.maklas.mengine.*;
-import ru.maklas.mengine.utils.ImmutableArray;
+import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.mengine.utils.Signal;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.AntiGravComponent;
@@ -26,9 +26,7 @@ public class AntiGravSystem extends EntitySystem {
     public void onAddedToEngine(Engine engine) {
         entities = engine.entitiesFor(AntiGravComponent.class);
 
-        subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
-            @Override
-            public void receive(Signal<AttachEvent> signal, AttachEvent e) {
+        subscribe(AttachEvent.class, e -> {
                 AntiGravComponent antiGrav = e.getOwner().get(Mappers.antiGravM);
                 ComponentMapper<PhysicsComponent> physicsM = Mappers.physicsM;
                 PhysicsComponent weaponPC = e.getAttachable().get(physicsM);
@@ -42,8 +40,7 @@ public class AntiGravSystem extends EntitySystem {
                 } else {
                     antiGrav.mass -= weaponPC.body.getMass();
                 }
-            }
-        });
+            });
     }
 
     @Override

@@ -1,11 +1,11 @@
 package ru.maklas.wreckers.engine.systems;
 
 
+import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.mengine.ComponentMapper;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.EntitySystem;
-import ru.maklas.mengine.utils.ImmutableArray;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.CameraComponent;
 
@@ -20,15 +20,13 @@ public class CameraSystem extends EntitySystem {
 
     @Override
     public void onAddedToEngine(Engine engine) {
-        entities = engine.entitiesFor(CameraComponent.class);
+        entities = entitiesFor(CameraComponent.class);
     }
 
 
 
     @Override
     public void update(float deltaTime) {
-        super.update(deltaTime);
-
         for (Entity e : entities) {
 
             CameraComponent cc = e.get(cameraM);

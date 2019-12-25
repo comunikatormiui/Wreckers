@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.components.IRenderComponent;
-import ru.maklas.mengine.systems.IterableZSortedRenderSystem;
+import ru.maklas.mengine.IterableZSortedRenderSystem;
 import ru.maklas.wreckers.engine.components.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.components.rendering.RenderUnit;
 import ru.maklas.wreckers.libs.Utils;
@@ -17,10 +17,11 @@ public class RenderingSystem extends IterableZSortedRenderSystem {
     private OrthographicCamera cam;
 
     public RenderingSystem(SpriteBatch batch, OrthographicCamera cam) {
-        super(RenderComponent.class);
+        super(RenderComponent.class, false);
         this.batch = batch;
         this.cam = cam;
         setEnabled(false);
+        setAlwaysInvalidate(true);
     }
 
 

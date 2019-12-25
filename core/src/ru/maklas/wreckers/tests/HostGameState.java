@@ -10,9 +10,8 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.World;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
-import ru.maklas.mnet.Socket;
-import ru.maklas.mnet.SocketProcessor;
-import ru.maklas.mrudp.SocketIterator;
+import ru.maklas.mnet2.Socket;
+import ru.maklas.mnet2.SocketProcessor;
 import ru.maklas.wreckers.assets.EntityType;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.assets.Images;
@@ -137,7 +136,7 @@ public class HostGameState extends State implements SocketProcessor {
 
     @Override
     protected void update(float dt) {
-        socket.receive(this);
+        socket.update(this);
 
         handleKeyboardInput();
         model.getEngine().update(dt);
@@ -168,7 +167,7 @@ public class HostGameState extends State implements SocketProcessor {
     }
 
     @Override
-    public void process(Object o, Socket socket, SocketIterator iterator) {
+    public void process(Socket socket, Object o) {
         if (!((o instanceof BodySyncEvent) || (o instanceof WreckerSyncEvent)))Log.CLIENT.event(o);
         model.getEngine().dispatch(o);
     }

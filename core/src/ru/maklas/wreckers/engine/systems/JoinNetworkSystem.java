@@ -21,7 +21,6 @@ public class JoinNetworkSystem extends NetworkSystem {
 
     @Override
     public void update(float dt) {
-        super.update(dt);
         sync();
     }
 

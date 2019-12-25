@@ -39,48 +39,40 @@ public class HostPickUpSystem extends DefaultPickUpSystem {
     public void onAddedToEngine(final Engine engine) {
         super.onAddedToEngine(engine);
 
-
         // Диспатчим что изменили GrabZone у кого-то
-        subscribe(new Subscription<GrabZoneChangeRequest>(GrabZoneChangeRequest.class) {
-            @Override
-            public void receive(Signal<GrabZoneChangeRequest> signal, GrabZoneChangeRequest e) {
+        subscribe(GrabZoneChangeRequest.class, e -> {
                 model.getSocket().send(new NetGrabZoneChange(e.getEntity().id, e.state())); // Диспатчим что убрали
-            }
         });
 
         // Сообщаем другому клиенту об удачном привязывании/отвязывании итема
-        subscribe(new Subscription<AttachEvent>(AttachEvent.class) {
-            @Override
-            public void receive(Signal<AttachEvent> signal, AttachEvent e) {
+        subscribe(AttachEvent.class, e -> {
                 model.getSocket().send(new NetAttachDetachEvent(e.getOwner().id, e.getAttachable().id, e.isAttached()));
-            }
-        });
+            });
 
         //Получаем это от Join. Просто находим Entity и перенаправляем на локальный DetachEvent
-        subscribe(new Subscription<NetDetachRequest>(NetDetachRequest.class) {
-            @Override
-            public void receive(Signal<NetDetachRequest> signal, NetDetachRequest e) {
+        subscribe(NetDetachRequest.class, e -> {
 
-                Entity player = engine.getById(e.getPlayerId());
-                Entity weapon = engine.getById(e.getWeaponId());
+                Entity player = engine.findById(e.getPlayerId());
+                Entity weapon = engine.findById(e.getWeaponId());
                 if (player == null || weapon == null){
                     return;
                 }
                 engine.dispatch(new DetachRequest(DetachRequest.Type.TARGET_ENTITY_AND_WEAPON, player, weapon));
 
-            }
-        });
+            });
 
         //Получаем это от Join. Просто находим Entity и перенаправляем на локальный GrabZoneChangeReq
-        subscribe(new Subscription<NetGrabZoneChangeRequest>(NetGrabZoneChangeRequest.class) {
-            @Override
-            public void receive(Signal<NetGrabZoneChangeRequest> signal, NetGrabZoneChangeRequest e) {
-                Entity entity = engine.getById(e.getPlayerId());
+        subscribe(NetGrabZoneChangeRequest.class, e -> {
+                Entity entity = engine.findById(e.getPlayerId());
                 if (entity != null) {
                     engine.dispatch(new GrabZoneChangeRequest(e.getEnable(), entity));
                 }
-            }
-        });
+            });
     }
 
+
+    @Override
+    public void update(float dt) {
+
+    }
 }

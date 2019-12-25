@@ -1,65 +1,23 @@
 package ru.maklas.wreckers.tests;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import ru.maklas.mnet.ServerAuthenticator;
-import ru.maklas.mnet.ServerSocket;
-import ru.maklas.mnet.Socket;
-import ru.maklas.mnet.impl.ServerSocketImpl;
-import ru.maklas.mrudp.ConnectionResponsePackage;
-import ru.maklas.mrudp.JavaUDPSocket;
-import ru.maklas.mrudp.UDPSocket;
+import ru.maklas.mnet2.*;
 import ru.maklas.wreckers.assets.InetAssets;
 import ru.maklas.wreckers.libs.gsm_lib.GSMBackToFirst;
 import ru.maklas.wreckers.libs.gsm_lib.State;
 import ru.maklas.wreckers.network.events.ConnectionResponse;
 
-import java.net.InetAddress;
+public class HostState extends State implements ServerAuthenticator {
 
-public class HostState extends State {
-
-    ServerSocket serverSocket;
-    Socket socket;
+    private ServerSocket serverSocket;
+    private Socket socket;
 
     @Override
     protected void onCreate() {
-        ServerAuthenticator singleSocketAuthenticator = new ServerAuthenticator() {
-            @Override
-            public ConnectionResponsePackage<?> validateNewConnection(InetAddress address, int port, Object request) {
-                if (socket == null) {
-                    return ConnectionResponsePackage.accept(new ConnectionResponse(true, ""));
-                } else {
-                    return ConnectionResponsePackage.accept(new ConnectionResponse(false, "Busy"));
-                }
-            }
 
-            @Override
-            public void registerNewConnection(final Socket socket, ConnectionResponsePackage<?> sentResponsePackage, Object request) {
-                if (HostState.this.socket == null) {
-                    HostState.this.socket = socket;
-                    socket.start(InetAssets.defaultServerSocketUpdate);
-                    if (getGsm().getCurrentState() == HostState.this) {
-                        pushState(new HostGameState(socket), true, false);
-                    }
-                } else {
-                    socket.disconnect();
-                }
-            }
-
-            @Override
-            public void onSocketDisconnected(final Socket socket, String msg) {
-                System.out.println("Socket disconnected with msg: " + msg);
-                if (socket == HostState.this.socket) {
-                    HostState.this.socket = null;
-                    if (getGsm().getCurrentState() != HostState.this){
-                        getGsm().setCommand(new GSMBackToFirst());
-                    }
-                };
-            }
-        };
         try {
             UDPSocket sock = new JavaUDPSocket(InetAssets.defaultPort);
-            serverSocket = new ServerSocketImpl("Server", sock, InetAssets.defaultBufferSize, 7000, 2500, singleSocketAuthenticator, InetAssets.serializerProvider());
-            serverSocket.start();
+            serverSocket = new ServerSocket(sock, InetAssets.defaultBufferSize, 7_000, 1_000, 100, this, InetAssets.serializerProvider());
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -67,8 +25,32 @@ public class HostState extends State {
     }
 
     @Override
+    public void acceptConnection(Connection conn) {
+        if (HostState.this.socket == null) {
+            HostState.this.socket = conn.accept(new ConnectionResponse(true, ""));
+            if (getGsm().getCurrentState() == HostState.this) {
+                pushState(new HostGameState(socket), true, false);
+            }
+            HostState.this.socket.addDcListener((socket, msg) -> {
+                System.out.println("Socket disconnected with msg: " + msg);
+                if (socket == HostState.this.socket) {
+                    HostState.this.socket = null;
+                    if (getGsm().getCurrentState() != HostState.this) {
+                        getGsm().setCommand(new GSMBackToFirst());
+                    }
+                }
+                ;
+            });
+        } else {
+            conn.reject(new ConnectionResponse(false, "Busy"));
+        }
+    }
+
+    @Override
     protected void update(float dt) {
-        serverSocket.processNewConnections();
+        serverSocket.update();
+        if (socket != null) {
+        }
     }
 
     @Override

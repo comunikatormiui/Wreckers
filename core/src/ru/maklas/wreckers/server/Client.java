@@ -1,6 +1,6 @@
 package ru.maklas.wreckers.server;
 
-import ru.maklas.mnet.Socket;
+import ru.maklas.mnet2.Socket;
 
 public class Client {
 

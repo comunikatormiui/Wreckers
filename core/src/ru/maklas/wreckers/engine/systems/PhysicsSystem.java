@@ -6,12 +6,8 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import ru.maklas.mengine.ComponentMapper;
-import ru.maklas.mengine.Engine;
-import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.EntityListener;
-import ru.maklas.mengine.systems.CollisionEntitySystem;
-import ru.maklas.mengine.utils.ImmutableArray;
+import ru.maklas.mengine.*;
+import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.wreckers.assets.GameAssets;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
@@ -22,11 +18,11 @@ import ru.maklas.wreckers.engine.components.PhysicsComponent;
  * а у каждого Fixture будет FixtureData или кинет RuntimeException
  * При удалении из движка Entity, удаляет и Body, потому не нужно удалять Body самостоятельно.
  */
-public class PhysicsSystem extends CollisionEntitySystem implements EntityListener {
+public class PhysicsSystem extends EntitySystem implements EntityListener {
 
     private final World world;
     private ImmutableArray<Entity> entities;
-    private Array<PhysicsComponent> toDestroy = new Array<PhysicsComponent>();
+    private Array<PhysicsComponent> toDestroy = new Array<>();
 
     public PhysicsSystem(World world) {
         this.world = world;

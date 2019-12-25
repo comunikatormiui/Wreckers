@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.EntitySystem;
-import ru.maklas.mengine.utils.ImmutableArray;
+import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.rendering.Animation;
 import ru.maklas.wreckers.engine.components.rendering.AnimationComponent;

@@ -1,7 +1,7 @@
 package ru.maklas.wreckers.engine.systems;
 
 import ru.maklas.mengine.*;
-import ru.maklas.mengine.utils.ImmutableArray;
+import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.StatusEffectComponent;
 import ru.maklas.wreckers.engine.others.StatusEffect;

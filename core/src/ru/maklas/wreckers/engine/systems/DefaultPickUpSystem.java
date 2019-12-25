@@ -35,18 +35,13 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
         engine.addListener(this);
 
         // Включаем/выключаем зону подбора для игрока.
-        subscribe(new Subscription<GrabZoneChangeRequest>(GrabZoneChangeRequest.class) {
-            @Override
-            public void receive(Signal<GrabZoneChangeRequest> signal, GrabZoneChangeRequest e) {
+        subscribe(GrabZoneChangeRequest.class, e -> {
                 Entity target = e.getEntity();
                 changeGrabZone(target, e.state());
-            }
-        });
+            });
 
         // Attach request. Тут мы проверяем есть ли сокет, можно ли в целом прикрепить. Если да, то диспатчим success
-        subscribe(new Subscription<AttachRequest>(AttachRequest.class) {
-            @Override
-            public void receive(Signal<AttachRequest> signal, AttachRequest req) {
+        subscribe(AttachRequest.class, req -> {
                 SocketComponent sockC = req.getWielder().get(Mappers.socketM);
                 PhysicsComponent weaponPC = req.getWeapon().get(Mappers.physicsM);
 
@@ -58,13 +53,10 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
                 if (attached){
                     engine.dispatch(new AttachEvent(req.getWielder(), req.getWeapon(), true));
                 }
-            }
         });
 
         //DetachRequest. Тут мы проверяем можно ли изять у носителя оружие. Если можно, изымаем и диспатчим success
-        subscribe(new Subscription<DetachRequest>(DetachRequest.class) {
-            @Override
-            public void receive(Signal<DetachRequest> signal, DetachRequest req) {
+        subscribe(DetachRequest.class, req -> {
 
                 final Entity wielderDetachFrom;
                 final Entity entityToDetach;
@@ -108,7 +100,6 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
                         engine.dispatch(new AttachEvent(wielderDetachFrom, entityToDetach, false));
                     }
                 }
-            }
         });
 
     }

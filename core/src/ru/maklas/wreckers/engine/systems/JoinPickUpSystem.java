@@ -26,23 +26,18 @@ public class JoinPickUpSystem extends DefaultPickUpSystem {
         super.onAddedToEngine(engine);
 
         // По требованию сервера.
-        subscribe(new Subscription<NetGrabZoneChange>(NetGrabZoneChange.class) {
-            @Override
-            public void receive(Signal<NetGrabZoneChange> signal, NetGrabZoneChange e) {
-                Entity target = engine.getById(e.getEntityId());
+        subscribe(NetGrabZoneChange.class, e -> {
+                Entity target = engine.findById(e.getEntityId());
                 if (target == null){
                     return;
                 }
                 changeGrabZone(target, e.getState());
-            }
         });
 
         //Тупо аттачим/детачим по требованию сервера. В обход AttachRequest/DetachRequest. Code duplication
-        subscribe(new Subscription<NetAttachDetachEvent>(NetAttachDetachEvent.class) {
-            @Override
-            public void receive(Signal<NetAttachDetachEvent> signal, NetAttachDetachEvent e) {
-                Entity owner = engine.getById(e.getPlayerId());
-                Entity weapon = engine.getById(e.getWeaponId());
+        subscribe(NetAttachDetachEvent.class, e -> {
+                Entity owner = engine.findById(e.getPlayerId());
+                Entity weapon = engine.findById(e.getWeaponId());
                 if (owner == null || weapon == null){
                     return;
                 }
@@ -65,9 +60,11 @@ public class JoinPickUpSystem extends DefaultPickUpSystem {
                 if (success){ // Диспатчим внутренний ивент для антиграва
                     engine.dispatch(new AttachEvent(owner, weapon, e.toAttach()));
                 }
-            }
         });
     }
 
+    @Override
+    public void update(float dt) {
 
+    }
 }

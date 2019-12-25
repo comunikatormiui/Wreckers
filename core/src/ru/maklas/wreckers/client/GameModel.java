@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.World;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
-import ru.maklas.mnet.Socket;
+import ru.maklas.mnet2.Socket;
 import ru.maklas.wreckers.game.BodyBuilder;
 import ru.maklas.wreckers.game.FDefBuilder;
 import ru.maklas.wreckers.game.ShapeBuilder;

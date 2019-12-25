@@ -1,7 +1,7 @@
 package ru.maklas.wreckers.engine.others;
 
 import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.utils.ImmutableArray;
+import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.AntiGravComponent;
 import ru.maklas.wreckers.engine.components.MotorComponent;

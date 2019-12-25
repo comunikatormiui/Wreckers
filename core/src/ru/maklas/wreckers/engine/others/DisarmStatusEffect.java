@@ -1,7 +1,7 @@
 package ru.maklas.wreckers.engine.others;
 
 import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.utils.ImmutableArray;
+import com.badlogic.gdx.utils.ImmutableArray;
 
 public class DisarmStatusEffect extends TimedEffect {
 

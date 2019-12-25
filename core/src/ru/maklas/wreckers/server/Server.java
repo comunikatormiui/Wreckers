@@ -1,26 +1,21 @@
 package ru.maklas.wreckers.server;
 
 import ru.maklas.libs.game_looper.LoopedApplication;
-import ru.maklas.libs.game_looper.LooperAccessor;
-import ru.maklas.mnet.ServerAuthenticator;
-import ru.maklas.mnet.ServerSocket;
-import ru.maklas.mnet.Socket;
-import ru.maklas.mrudp.ConnectionResponsePackage;
+import ru.maklas.libs.game_looper.Looper;
+import ru.maklas.mnet2.Connection;
+import ru.maklas.mnet2.ServerAuthenticator;
+import ru.maklas.mnet2.ServerSocket;
+import ru.maklas.mnet2.Socket;
 import ru.maklas.wreckers.assets.DCAssets;
 import ru.maklas.wreckers.libs.Log;
 import ru.maklas.wreckers.network.events.ConnectionRequest;
 import ru.maklas.wreckers.network.events.ConnectionResponse;
 
-import java.net.InetAddress;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-
 public class Server implements LoopedApplication, ServerAuthenticator {
 
     private final ServerSocket serverSocket;
     private ClientBase clients;
-    private LooperAccessor fps;
+    private Looper looper;
     private final LoopedApplication loginPage;
 
 
@@ -31,8 +26,8 @@ public class Server implements LoopedApplication, ServerAuthenticator {
     }
 
     @Override
-    public void onStart(LooperAccessor fps) {
-        this.fps = fps;
+    public void onStart(Looper fps) {
+        this.looper = fps;
         loginPage.onStart(fps);
     }
 
@@ -47,82 +42,33 @@ public class Server implements LoopedApplication, ServerAuthenticator {
         clients.disconnectAll(DCAssets.SERVER_STOPPED);
     }
 
-
     @Override
-    public ConnectionResponsePackage<?> validateNewConnection(InetAddress address, int port, Object request) {
-        if (!(request instanceof ConnectionRequest)){
-            return ConnectionResponsePackage.refuse(new ConnectionResponse(false, "Wrong request"));
+    public void acceptConnection(Connection conn) {
+        if (!(conn.getRequest() instanceof ConnectionRequest)){
+            conn.reject(new ConnectionResponse(false, "Wrong request"));
+            return;
         }
+        ConnectionRequest request = (ConnectionRequest) conn.getRequest();
 
-        ConnectionRequest req = (ConnectionRequest) request;
-
-
-        FutureTask<Boolean> clientSizeCheck = new FutureTask<Boolean>(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                if (clients.size() < 2) {
-                    return true;
-                }
-                return false;
-            }
-        });
-        fps.postRunnable(clientSizeCheck);
-
-        boolean success;
-        try {
-            success = clientSizeCheck.get(500, TimeUnit.MILLISECONDS);
-        } catch (Exception e){
-            return ConnectionResponsePackage.refuse(new ConnectionResponse(false, "Fatal server error"));
+        if (clients.size() < 2) {
+            Socket socket = conn.accept(new ConnectionResponse(true, "Success"));
+            registerNewConnection(socket, request);
+        } else {
+            conn.reject(new ConnectionResponse(false, "Server is busy"));
         }
-
-        if (success){
-            return ConnectionResponsePackage.accept(new ConnectionResponse(true, "Success"));
-        }
-
-        return ConnectionResponsePackage.refuse(new ConnectionResponse(false, "Server is busy"));
     }
 
-    @Override
-    public void registerNewConnection(final Socket socket, ConnectionResponsePackage<?> sentResponsePackage, Object request) {
-        ConnectionRequest req = (ConnectionRequest) request;
+    public void registerNewConnection(final Socket socket, ConnectionRequest request) {
         final Client client = new Client();
         socket.setUserData(client);
 
         client.setSocket(socket);
         client.setHealth(100);
-        client.setName(req.getName());
+        client.setName(request.getName());
         client.setAdmin(false);
-        FutureTask<Boolean> additionTask = new FutureTask<Boolean>(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                if (clients.size() < 2) {
-                    clients.add(client);
-                    return true;
-                }
-                return false;
-            }
-        });
 
-        Boolean result;
-        try {
-            result = additionTask.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            socket.disconnect();
-            socket.setUserData(null);
-            return;
-        }
-
-        if (result){
-            Log.SERVER.info("Client added " + client);
-        } else {
-            Log.SERVER.info("failed to add client " + client);
-        }
-    }
-
-    @Override
-    public void onSocketDisconnected(Socket socket, String msg) {
-        clients.removeBySocket(socket);
+        Log.SERVER.info("Client added " + client);
+        socket.addDcListener((socket1, msg) -> clients.removeBySocket(socket));
     }
 
 }

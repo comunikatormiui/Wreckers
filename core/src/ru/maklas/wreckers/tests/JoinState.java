@@ -2,13 +2,7 @@ package ru.maklas.wreckers.tests;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import ru.maklas.mnet.Handler;
-import ru.maklas.mnet.ServerResponse;
-import ru.maklas.mnet.Socket;
-import ru.maklas.mnet.impl.SocketImpl;
-import ru.maklas.mnet.impl.udp.HighPingUDPSocket;
-import ru.maklas.mrudp.JavaUDPSocket;
-import ru.maklas.mrudp.UDPSocket;
+import ru.maklas.mnet2.*;
 import ru.maklas.wreckers.Wreckers;
 import ru.maklas.wreckers.assets.InetAssets;
 import ru.maklas.wreckers.libs.gsm_lib.State;
@@ -29,11 +23,13 @@ public class JoinState extends State{
     protected void onCreate() {
         try {
             UDPSocket sock = new JavaUDPSocket();
-            socket = new SocketImpl("Client", sock, 7000, InetAssets.defaultBufferSize, InetAssets.serializerProvider().provide());
-            socket.start(InetAssets.defaultClientSocketUpdate);
-            socket.connectAsync((int) TimeUnit.SECONDS.toMillis(10), InetAddress.getLocalHost(), InetAssets.defaultPort, new ConnectionRequest("Client", Wreckers.VERSION), new Handler<ServerResponse>() {
+            InetAddress address = InetAddress.getLocalHost();
+            int port = InetAssets.defaultPort;
+
+            socket = new SocketImpl(sock, address, port, InetAssets.defaultBufferSize, 7_000, 1_000, 100, InetAssets.serializerProvider().get());
+            socket.connectAsync(new ConnectionRequest("Client", Wreckers.VERSION), 5_000, new ServerResponseHandler() {
                 @Override
-                public void handle(final ServerResponse resp) {
+                public void handle(ServerResponse resp) {
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {

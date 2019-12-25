@@ -30,10 +30,8 @@ public class JoinDamageSystem extends EntitySystem {
 
     @Override
     public void onAddedToEngine(final Engine engine) {
-       subscribe(new Subscription<NetHitEvent>(NetHitEvent.class) {
-           @Override
-           public void receive(Signal<NetHitEvent> signal, NetHitEvent hitEvent) {
-               Entity player = engine.getById(hitEvent.getPlayerId());
+       subscribe(NetHitEvent.class, e -> {
+               Entity player = engine.findById(e.getPlayerId());
                if (player == null){
                    return;
                }
@@ -42,17 +40,15 @@ public class JoinDamageSystem extends EntitySystem {
                    return;
                }
 
-               hc.health = hitEvent.getNewHealth();
+               hc.health = e.getNewHealth();
                hc.lastDamageDone = System.currentTimeMillis();
-               getEngine().dispatch(new DamageEvent(player, hitEvent.getDamage(), null));
-               if (hitEvent.died()){
+               getEngine().dispatch(new DamageEvent(player, e.getDamage(), null));
+               if (e.died()){
                    hc.dead = true;
                    getEngine().dispatchLater(new DeathEvent(player, null));
                }
 
-               test(hitEvent, player);
-           }
-
+               test(e, player);
        });
     }
 
@@ -70,5 +66,10 @@ public class JoinDamageSystem extends EntitySystem {
                 (int)(e.getDullness() * 100) + " / " +
                         (int) (e.getSliceness() * 100) + " / " +
                         (int) (e.getSharpness() * 100), 2, e.getX() + (rand.nextFloat() * 50 - 25), e.getY() + 25, Color.PINK));
+    }
+
+    @Override
+    public void update(float dt) {
+
     }
 }

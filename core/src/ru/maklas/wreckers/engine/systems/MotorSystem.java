@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.EntitySystem;
-import ru.maklas.mengine.utils.ImmutableArray;
+import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.wreckers.engine.Mappers;
 import ru.maklas.wreckers.engine.components.MotorComponent;
 import ru.maklas.wreckers.engine.components.PhysicsComponent;
