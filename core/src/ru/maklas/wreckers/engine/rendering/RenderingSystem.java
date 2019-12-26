@@ -48,12 +48,8 @@ public class RenderingSystem extends IterableZSortedRenderSystem<RenderComponent
 	private void onLayerChanged(int oldLayer, int newLayer) {
 		//перечислять строго в порядке повышения слоя.
 		// не делать if-else цепочек, так как можно пропустить смену нужного слоя
-		if (Layers.background > oldLayer && Layers.background <= newLayer){
-			//before rendering background
-		}
-
-		if (Layers.character > oldLayer && Layers.character <= newLayer){
-			//before rendering characters
+		if (Layers.playerZ > oldLayer && Layers.playerZ <= newLayer){
+			//before rendering player
 		}
 
 		if (oldLayer == Layers.playerZ){

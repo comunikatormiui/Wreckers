@@ -26,22 +26,14 @@ public class JoinState extends State{
 			int port = InetAssets.defaultPort;
 
 			socket = new SocketImpl(sock, address, port, InetAssets.defaultBufferSize, 7_000, 1_000, 100, InetAssets.serializerProvider().get());
-			socket.connectAsync(new NetConnectionRequest("Client", Wreckers.VERSION), 5_000, new ServerResponseHandler() {
-				@Override
-				public void handle(ServerResponse resp) {
-					Gdx.app.postRunnable(new Runnable() {
-						@Override
-						public void run() {
-							System.err.println(resp);
-							switch (resp.getType()){
-								case ACCEPTED:
-									pushState(new JoinGameState(socket), false, false);
-									break;
-							}
-						}
-					});
+			socket.connectAsync(new NetConnectionRequest("Client", Wreckers.VERSION), 5_000, resp -> Gdx.app.postRunnable(() -> {
+				System.err.println(resp);
+				switch (resp.getType()){
+					case ACCEPTED:
+						pushState(new JoinGameState(socket), false, false);
+						break;
 				}
-			});
+			}));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -18,6 +18,7 @@ import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
 import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.statics.Game;
+import ru.maklas.wreckers.statics.Layers;
 
 public class EntitySword extends WeaponEntity implements AttachAction {
 
@@ -26,8 +27,8 @@ public class EntitySword extends WeaponEntity implements AttachAction {
 	PickUpComponent pickUpC;
 	Joint lastJoint;
 
-	public EntitySword(int id, float x, float y, int zOrder) {
-		super(id, x, y, zOrder);
+	public EntitySword(int id, float x, float y) {
+		super(id, x, y, Layers.swordZ);
 		this.world = A.physics.world;
 		final float scale = 0.15f;
 		final EntityType eType = EntityType.of(EntityType.NEUTRAL_WEAPON);

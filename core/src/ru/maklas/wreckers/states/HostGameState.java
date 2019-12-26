@@ -43,6 +43,7 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 	private final Socket socket;
 	private OrthographicCamera cam;
 	private InputProcessor input;
+	private NetDispatcher netD;
 
 	public HostGameState(Socket socket) {
 		this.socket = socket;
@@ -55,6 +56,7 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 		A.physics.load();
 		cam = new OrthographicCamera(1280, 720);
 		input = new KeyboardGameInput(new HostInputController(engine));
+		netD = new NetDispatcher();
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 		bundler.set(B.world, A.physics.world);
 		bundler.set(B.batch, batch);
 		bundler.set(B.builders, A.physics.builders);
-		bundler.set(B.netD, new NetDispatcher());
+		bundler.set(B.netD, netD);
 		bundler.set(B.gsmState, this);
 		bundler.set(B.cam, cam);
 		bundler.set(B.dt, 1 / 60f);
@@ -116,14 +118,14 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 		}
 
 		{ //Set up sword
-			Entity sword = new EntitySword(10, -200,   600, Layers.swordZ);
+			Entity sword = new EntitySword(10, -200,   600);
 			NetWeaponCreationEvent netEvent = new NetSwordCreationEvent(sword.id, sword.x, sword.y, 0);
 			socket.send(netEvent);
 			engine.add(sword);
 		}
 
 		{ //Set up Hammer
-			Entity hammer = new EntityHammer(11, 200,   600, Layers.hammerZ);
+			Entity hammer = new EntityHammer(11, 200,   600);
 			NetWeaponCreationEvent netEvent = new NetHammerCreationEvent(hammer.id, hammer.x, hammer.y, 0);
 			socket.send(netEvent);
 			engine.add(hammer);
@@ -135,6 +137,7 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 			socket.send(netEvent);
 			engine.add(scythe);
 		}
+
 		{ //Camera
 			EntityUtils.camera(cam, engine.getBundler().get(B.player).id);
 		}
@@ -180,7 +183,7 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 	@Override
 	public void process(Socket socket, Object o) {
 		if (!((o instanceof NetBodySyncEvent) || (o instanceof NetWreckerSyncEvent)))Log.debug(o);
-		engine.dispatch(o);
+		netD.process(socket, o);
 	}
 
 	@Override

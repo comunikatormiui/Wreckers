@@ -39,8 +39,9 @@ import ru.maklas.wreckers.utils.physics.Builders;
 public class JoinGameState extends AbstractEngineState implements SocketProcessor {
 
 	private final Socket socket;
-	OrthographicCamera cam;
+	private OrthographicCamera cam;
 	private InputProcessor input;
+	private NetDispatcher netD;
 
 	public JoinGameState(Socket socket) {
 		this.socket = socket;
@@ -51,13 +52,13 @@ public class JoinGameState extends AbstractEngineState implements SocketProcesso
 		A.images.load();
 		A.physics.load();
 		cam = new OrthographicCamera(1280, 720);
-
+		netD = new NetDispatcher();
 	}
 
 	@Override
 	protected void fillBundler(Bundler bundler) {
 		bundler.set(B.world, A.physics.world);
-		bundler.set(B.netD, new NetDispatcher());
+		bundler.set(B.netD, netD);
 		bundler.set(B.batch, batch);
 		bundler.set(B.builders, new Builders(A.physics.world, Game.scale));
 		bundler.set(B.gsmState, this);
@@ -158,6 +159,6 @@ public class JoinGameState extends AbstractEngineState implements SocketProcesso
 			return;
 		}
 
-		engine.dispatch(o);
+		netD.process(socket, o);
 	}
 }

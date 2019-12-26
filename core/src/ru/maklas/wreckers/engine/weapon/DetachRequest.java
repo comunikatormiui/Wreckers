@@ -5,9 +5,8 @@ import ru.maklas.mengine.Entity;
 /** Внутридвижковый ивент. Запрос на детач оружия **/
 public class DetachRequest {
 
-
 	public enum Type {
-		/** Удаляем самое первое оружие если оно имеется **/
+		/** Удаляем самое первое оружие если оно имеется. wielder != null **/
 		FIRST,
 		/** Удаляем таргетное оружие из таргетного Entity. В таком случае weapon != null и wielder != null **/
 		TARGET_ENTITY_AND_WEAPON,
@@ -16,9 +15,9 @@ public class DetachRequest {
 
 	}
 
-	Entity wielder;
-	Entity weapon;
-	Type type;
+	private Entity wielder;
+	private Entity weapon;
+	private Type type;
 
 	public DetachRequest(Type type, Entity wielder, Entity weapon) {
 		this.wielder = wielder;

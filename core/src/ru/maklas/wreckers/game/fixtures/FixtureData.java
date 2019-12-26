@@ -4,7 +4,7 @@ import ru.maklas.wreckers.game.FixtureType;
 
 public class FixtureData {
 
-	FixtureType fixtureType;
+	private FixtureType fixtureType;
 
 	public FixtureData(FixtureType fixtureType) {
 		this.fixtureType = fixtureType;

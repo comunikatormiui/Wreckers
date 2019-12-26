@@ -24,6 +24,18 @@ public class PostCollisionEvent implements Event {
 	public PostCollisionEvent() {
 	}
 
+	public PostCollisionEvent init(Entity a, Entity b, Fixture fixA, Fixture fixB, Vector2 point, Vector2 normal, float normalImpulse, float tangentImpulse) {
+		this.a = a;
+		this.b = b;
+		this.fixA = fixA;
+		this.fixB = fixB;
+		this.point.set(point);
+		this.normal.set(normal);
+		this.normalImpulse = normalImpulse;
+		this.tangentImpulse = tangentImpulse;
+		return this;
+	}
+
 	public PostCollisionEvent init(Contact contact, ContactImpulse impulse) {
 		fixA = contact.getFixtureA();
 		fixB = contact.getFixtureB();
@@ -70,4 +82,11 @@ public class PostCollisionEvent implements Event {
 	public float getTangentImpulse() {
 		return tangentImpulse;
 	}
+
+
+	/** Меняет A и B местами, с учётом вектора нормали и возвращает. <b>Внимание! Мутирует данный объект!</b> **/
+	public PostCollisionEvent reverse(){
+		return init(b, a, fixB, fixA, point, new Vector2(normal.x * -1, normal.y * -1), normalImpulse, tangentImpulse);
+	}
+
 }

@@ -150,11 +150,11 @@ public abstract class NetworkSystem extends EntitySystem {
 	}
 
 	protected void createSword(Socket s, NetSwordCreationEvent e) {
-		getEngine().add(new EntitySword(e.getId(), e.getX(), e.getY(), Layers.swordZ));
+		getEngine().add(new EntitySword(e.getId(), e.getX(), e.getY()));
 	}
 
 	protected void createHammer(Socket s, NetHammerCreationEvent e) {
-		getEngine().add(new EntityHammer(e.getId(), e.getX(), e.getY(), Layers.hammerZ));
+		getEngine().add(new EntityHammer(e.getId(), e.getX(), e.getY()));
 	}
 
 	protected void createScythe(Socket s, NetScytheCreationEvent e) {

@@ -38,12 +38,9 @@ public class StatusEffectComponent implements Component {
 			effectUpdateArray.add(effect);
 			effectUpdateArray.sort();
 		} else {
-			engine.executeAfterUpdate(new Runnable() {
-				@Override
-				public void run() {
-					effectUpdateArray.add(effect);
-					effectUpdateArray.sort();
-				}
+			engine.executeAfterUpdate(() -> {
+				effectUpdateArray.add(effect);
+				effectUpdateArray.sort();
 			});
 		}
 		return true;
@@ -61,12 +58,7 @@ public class StatusEffectComponent implements Component {
 			if (!isUpdating){
 				effectUpdateArray.removeValue(effect, true);
 			} else {
-				engine.executeAfterUpdate(new Runnable() {
-					@Override
-					public void run() {
-						effectUpdateArray.removeValue(effect, true);
-					}
-				});
+				engine.executeAfterUpdate(() -> effectUpdateArray.removeValue(effect, true));
 			}
 		}
 	}
@@ -79,12 +71,7 @@ public class StatusEffectComponent implements Component {
 		StatusEffect[] effectsArray = effects.toArray(StatusEffect.class);
 		effects.clear();
 		if (isUpdating){
-			engine.executeAfterUpdate(new Runnable() {
-				@Override
-				public void run() {
-					effectUpdateArray.clear();
-				}
-			});
+			engine.executeAfterUpdate(() -> effectUpdateArray.clear());
 		} else {
 			effectUpdateArray.clear();
 		}

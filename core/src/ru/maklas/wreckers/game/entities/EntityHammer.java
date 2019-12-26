@@ -17,16 +17,15 @@ import ru.maklas.wreckers.game.FixtureType;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.statics.Game;
+import ru.maklas.wreckers.statics.Layers;
 
 public class EntityHammer extends WeaponEntity implements AttachAction {
 
-	Body body;
-	World world;
-	PickUpComponent pickUpC;
+	private Body body;
+	private PickUpComponent pickUpC;
 
-	public EntityHammer(int id, float x, float y, int zOrder) {
-		super(id, x, y, zOrder);
-		this.world = A.physics.world;
+	public EntityHammer(int id, float x, float y) {
+		super(id, x, y, Layers.hammerZ);
 		final float scale = 0.13f;
 		final int type = EntityType.NEUTRAL_WEAPON;
 
@@ -46,9 +45,6 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
 				new Vector2(1045, 575 - 8),
 				new Vector2(762, 575 - 8)
 		};
-
-
-
 
 		for (Vector2 point : pointsHandle) {
 			point.scl(scale / (Game.scale));

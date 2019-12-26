@@ -34,10 +34,9 @@ import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.statics.Game;
 import ru.maklas.wreckers.user_interface.GameUI;
 import ru.maklas.wreckers.utils.Utils;
-import ru.maklas.wreckers.utils.net_dispatcher.NetDispatcher;
 import ru.maklas.wreckers.utils.physics.Builders;
 
-public class MainMenuState extends AbstractEngineState implements GameController {
+public class SinglePlayerState extends AbstractEngineState implements GameController {
 
 	private OrthographicCamera cam;
 	private GameModel model;
@@ -61,7 +60,6 @@ public class MainMenuState extends AbstractEngineState implements GameController
 	protected void fillBundler(Bundler bundler) {
 		model.setEngine(engine);
 		bundler.set(B.world, A.physics.world);
-		bundler.set(B.netD, new NetDispatcher());
 		bundler.set(B.batch, batch);
 		bundler.set(B.builders, A.physics.builders);
 		bundler.set(B.gsmState, this);
@@ -74,14 +72,15 @@ public class MainMenuState extends AbstractEngineState implements GameController
 	protected void addSystems(Engine engine) {
 		engine.add(new PhysicsSystem());
 		engine.add(new RenderingSystem());
-		engine.add(new HostCollisionSystem());
-		engine.add(new HostDamageSystem());
 		engine.add(new TTLSystem());
 		engine.add(new AntiGravSystem());
-		engine.add(new HostPickUpSystem());
 		engine.add(new MotorSystem());
 		engine.add(new StatusEffectSystem());
 		engine.add(new CameraSystem());
+
+		engine.add(new HostCollisionSystem());
+		engine.add(new HostPickUpSystem());
+		engine.add(new HostDamageSystem());
 	}
 
 	@Override
@@ -90,7 +89,7 @@ public class MainMenuState extends AbstractEngineState implements GameController
 				.newBody(BodyDef.BodyType.StaticBody)
 				.addFixture(
 						A.physics.builders.newFixture()
-								.shape(A.physics.builders.buildRectangle(0, 0, 2000, 100))
+								.shape(A.physics.builders.buildRectangle(0, 0, 2500, 100))
 								.friction(0.1f)
 								.density(10)
 								.bounciness(0.2f)
@@ -103,9 +102,9 @@ public class MainMenuState extends AbstractEngineState implements GameController
 
 		final Entity player = new EntityWrecker(1, EntityType.PLAYER,   0, 500, 10000);
 		final EntityWrecker opponent = new EntityWrecker(2, EntityType.OPPONENT, 200, 500, 10000);
-		final EntitySword sword = new EntitySword(3, -200, 700, 10);
-		final EntitySword sword2 = new EntitySword(4, 0, 300, 10);
-		final EntityHammer hammer = new EntityHammer(5, -200, 300, 10);
+		final EntitySword sword = new EntitySword(3, -200, 700);
+		final EntitySword sword2 = new EntitySword(4, 0, 300);
+		final EntityHammer hammer = new EntityHammer(5, -200, 300);
 		final Entity scythe = new EntityScythe(6, 370, 300, 10);
 		final Entity platform = new GameEntity(-2, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
 

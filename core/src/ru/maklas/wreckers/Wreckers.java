@@ -9,7 +9,7 @@ import ru.maklas.libs.SimpleProfiler;
 import ru.maklas.wreckers.assets.A;
 import ru.maklas.wreckers.engine.M;
 import ru.maklas.wreckers.mnw.MNW;
-import ru.maklas.wreckers.states.MainMenuState;
+import ru.maklas.wreckers.states.SinglePlayerState;
 import ru.maklas.wreckers.statics.Game;
 import ru.maklas.wreckers.utils.Log;
 import ru.maklas.wreckers.utils.gsm_lib.EmptyStateManager;
@@ -27,7 +27,7 @@ public class Wreckers extends ApplicationAdapter {
 	}
 
 	public Wreckers() {
-		this(new MainMenuState());
+		this(new SinglePlayerState());
 	}
 
 	@Override

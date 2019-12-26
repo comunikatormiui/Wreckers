@@ -7,9 +7,7 @@ import ru.maklas.libs.Counter;
 import ru.maklas.mengine.Bundler;
 import ru.maklas.mengine.BundlerKey;
 import ru.maklas.mengine.Entity;
-import ru.maklas.mnet2.ServerSocket;
 import ru.maklas.mnet2.Socket;
-import ru.maklas.wreckers.server.ClientBase;
 import ru.maklas.wreckers.statics.ID;
 import ru.maklas.wreckers.user_interface.GameUI;
 import ru.maklas.wreckers.utils.gsm_lib.State;
@@ -27,23 +25,17 @@ public class B {
 	public static final BundlerKey<Socket> socket = BundlerKey.of("socket");
 	public static final BundlerKey<State> gsmState = BundlerKey.of("state");
 	public static final BundlerKey<NetDispatcher> netD = BundlerKey.of("net");
-	public static final BundlerKey<ServerSocket> server = BundlerKey.of("server");
-	public static final BundlerKey<ClientBase> clients = BundlerKey.of("clients");
 	public static final BundlerKey<Entity> player = BundlerKey.of("player");
 	public static final BundlerKey<Entity> opponent = BundlerKey.of("opponent");
-	public static final BundlerKey<Counter> idPlayers = BundlerKey.of("idPlayers");
-	public static final BundlerKey<Counter> idItems = BundlerKey.of("idItems");
-	public static final BundlerKey<Counter> idEnemies = BundlerKey.of("idEnemies");
-	public static final BundlerKey<Counter> idEnvironment = BundlerKey.of("idEnvironment");
 	public static final BundlerKey<Boolean> isClient = BundlerKey.of("isClient"); //Is this client or server engine.
-	public static final BundlerKey<GameUI> ui = BundlerKey.of("ui");
 	public static final BundlerKey<Boolean> updateThisFrame = BundlerKey.of("urgentUpdate");
 
 
+	public static final BundlerKey<GameUI> ui = BundlerKey.of("ui");
+	public static final BundlerKey<Counter> idEnvironments = BundlerKey.of("idEnvironments");
+
+
 	public static void fillIds(Bundler bundler){
-		bundler.set(idPlayers, ID.counterForPlayers());
-		bundler.set(idItems, ID.counterForItems());
-		bundler.set(idEnemies, ID.counterForEnemies());
-		bundler.set(idEnvironment, ID.counterForEnvironment());
+		bundler.set(idEnvironments, ID.counterForEnvironment());
 	}
 }
