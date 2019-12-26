@@ -84,9 +84,7 @@ public class NetHitEvent implements NetEvent {
 		return this.sharpness;
 	}
 
-	/**
-	 * If <0 there is no stun
-	 */
+	/** If <0 there is no stun **/
 	public float getStunDuration() {
 		return stunDuration;
 	}
@@ -95,16 +93,12 @@ public class NetHitEvent implements NetEvent {
 		return stunDuration > 0;
 	}
 
-	/**
-	 * Engine scale X coll position
-	 */
+	/** Engine scale X coll position **/
 	public float getX() {
 		return x;
 	}
 
-	/**
-	 * Engine scale Y coll position
-	 */
+	/** Engine scale Y coll position **/
 	public float getY() {
 		return y;
 	}

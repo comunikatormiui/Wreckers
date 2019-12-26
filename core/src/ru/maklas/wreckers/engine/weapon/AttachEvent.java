@@ -2,9 +2,7 @@ package ru.maklas.wreckers.engine.weapon;
 
 import ru.maklas.mengine.Entity;
 
-/**
- * Внутридвижковый ивент об удачной смене состояния оружия (Прикрепилось / Открепилось)
- */
+/** Внутридвижковый ивент об удачной смене состояния оружия (Прикрепилось / Открепилось) **/
 public class AttachEvent {
 
 	private Entity owner;

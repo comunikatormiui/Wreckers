@@ -153,9 +153,7 @@ public class ClassUtils {
 	}
 
 
-	/**
-	 * Starts main() method in new Process
-	 */
+	/** Starts main() method in new Process **/
 	public static int newProcess(Class klass, String... args) throws IOException,
 			InterruptedException {
 		String javaHome = System.getProperty("java.home");

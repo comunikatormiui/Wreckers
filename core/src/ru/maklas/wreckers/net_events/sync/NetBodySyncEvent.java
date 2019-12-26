@@ -64,9 +64,7 @@ public class NetBodySyncEvent implements NetEvent {
 		return this.velY;
 	}
 
-	/**
-	 * Угол тела в радианах
-	 */
+	/** Угол тела в радианах **/
 	public float getAngle() {
 		return angle;
 	}

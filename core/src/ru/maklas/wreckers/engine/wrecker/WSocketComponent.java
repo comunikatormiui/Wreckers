@@ -1,9 +1,8 @@
-package ru.maklas.wreckers.engine.networking;
+package ru.maklas.wreckers.engine.wrecker;
 
 import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Component;
 import ru.maklas.mengine.Entity;
-import ru.maklas.wreckers.engine.wrecker.WSocket;
 
 public class WSocketComponent implements Component{
 

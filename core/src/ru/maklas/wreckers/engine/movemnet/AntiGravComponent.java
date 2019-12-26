@@ -2,6 +2,7 @@ package ru.maklas.wreckers.engine.movemnet;
 
 import ru.maklas.mengine.Component;
 
+/** Component resposible for Wrecker's levitation around the same spot **/
 public class AntiGravComponent implements Component{
 
 	public boolean antiGravEnabled = true;

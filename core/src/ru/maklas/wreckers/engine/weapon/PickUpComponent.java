@@ -10,9 +10,7 @@ import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.statics.EntityType;
 
 
-/**
- * Component for grabbing this entity.
- */
+/** Component for grabbing this entity **/
 public class PickUpComponent implements Component {
 
 	public final FixtureDef def; // definition для зоны подбирания
@@ -37,9 +35,7 @@ public class PickUpComponent implements Component {
 		this.attachAction = attachAction;
 	}
 
-	/**
-	 * means that this entity has PickUp fixture enabled, != null and can be grabbed
-	 */
+	/** means that this entity has PickUp fixture enabled, != null and can be grabbed **/
 	public boolean pickUpZoneEnabled(){
 		return fixture != null;
 	}

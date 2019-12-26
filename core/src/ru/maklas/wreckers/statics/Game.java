@@ -1,6 +1,5 @@
 package ru.maklas.wreckers.statics;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
@@ -12,19 +11,14 @@ public class Game {
 
 	public static final float gravitationalAcceleration = 9.8f;
 	public static final float scale = 40;
-	private static final Vector2 vec = new Vector2();
-	public static void rotateBody(@NotNull Body body, float targetX, float targetY){
-		float angle = vec.set(body.getPosition()).scl(scale).sub(targetX, targetY).angle();
-		body.setTransform(body.getPosition(), (angle + 180) * MathUtils.degreesToRadians);
-	}
 	public static final float scaleReversed = 1.0f / scale;
 
 	public static final float width = 720;
 	public static float height = 1280;
-
-
 	public static final float hWidth = width / 2;
 	public static float hHeight = height/2;
+
+
 
 	public static void getEntityDirection(float angle, Vector2 direction) {
 		direction.set(1, 0).setAngle(angle);

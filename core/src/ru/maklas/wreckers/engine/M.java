@@ -13,7 +13,6 @@ import ru.maklas.wreckers.engine.movemnet.AntiGravSystem;
 import ru.maklas.wreckers.engine.movemnet.MotorComponent;
 import ru.maklas.wreckers.engine.movemnet.MotorSystem;
 import ru.maklas.wreckers.engine.networking.NetworkSystem;
-import ru.maklas.wreckers.engine.networking.WSocketComponent;
 import ru.maklas.wreckers.engine.other.EntityDebugSystem;
 import ru.maklas.wreckers.engine.other.TTLComponent;
 import ru.maklas.wreckers.engine.other.TTLSystem;
@@ -27,6 +26,7 @@ import ru.maklas.wreckers.engine.weapon.DefaultPickUpSystem;
 import ru.maklas.wreckers.engine.weapon.GrabZoneComponent;
 import ru.maklas.wreckers.engine.weapon.PickUpComponent;
 import ru.maklas.wreckers.engine.weapon.WeaponComponent;
+import ru.maklas.wreckers.engine.wrecker.WSocketComponent;
 import ru.maklas.wreckers.engine.wrecker.WreckerComponent;
 
 import java.lang.reflect.Field;

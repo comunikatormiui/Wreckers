@@ -9,12 +9,8 @@ public class MotorComponent implements Component {
 	public float maxVelocity = 0;
 	public boolean enabled = true;
 
-	public MotorComponent(float maxVel, float x, float y) {
-		direction.set(x, y);
-		this.maxVelocity = maxVel;
-	}
-
 	public MotorComponent(float maxVel) {
 		this.maxVelocity = maxVel;
 	}
+
 }

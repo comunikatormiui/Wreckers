@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import ru.maklas.wreckers.engine.other.Event;
 
 /** Палец был поднят. **/
+@Deprecated
 public class TouchUpEvent implements Event {
 
 	float x;

@@ -8,9 +8,7 @@ import ru.maklas.mengine.EntitySystem;
 import ru.maklas.wreckers.engine.M;
 import ru.maklas.wreckers.engine.physics.PhysicsComponent;
 
-/**
- * Отвечает за передвижение игрока, придавая постоянное ускорение.
- */
+/** Отвечает за передвижение игрока, придавая постоянное ускорение **/
 public class MotorSystem extends EntitySystem {
 
 	private ImmutableArray<Entity> entities;

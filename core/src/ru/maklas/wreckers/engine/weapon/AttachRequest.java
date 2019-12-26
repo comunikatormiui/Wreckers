@@ -2,15 +2,13 @@ package ru.maklas.wreckers.engine.weapon;
 
 import ru.maklas.mengine.Entity;
 
-/**
- * Внутридвижковый ивент. Запрос на аттач оружия
- */
+/** Request to attach weapon to the target **/
 public class AttachRequest {
 
-	Entity wielder;
-	GrabZoneComponent playerPickUp;
-	Entity weapon;
-	PickUpComponent weaponPickUp;
+	private Entity wielder;
+	private GrabZoneComponent playerPickUp;
+	private Entity weapon;
+	private PickUpComponent weaponPickUp;
 
 	public AttachRequest(Entity wielder, GrabZoneComponent playerPickUp, Entity weapon, PickUpComponent weaponPickUp) {
 		this.wielder = wielder;

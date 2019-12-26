@@ -53,9 +53,7 @@ public class WeaponWreckerHitEvent implements Event {
 		return targetWrecker;
 	}
 
-	/**
-	 * Engine scale
-	 */
+	/** Engine scale **/
 	public Vector2 getPoint() {
 		return point;
 	}
@@ -64,9 +62,7 @@ public class WeaponWreckerHitEvent implements Event {
 		return impulse;
 	}
 
-	/**
-	 * Vector pointing from body to the weapon
-	 */
+	/** Vector pointing from body to the weapon **/
 	public Vector2 getNormal() {
 		return normal;
 	}

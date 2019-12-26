@@ -3,9 +3,7 @@ package ru.maklas.wreckers.engine.wrecker;
 import com.badlogic.gdx.physics.box2d.Joint;
 import ru.maklas.mengine.Entity;
 
-/**
- * Сокет с оружием
- */
+/** Сокет с оружием */
 public class WSocket {
 
 	public Entity attachedEntity;

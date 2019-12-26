@@ -5,6 +5,7 @@ import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.engine.B;
 import ru.maklas.wreckers.engine.M;
 import ru.maklas.wreckers.engine.wrecker.WSocket;
+import ru.maklas.wreckers.engine.wrecker.WSocketComponent;
 
 public class JoinNetworkSystem extends NetworkSystem {
 

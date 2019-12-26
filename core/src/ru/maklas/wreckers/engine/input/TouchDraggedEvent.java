@@ -3,6 +3,7 @@ package ru.maklas.wreckers.engine.input;
 import ru.maklas.wreckers.engine.other.Event;
 
 /** Палец был драгнут по экрану. **/
+@Deprecated
 public class TouchDraggedEvent implements Event {
 
 	float x;

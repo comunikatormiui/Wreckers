@@ -13,7 +13,6 @@ import ru.maklas.wreckers.game.entities.EntityString;
 import ru.maklas.wreckers.net_events.NetHitEvent;
 import ru.maklas.wreckers.utils.StringUtils;
 import ru.maklas.wreckers.utils.net_dispatcher.NetDispatcher;
-import ru.maklas.wreckers.utils.net_dispatcher.NetEvent;
 
 import java.util.Random;
 

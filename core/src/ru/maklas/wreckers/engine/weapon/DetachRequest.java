@@ -2,24 +2,16 @@ package ru.maklas.wreckers.engine.weapon;
 
 import ru.maklas.mengine.Entity;
 
-/**
- * Внутридвижковый ивент. Запрос на детач оружия
- */
+/** Внутридвижковый ивент. Запрос на детач оружия **/
 public class DetachRequest {
 
 
 	public enum Type {
-		/**
-		 * Удаляем самое первое оружие если оно имеется
-		 */
+		/** Удаляем самое первое оружие если оно имеется **/
 		FIRST,
-		/**
-		 * Удаляем таргетное оружие из таргетного Entity. В таком случае weapon != null и wielder != null
-		 */
+		/** Удаляем таргетное оружие из таргетного Entity. В таком случае weapon != null и wielder != null **/
 		TARGET_ENTITY_AND_WEAPON,
-		/**
-		 * Отсоеденияем указанное Оружие. wielder может быть null.
-		 */
+		/** Отсоеденияем указанное Оружие. wielder может быть null **/
 		TARGET_WEAPON
 
 	}

@@ -65,9 +65,7 @@ public class CollisionEvent implements Event {
         return normal;
     }
 
-    /**
-     * Меняет A и B местами, с учётом вектора нормали и возвращает. <b>Внимание! Мутирует данный объект!</b>
-     */
+    /** Меняет A и B местами, с учётом вектора нормали и возвращает. <b>Внимание! Мутирует данный объект!</b> **/
     public CollisionEvent reverse(){
         return init(b, a, fixB, fixA, point, new Vector2(normal.x * -1, normal.y * -1));
     }
@@ -103,9 +101,7 @@ public class CollisionEvent implements Event {
         } else return null;
     }
 
-    /**
-     * Ведёт себя как и {@link #mapMutate(int, int)}, но проверяет только тип одного из Entity.
-     */
+    /** Ведёт себя как и {@link #mapMutate(int, int)}, но проверяет только тип одного из Entity **/
     public CollisionEvent mapMutate(int typeA){
         if (this.a.type == typeA){
             return this;

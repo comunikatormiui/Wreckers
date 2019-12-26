@@ -10,17 +10,15 @@ import ru.maklas.mengine.EntityListener;
 import ru.maklas.mengine.EntitySystem;
 import ru.maklas.wreckers.assets.A;
 import ru.maklas.wreckers.engine.M;
-import ru.maklas.wreckers.engine.networking.WSocketComponent;
 import ru.maklas.wreckers.engine.physics.PhysicsComponent;
 import ru.maklas.wreckers.engine.wrecker.WSocket;
+import ru.maklas.wreckers.engine.wrecker.WSocketComponent;
 import ru.maklas.wreckers.game.FixtureType;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.statics.Game;
 
-/**
- * Набор методов для удачного удаления у прикрепления оружия к игроку, А так же смене GrabZone
- */
+/** Набор методов для удачного удаления у прикрепления оружия к игроку, А так же смене GrabZone **/
 public abstract class DefaultPickUpSystem extends EntitySystem implements EntityListener {
 
 	@Override
@@ -32,7 +30,6 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
 		subscribe(DetachRequest.class, this::onDetachRequest);
 	}
 
-	//DetachRequest. Тут мы проверяем можно ли изять у носителя оружие. Если можно, изымаем и диспатчим success
 	private void onDetachRequest(DetachRequest req) {
 		final Entity wielderDetachFrom;
 		final Entity entityToDetach;
@@ -78,7 +75,6 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
 		}
 	}
 
-	// Attach request. Тут мы проверяем есть ли сокет, можно ли в целом прикрепить. Если да, то диспатчим success
 	private void onAttachRequest(AttachRequest req) {
 		WSocketComponent sockC = req.getWielder().get(M.wSocket);
 		PhysicsComponent weaponPC = req.getWeapon().get(M.physics);

@@ -4,9 +4,7 @@ import com.badlogic.gdx.utils.ImmutableArray;
 import ru.maklas.mengine.*;
 import ru.maklas.wreckers.engine.M;
 
-/**
- * Система эффектов. Управляет эффектами игроков, обновляет.
- */
+/** Система эффектов. Управляет эффектами игроков, обновляет **/
 public class StatusEffectSystem extends EntitySystem implements EntityListener {
 
 	ImmutableArray<Entity> entities;

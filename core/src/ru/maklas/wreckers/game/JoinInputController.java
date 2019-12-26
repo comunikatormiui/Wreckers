@@ -7,8 +7,8 @@ import ru.maklas.mengine.Entity;
 import ru.maklas.mnet2.Socket;
 import ru.maklas.wreckers.engine.B;
 import ru.maklas.wreckers.engine.M;
-import ru.maklas.wreckers.engine.networking.WSocketComponent;
 import ru.maklas.wreckers.engine.wrecker.WSocket;
+import ru.maklas.wreckers.engine.wrecker.WSocketComponent;
 import ru.maklas.wreckers.net_events.NetDetachRequest;
 import ru.maklas.wreckers.net_events.NetGrabZoneChangeRequest;
 

@@ -110,18 +110,14 @@ public abstract class NetworkSystem extends EntitySystem {
 		}
 	}
 
-	/**
-	 * Обрабатывает NetWreckerCreationEvent
-	 */
+	/** Обрабатывает NetWreckerCreationEvent **/
 	protected void onWreckerEvent(Socket s, NetWreckerCreationEvent e){
 		Entity wrecker = createWrecker(e);
 		getEngine().add(wrecker);
 		onWreckerAdded(wrecker, e.isPlayer());
 	}
 
-	/**
-	 * Создаёт Wrecker
-	 */
+	/** Создаёт Wrecker **/
 	protected Entity createWrecker(NetWreckerCreationEvent e){
 		int type = e.isPlayer() ? EntityType.PLAYER : EntityType.OPPONENT;
 		EntityWrecker wrecker = new EntityWrecker(e.getId(), type, e.getX(), e.getY(), e.getHealth());
@@ -144,9 +140,7 @@ public abstract class NetworkSystem extends EntitySystem {
 
 	protected abstract void sync();
 
-	/**
-	 * Ивент о создании и занесении в model Wrecker'a
-	 */
+	/** Ивент о создании и занесении в model Wrecker'a **/
 	protected void onWreckerAdded(Entity wrecker, boolean isPlayer){
 		if (isPlayer){
 			engine.getBundler().set(B.player, wrecker);

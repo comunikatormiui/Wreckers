@@ -6,9 +6,7 @@ import ru.maklas.wreckers.utils.Config;
 import ru.maklas.wreckers.utils.Log;
 import ru.maklas.wreckers.utils.StringUtils;
 
-/**
- * Автоматически Загружаемый/Выгружаемый ассет.
- */
+/** Автоматически Загружаемый/Выгружаемый ассет **/
 public abstract class Asset {
 
 	private boolean loaded = false;

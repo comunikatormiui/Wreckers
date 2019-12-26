@@ -12,6 +12,7 @@ import ru.maklas.wreckers.utils.Log;
 import ru.maklas.wreckers.utils.Utils;
 
 /** Подаёт Input-Ивенты в движок **/
+@Deprecated
 public class EngineInputAdapter implements InputProcessor {
 
 	private final Engine engine;

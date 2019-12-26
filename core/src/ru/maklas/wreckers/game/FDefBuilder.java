@@ -39,17 +39,13 @@ public class FDefBuilder {
 		return this;
 	}
 
-	/**
-	 * Определяет массу на квадратный метр объекта
-	 */
+	/** Определяет массу на квадратный метр объекта **/
 	public FDefBuilder density(float density){
 		fDef.density = density;
 		return this;
 	}
 
-	/**
-	 * По дефолту 0.2f
-	 */
+	/** По дефолту 0.2f **/
 	public FDefBuilder friction(float friction){
 		fDef.friction = friction;
 		return this;

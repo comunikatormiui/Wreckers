@@ -11,13 +11,9 @@ import ru.maklas.wreckers.statics.Game;
 
 public class GrabZoneComponent implements Component{
 
-	/**
-	 * Definition of the fixture that allows grab
-	 */
+	/** Definition of the fixture that allows grab **/
 	public final FixtureDef def;
-	/**
-	 * Current fixture that allows grabbing
-	 */
+	/** Current fixture that allows grabbing **/
 	public Fixture fixture;
 
 	public GrabZoneComponent(FixtureDef def) {

@@ -10,9 +10,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
-/**
- * Вырисовывает на экран все физические тела.
- */
+/** Вырисовывает на экран все физические тела **/
 public class PhysicsDebugRenderer {
 
     private final OrthographicCamera worldCamera;

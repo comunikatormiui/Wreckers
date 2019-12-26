@@ -4,9 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-/**
- * Простая имплементация {@link RenderUnit} в которой на экран просто рисуется картинка.
- */
+/** Простая имплементация {@link RenderUnit} в которой на экран просто рисуется картинка **/
 public class TextureUnit extends RenderUnit<TextureUnit> {
 
 	public TextureRegion region;

@@ -9,6 +9,7 @@ import ru.maklas.wreckers.engine.B;
 import ru.maklas.wreckers.engine.M;
 import ru.maklas.wreckers.engine.weapon.WeaponComponent;
 import ru.maklas.wreckers.engine.wrecker.WSocket;
+import ru.maklas.wreckers.engine.wrecker.WSocketComponent;
 
 public class HostNetworkSystem extends NetworkSystem {
 
@@ -25,9 +26,7 @@ public class HostNetworkSystem extends NetworkSystem {
 	}
 
 
-	/**
-	 * Синхронизуем игрока и все оружия кроме того что сейчас прикреплён к оппоненту
-	 */
+	/** Синхронизуем игрока и все оружия кроме того что сейчас прикреплён к оппоненту **/
 	@Override
 	protected void sync(){
 		sendSynchWrecker(engine.getBundler().get(B.player));

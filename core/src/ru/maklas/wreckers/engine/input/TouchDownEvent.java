@@ -3,9 +3,8 @@ package ru.maklas.wreckers.engine.input;
 import com.badlogic.gdx.math.Vector2;
 import ru.maklas.wreckers.engine.other.Event;
 
-/**
- * Нажатие на экран.
- */
+/** Нажатие на экран **/
+@Deprecated
 public class TouchDownEvent implements Event {
 
 	float x;
