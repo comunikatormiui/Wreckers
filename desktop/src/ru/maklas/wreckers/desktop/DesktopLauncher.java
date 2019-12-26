@@ -7,8 +7,8 @@ import ru.maklas.wreckers.Wreckers;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width  = (int) (640 * 1.5f);
-		config.height = (int) (360 * 1.5f);
+		config.width  = (int) (640 * 1.0f);
+		config.height = (int) (360 * 1.0f);
 		new LwjglApplication(new Wreckers(), config);
 	}
 }

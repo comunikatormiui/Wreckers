@@ -4,18 +4,18 @@ import ru.maklas.wreckers.game.FixtureType;
 
 public class FixtureData {
 
-    FixtureType fixtureType;
+	FixtureType fixtureType;
 
-    public FixtureData(FixtureType fixtureType) {
-        this.fixtureType = fixtureType;
-    }
+	public FixtureData(FixtureType fixtureType) {
+		this.fixtureType = fixtureType;
+	}
 
-    public FixtureType getFixtureType() {
-        return fixtureType;
-    }
+	public FixtureType getFixtureType() {
+		return fixtureType;
+	}
 
-    public void setFixtureType(FixtureType fixtureType) {
-        this.fixtureType = fixtureType;
-    }
+	public void setFixtureType(FixtureType fixtureType) {
+		this.fixtureType = fixtureType;
+	}
 
 }

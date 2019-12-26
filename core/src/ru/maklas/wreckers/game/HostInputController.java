@@ -1,38 +1,39 @@
 package ru.maklas.wreckers.game;
 
-import ru.maklas.wreckers.client.GameModel;
-import ru.maklas.wreckers.engine.events.requests.DetachRequest;
-import ru.maklas.wreckers.engine.events.requests.GrabZoneChangeRequest;
-import ru.maklas.wreckers.libs.gsm_lib.GSMSet;
-import ru.maklas.wreckers.network.events.state_change.NetRestartEvent;
-import ru.maklas.wreckers.tests.HostGameState;
+import ru.maklas.mengine.Engine;
+import ru.maklas.wreckers.engine.B;
+import ru.maklas.wreckers.engine.weapon.DetachRequest;
+import ru.maklas.wreckers.engine.weapon.GrabZoneChangeRequest;
+import ru.maklas.wreckers.net_events.state_change.NetRestartEvent;
+import ru.maklas.wreckers.states.HostGameState;
+import ru.maklas.wreckers.utils.gsm_lib.GSMSet;
 
 public class HostInputController implements InputController {
 
-    private final GameModel model;
+	private final Engine engine;
 
-    public HostInputController(GameModel model) {
-        this.model = model;
-    }
+	public HostInputController(Engine engine) {
+		this.engine = engine;
+	}
 
-    @Override
-    public void enableGrabZone() {
-        model.getEngine().dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
-    }
+	@Override
+	public void enableGrabZone() {
+		engine.dispatch(new GrabZoneChangeRequest(true, engine.getBundler().get(B.player)));
+	}
 
-    @Override
-    public void disableGrabZone() {
-        model.getEngine().dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
-    }
+	@Override
+	public void disableGrabZone() {
+		engine.dispatch(new GrabZoneChangeRequest(false, engine.getBundler().get(B.player)));
+	}
 
-    @Override
-    public void detachWeapon() {
-        model.getEngine().dispatch(new DetachRequest(DetachRequest.Type.FIRST, model.getPlayer(), null));
-    }
+	@Override
+	public void detachWeapon() {
+		engine.dispatch(new DetachRequest(DetachRequest.Type.FIRST, engine.getBundler().get(B.player), null));
+	}
 
-    @Override
-    public void restart() {
-        model.getSocket().send(new NetRestartEvent());
-        model.getGsm().setCommand(new GSMSet(model.getCurrentState(), new HostGameState(model.getSocket())));
-    }
+	@Override
+	public void restart() {
+		engine.getBundler().get(B.socket).send(new NetRestartEvent());
+		engine.getBundler().get(B.gsmState).getGsm().setCommand(new GSMSet(engine.getBundler().get(B.gsmState), new HostGameState(engine.getBundler().get(B.socket))));
+	}
 }

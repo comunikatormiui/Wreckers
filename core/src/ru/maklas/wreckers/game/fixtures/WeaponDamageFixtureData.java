@@ -4,7 +4,7 @@ import ru.maklas.wreckers.game.FixtureType;
 
 public class WeaponDamageFixtureData extends FixtureData {
 
-    public WeaponDamageFixtureData() {
-        super(FixtureType.WEAPON_DAMAGE);
-    }
+	public WeaponDamageFixtureData() {
+		super(FixtureType.WEAPON_DAMAGE);
+	}
 }

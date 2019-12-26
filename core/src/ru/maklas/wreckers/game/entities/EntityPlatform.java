@@ -2,32 +2,31 @@ package ru.maklas.wreckers.game.entities;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import ru.maklas.wreckers.assets.EntityType;
-import ru.maklas.wreckers.client.GameModel;
-import ru.maklas.wreckers.engine.components.PhysicsComponent;
+import ru.maklas.wreckers.assets.A;
+import ru.maklas.wreckers.engine.physics.PhysicsComponent;
 import ru.maklas.wreckers.game.FixtureType;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
+import ru.maklas.wreckers.statics.EntityType;
 
 public class EntityPlatform extends GameEntity {
 
 
-    public EntityPlatform(int id, float x, float y, int zOrder, float width, float height, GameModel model) {
-        super(id, EntityType.OBSTACLE, x, y, zOrder);
+	public EntityPlatform(int id, float x, float y, int zOrder, float width, float height) {
+		super(id, EntityType.OBSTACLE, x, y, zOrder);
 
-        Body platformBody = model.getBuilder()
-                .newBody()
-                .addFixture(model.getFixturer().newFixture()
-                        .shape(model.getShaper().buildRectangle(0, 0, width, height))
-                        .friction(0.7f)
-                        .density(10)
-                        .bounciness(0.2f)
-                        .mask(EntityType.OBSTACLE)
-                        .build(), new FixtureData(FixtureType.OBSTACLE))
-                .pos(-360, 200)
-                .type(BodyDef.BodyType.StaticBody)
-                .linearDamp(0)
-                .build();
+		Body platformBody = A.physics.builders
+				.newBody(BodyDef.BodyType.StaticBody)
+				.addFixture(A.physics.builders.newFixture()
+						.shape(A.physics.builders.buildRectangle(0, 0, width, height))
+						.friction(0.7f)
+						.density(10)
+						.bounciness(0.2f)
+						.mask(EntityType.OBSTACLE)
+						.build(), new FixtureData(FixtureType.OBSTACLE))
+				.pos(-360, 200)
+				.linearDamp(0)
+				.build();
 
-        add(new PhysicsComponent(platformBody));
-    }
+		add(new PhysicsComponent(platformBody));
+	}
 }

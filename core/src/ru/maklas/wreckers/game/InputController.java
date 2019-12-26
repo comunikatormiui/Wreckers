@@ -2,12 +2,12 @@ package ru.maklas.wreckers.game;
 
 public interface InputController {
 
-    void enableGrabZone();
+	void enableGrabZone();
 
-    void disableGrabZone();
+	void disableGrabZone();
 
-    void detachWeapon();
+	void detachWeapon();
 
-    void restart();
+	void restart();
 
 }

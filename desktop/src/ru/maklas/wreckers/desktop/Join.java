@@ -3,7 +3,7 @@ package ru.maklas.wreckers.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import ru.maklas.wreckers.Wreckers;
-import ru.maklas.wreckers.tests.JoinState;
+import ru.maklas.wreckers.states.JoinState;
 
 import java.awt.*;
 
