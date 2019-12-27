@@ -19,6 +19,10 @@ public class EntityNumber extends Entity {
 	private static float scale = 2;
 
 	public EntityNumber(int number, float ttl, float x, float y) {
+		this(number, ttl, x, y, Color.GREEN);
+	}
+
+	public EntityNumber(int number, float ttl, float x, float y, Color color) {
 		super(x, y, 100);
 
 		if (numbers[0] == null || !numbers[0].getTexture().isManaged())
@@ -39,8 +43,7 @@ public class EntityNumber extends Entity {
 
 		float dtX = 0;
 
-		RenderComponent rc = new RenderComponent();
-		rc.color = Color.GREEN;
+		RenderComponent rc = new RenderComponent().color(color);
 
 		for (int item : digits.items) {
 			TextureRegion n = numbers[item];

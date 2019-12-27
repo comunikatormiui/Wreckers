@@ -18,7 +18,7 @@ public class EntityString extends Entity {
 	private static int spaceWidth = 5;
 	private static float scale = 2;
 
-	public EntityString(String s, int ttl, float x, float y, Color color) {
+	public EntityString(String s, float ttl, float x, float y, Color color) {
 		super(x, y, 100);
 		if (charMap.size < 2){
 			init();

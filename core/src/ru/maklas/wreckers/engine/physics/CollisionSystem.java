@@ -1,5 +1,6 @@
 package ru.maklas.wreckers.engine.physics;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -15,8 +16,12 @@ import ru.maklas.wreckers.engine.weapon.WeaponComponent;
 import ru.maklas.wreckers.engine.weapon.WeaponWreckerHitEvent;
 import ru.maklas.wreckers.engine.wrecker.WreckerComponent;
 import ru.maklas.wreckers.game.FixtureType;
+import ru.maklas.wreckers.game.entities.EntityArrow;
+import ru.maklas.wreckers.game.entities.EntityNumber;
+import ru.maklas.wreckers.game.entities.EntityString;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
+import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.statics.Game;
 import ru.maklas.wreckers.utils.BiConsumer;
 import ru.maklas.wreckers.utils.Log;
@@ -31,6 +36,35 @@ public class CollisionSystem extends SubscriptionSystem {
 	@Override
 	public void onAddedToEngine(final Engine engine) {
 		subscribe(PostCollisionEvent.class, this::onPostCollisionEvent);
+		subscribe(CollisionEvent.class, this::collEvent);
+	}
+
+	private void collEvent(CollisionEvent e) {
+		if (EntityType.isPlayerOrOpponent(e.getB().type) && EntityType.isWeapon(e.getA().type)) {
+			e = e.reverse();
+		} else if (!(EntityType.isPlayerOrOpponent(e.getA().type) && EntityType.isWeapon(e.getB().type))) {
+			return;
+		}
+		Body weaponBody = e.getFixB().getBody();
+		Body wreckerBody = e.getFixA().getBody();
+		Vector2 worldCollisionPoint = new Vector2(e.getPoint()).scl(Game.scaleReversed);
+
+		//test
+		Vector2 testV = new Vector2(weaponBody.getLinearVelocityFromWorldPoint(worldCollisionPoint)).sub(wreckerBody.getLinearVelocityFromWorldPoint(worldCollisionPoint));
+		engine.add(new EntityArrow(e.getPoint(), new Vector2(testV).scl(10).add(e.getPoint()), 2, Color.GREEN));
+		float dullness = calculateDullness(testV, calculatePlayerNormal(e.getFixA(), worldCollisionPoint, e.getNormal(), false));
+		float sliceness = 1 - dullness;
+		float sharpness = 0;
+		FixtureData fData = (FixtureData) e.getFixB().getUserData();
+		if (fData instanceof WeaponPiercingFD) {
+			sharpness = calculateSharpness(((WeaponPiercingFD) fData), e.getFixB(), testV);
+			float oldDullness = dullness;
+			dullness = oldDullness * (1 - sharpness);
+			sharpness = oldDullness * sharpness;
+		}
+
+		String s = (int)(dullness * 100) + " / " + (int)(sliceness * 100) + " / " + (int)(sharpness * 100);
+		engine.add(new EntityString(s, 1.5f, e.getPoint().x, e.getPoint().y + 40, Color.ORANGE));
 	}
 
 	protected void onPostCollisionEvent(PostCollisionEvent e) {
@@ -84,7 +118,7 @@ public class CollisionSystem extends SubscriptionSystem {
 		float disarmResist1 = wr1 == null ? 9999999f : wr1.disarmResist;
 		float disarmResist2 = wr2 == null ? 9999999f : wr2.disarmResist;
 
-		final float minToDisarm = 50;
+		final float minToDisarm = 30;
 		boolean disarm1 = impulseForce * (wc2 == null ? 1 : wc2.disarmAbility) * leagueFormula(disarmResist1) > minToDisarm;
 		boolean disarm2 = impulseForce * (wc1 == null ? 1 : wc1.disarmAbility) * leagueFormula(disarmResist2) > minToDisarm;
 
@@ -95,10 +129,10 @@ public class CollisionSystem extends SubscriptionSystem {
 		}
 
 		if (disarm1) {
-			weaponOwnerConsumer.accept(owner1, weaponA);
+			weaponOwnerConsumer.accept(weaponA, owner1);
 		}
 		if (disarm2) {
-			weaponOwnerConsumer.accept(owner2, weaponB);
+			weaponOwnerConsumer.accept(weaponB, owner2);
 		}
 	}
 
@@ -114,8 +148,6 @@ public class CollisionSystem extends SubscriptionSystem {
 		final Fixture weaponFixture = e.getFixA();
 		final FixtureData weaponFixtureData = (FixtureData) weaponFixture.getUserData();
 		if (weaponFixtureData.getFixtureType() != FixtureType.WEAPON_DAMAGE) return;
-
-
 
 		//******************************//
 		//* MINIMAL VELOCITY CONDITION *//
@@ -175,7 +207,7 @@ public class CollisionSystem extends SubscriptionSystem {
 
 				weaponBody,
 				playerBody);
-		engine.dispatch(event);
+		engine.dispatchLater(event);
 	}
 
 	/**
@@ -193,22 +225,6 @@ public class CollisionSystem extends SubscriptionSystem {
 
 
 	/**
-	 * @param playerFixture Игрок
-	 * @param collisionPoint точка прикосновения
-	 * @param normal Нормаль прикосновения
-	 * @param weaponIsA Оружие - А в изначальном контакте
-	 * @return Вектор нормали от игрока к точке
-	 */
-	public static Vector2 calculatePlayerNormal(Fixture playerFixture, Vector2 collisionPoint, Vector2 normal, boolean weaponIsA) {
-		if (playerFixture.getShape() instanceof CircleShape) { //Если игрок - круг, то вектор нормали всегда исходит от центра к точке.
-			return new Vector2(collisionPoint).sub(playerFixture.getBody().getPosition()).nor();
-		} else {
-			Vector2 n = new Vector2(normal);
-			return weaponIsA ? n.scl(-1) : n;
-		}
-	}
-
-	/**
 	 * @param weaponFD Тип Fixture оружия - проникающий
 	 * @param weaponFixture сама Fixture
 	 * @return 0..1 Sharpness
@@ -222,6 +238,22 @@ public class CollisionSystem extends SubscriptionSystem {
 		angle = angle < 0 ? -angle : angle; // снова берем модуль 0..90. где 90 - топ
 		angle /= 90f; //0..1
 		return angle > 0.6f ? angle : 0; //Отсеиваем тупые удары
+	}
+
+	/**
+	 * @param playerFixture Игрок
+	 * @param box2dCollisionPoint точка прикосновения в формате box2d
+	 * @param normal Нормаль прикосновения
+	 * @param weaponIsA Оружие - А в изначальном контакте
+	 * @return Вектор нормали от игрока к точке
+	 */
+	public static Vector2 calculatePlayerNormal(Fixture playerFixture, Vector2 box2dCollisionPoint, Vector2 normal, boolean weaponIsA) {
+		if (playerFixture.getShape() instanceof CircleShape) { //Если игрок - круг, то вектор нормали всегда исходит от центра к точке.
+			return new Vector2(box2dCollisionPoint).sub(playerFixture.getBody().getPosition()).nor();
+		} else {
+			Vector2 n = new Vector2(normal);
+			return weaponIsA ? n.scl(-1) : n;
+		}
 	}
 
 }

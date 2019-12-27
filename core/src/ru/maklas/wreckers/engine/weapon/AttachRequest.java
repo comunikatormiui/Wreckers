@@ -1,36 +1,25 @@
 package ru.maklas.wreckers.engine.weapon;
 
 import ru.maklas.mengine.Entity;
+import ru.maklas.wreckers.engine.other.Request;
 
 /** Request to attach weapon to the target **/
-public class AttachRequest {
+public class AttachRequest implements Request {
 
 	private Entity wielder;
-	private GrabZoneComponent playerPickUp;
 	private Entity weapon;
-	private PickUpComponent weaponPickUp;
 
-	public AttachRequest(Entity wielder, GrabZoneComponent playerPickUp, Entity weapon, PickUpComponent weaponPickUp) {
+	public AttachRequest(Entity wielder, Entity weapon) {
 		this.wielder = wielder;
-		this.playerPickUp = playerPickUp;
 		this.weapon = weapon;
-		this.weaponPickUp = weaponPickUp;
 	}
 
 	public Entity getWielder() {
 		return wielder;
 	}
 
-	public GrabZoneComponent getPlayerPickUp() {
-		return playerPickUp;
-	}
-
 	public Entity getWeapon() {
 		return weapon;
-	}
-
-	public PickUpComponent getPickUp() {
-		return weaponPickUp;
 	}
 
 }

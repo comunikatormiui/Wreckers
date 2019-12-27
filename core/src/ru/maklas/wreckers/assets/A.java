@@ -4,9 +4,9 @@ import com.badlogic.gdx.utils.Array;
 
 public class A {
 
-	public static final ImageAssets	 images;
+	public static final ImageAssets	 	images;
 	public static final PhysicsAssets   physics;
-	public static final SkinAssets	  skins;
+	public static final SkinAssets	  	skins;
 
 	private static Array<Asset> allAssets;
 

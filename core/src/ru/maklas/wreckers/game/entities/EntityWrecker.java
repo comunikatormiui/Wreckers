@@ -80,11 +80,5 @@ public class EntityWrecker extends GameEntity {
 					System.out.println("Died");
 				}
 		});
-
-		subscribe(DamageEvent.class, e -> {
-				if (e.getTarget() == EntityWrecker.this){
-					System.out.println(EntityWrecker.this.toString() + " Damage: " + e.getDamage() + " Health left: " + get(M.health).health);
-				}
-		});
 	}
 }

@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.engine.other.Event;
 
-public class DeathEvent {
+public class DeathEvent implements Event {
 
 	Entity target;
 	@Nullable private final Event lastHitEvent;

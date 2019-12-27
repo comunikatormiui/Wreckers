@@ -27,20 +27,6 @@ public class PhysicsSystem extends EntitySystem implements EntityListener, Conta
 	private World world;
 	private ImmutableArray<Entity> entities;
 	private Array<PhysicsComponent> toDestroy = new Array<>();
-	private Pool<CollisionEvent> collisionEventPool = new Pool<CollisionEvent>() {
-		@Override
-		protected CollisionEvent newObject() {
-			return new CollisionEvent();
-		}
-	};
-	private Pool<PostCollisionEvent> postCollisionEventPool = new Pool<PostCollisionEvent>() {
-		@Override
-		protected PostCollisionEvent newObject() {
-			return new PostCollisionEvent();
-		}
-	};
-	private Array<CollisionEvent> collisionEvents = new Array<>();
-	private Array<PostCollisionEvent> postCollisionEvents = new Array<>();
 
 	@Override
 	public void onAddedToEngine(final Engine engine) {
@@ -63,28 +49,15 @@ public class PhysicsSystem extends EntitySystem implements EntityListener, Conta
 		Entity a = (Entity) fA.getBody().getUserData();
 		Entity b = (Entity) fB.getBody().getUserData();
 
-		if (Config.LOG_COLLISIONS) {
-			for (CollisionEvent cpe : collisionEvents) {
-				if (cpe.getA() == a && cpe.getB() == b || cpe.getB() == a && cpe.getA() == b){
-					Log.debug("2 Entities collided 2 times in a single PhysicsEngine.update():\n" +
-							StringUtils.entityToString(a) + '\n' +
-							StringUtils.entityToString(b)
-					);
-					return;
-				}
-			}
-		}
-
-
 		WorldManifold worldManifold = contact.getWorldManifold();
 		Vector2 point = worldManifold.getPoints()[0].scl(Game.scale);
 		Vector2 normal = worldManifold.getNormal();
-		collisionEvents.add(collisionEventPool.obtain().init(a, b, fA, fB, point, normal));
+		dispatch(new CollisionEvent(a, b, fA, fB, point, normal));
 	}
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
-		postCollisionEvents.add(postCollisionEventPool.obtain().init(contact, impulse));
+		dispatch(new PostCollisionEvent().init(contact, impulse));
 	}
 
 	@Override
@@ -97,29 +70,6 @@ public class PhysicsSystem extends EntitySystem implements EntityListener, Conta
 		ComponentMapper<PhysicsComponent> collisionM = mapper;
 		for (Entity entity : entities) {
 			entity.get(collisionM).updateEntity(entity);
-		}
-
-		dispatchCollisionEvents();
-	}
-
-	private void dispatchCollisionEvents() {
-		Array<CollisionEvent> collEvents = this.collisionEvents;
-		Array<PostCollisionEvent> postCollEvents = this.postCollisionEvents;
-
-		if (!collEvents.isEmpty()) {
-			for (CollisionEvent event : collEvents) {
-				dispatch(event);
-			}
-			collisionEventPool.freeAll(collEvents);
-			collEvents.clear();
-		}
-
-		if (!postCollEvents.isEmpty()) {
-			for (PostCollisionEvent event : postCollEvents) {
-				dispatch(event);
-			}
-			postCollisionEventPool.freeAll(postCollEvents);
-			postCollEvents.clear();
 		}
 	}
 

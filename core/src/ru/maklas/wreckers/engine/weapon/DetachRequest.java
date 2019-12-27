@@ -1,9 +1,10 @@
 package ru.maklas.wreckers.engine.weapon;
 
 import ru.maklas.mengine.Entity;
+import ru.maklas.wreckers.engine.other.Request;
 
 /** Внутридвижковый ивент. Запрос на детач оружия **/
-public class DetachRequest {
+public class DetachRequest implements Request {
 
 	public enum Type {
 		/** Удаляем самое первое оружие если оно имеется. wielder != null **/

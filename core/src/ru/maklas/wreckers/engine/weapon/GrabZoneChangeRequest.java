@@ -1,8 +1,9 @@
 package ru.maklas.wreckers.engine.weapon;
 
 import ru.maklas.mengine.Entity;
+import ru.maklas.wreckers.engine.other.Request;
 
-public class GrabZoneChangeRequest {
+public class GrabZoneChangeRequest implements Request {
 
 	private boolean enable;
 	private Entity entity;

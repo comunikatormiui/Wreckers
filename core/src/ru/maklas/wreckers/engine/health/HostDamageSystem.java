@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
 import ru.maklas.mengine.EntitySystem;
+import ru.maklas.mnet2.Socket;
 import ru.maklas.wreckers.engine.B;
 import ru.maklas.wreckers.engine.M;
 import ru.maklas.wreckers.engine.other.Event;
@@ -17,6 +18,7 @@ import ru.maklas.wreckers.game.entities.EntityNumber;
 import ru.maklas.wreckers.game.entities.EntityString;
 import ru.maklas.wreckers.net_events.NetHitEvent;
 import ru.maklas.wreckers.statics.Game;
+import ru.maklas.wreckers.utils.Log;
 import ru.maklas.wreckers.utils.StringUtils;
 
 import java.util.Random;
@@ -81,6 +83,9 @@ public class HostDamageSystem extends EntitySystem {
 		float pierceDamage = truePierceDamage * leagueFormula(wreckC.pierceArmor);
 
 		float totalDamage = dullDamage + sliceDamage + pierceDamage; // конечный Дамаг
+		if (totalDamage > 5) {
+			Log.debug("Damage applied. {dull=" + StringUtils.ff(dullDamage) + ", slice=" + StringUtils.ff(sliceDamage) + ", pierce=" + StringUtils.ff(pierceDamage) + "}");
+		}
 
 		//************************//
 		//* РАССЧЁТ ДОП ИМПУЛЬСА *//
@@ -149,19 +154,16 @@ public class HostDamageSystem extends EntitySystem {
 		//* ТЕСТЫ *//
 		//*********//
 
-		engine.add(new EntityNumber((int) totalDamage, 2, e.getPoint().x, e.getPoint().y));
+		engine.add(new EntityNumber((int) totalDamage, 2, e.getPoint().x, e.getPoint().y, Color.RED));
 		if (doStun){
-			engine.add(new EntityString("STUN! " + StringUtils.ff(stunDuration), 2, e.getPoint().x, e.getPoint().y + 50, Color.RED));
+			engine.add(new EntityString("STUN! " + StringUtils.ff(stunDuration), 2, e.getPoint().x + 30, e.getPoint().y + 75, Color.RED));
 			e.getTargetWrecker().get(M.effect).add(new StunEffect(stunDuration));
 		}
 		engine.add(new EntityString(
 				(int)(e.getDullness() * 100) + " / " +
 						(int) (e.getSliceness() * 100) + " / " +
-						(int) (e.getSharpness() * 100), 2, e.getPoint().x + (rand.nextFloat() * 50 - 25), e.getPoint().y + 25, Color.PINK));
-		engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getCollisionVelocity()).nor().scl(75).add(e.getPoint()), 1, Color.ORANGE));
-		engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getNormal()).scl(75).add(e.getPoint()), 1, Color.BROWN));
-		if ( e.getSharpness() > 0.1f) engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getPiercingDirection()).scl(75).add(e.getPoint()), 1, Color.CYAN));
-
+						(int) (e.getSharpness() * 100), 2, e.getPoint().x + (rand.nextFloat() * 50 - 25), e.getPoint().y + 125, Color.PINK));
+		if (e.getSharpness() > 0.1f) engine.add(new EntityArrow(e.getPoint(), new Vector2(e.getPiercingDirection()).scl(75).add(e.getPoint()), 1, Color.CYAN));
 	}
 
 	@Override
@@ -181,7 +183,10 @@ public class HostDamageSystem extends EntitySystem {
 
 		if (hitEvent instanceof WeaponWreckerHitEvent){
 			WeaponWreckerHitEvent wwh = (WeaponWreckerHitEvent) hitEvent;
-			engine.getBundler().get(B.socket).send(new NetHitEvent(e.id, wwh.getWeapon().id, wwh.getPoint().x, wwh.getPoint().y, damage, hc.health, !hc.alive, wwh.getSliceness(), wwh.getDullness(), wwh.getSharpness(), stunDuration));
+			Socket socket = engine.getBundler().get(B.socket);
+			if (socket != null){ //TODO remove this check for host
+				socket.send(new NetHitEvent(e.id, wwh.getWeapon().id, wwh.getPoint().x, wwh.getPoint().y, damage, hc.health, !hc.alive, wwh.getSliceness(), wwh.getDullness(), wwh.getSharpness(), stunDuration));
+			}
 		}
 	}
 

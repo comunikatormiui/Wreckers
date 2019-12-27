@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import ru.maklas.mengine.Bundler;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
+import ru.maklas.mengine.UpdatableEntitySystem;
 import ru.maklas.wreckers.assets.A;
 import ru.maklas.wreckers.engine.B;
 import ru.maklas.wreckers.engine.EntityUtils;
@@ -17,6 +18,7 @@ import ru.maklas.wreckers.engine.M;
 import ru.maklas.wreckers.engine.health.HostDamageSystem;
 import ru.maklas.wreckers.engine.movemnet.AntiGravSystem;
 import ru.maklas.wreckers.engine.movemnet.MotorSystem;
+import ru.maklas.wreckers.engine.other.EntityDebugSystem;
 import ru.maklas.wreckers.engine.other.TTLSystem;
 import ru.maklas.wreckers.engine.physics.HostCollisionSystem;
 import ru.maklas.wreckers.engine.physics.PhysicsComponent;
@@ -24,23 +26,23 @@ import ru.maklas.wreckers.engine.physics.PhysicsSystem;
 import ru.maklas.wreckers.engine.rendering.CameraSystem;
 import ru.maklas.wreckers.engine.rendering.RenderingSystem;
 import ru.maklas.wreckers.engine.status_effects.StatusEffectSystem;
+import ru.maklas.wreckers.engine.weapon.AttachRequest;
+import ru.maklas.wreckers.engine.weapon.DefaultPickUpSystem;
 import ru.maklas.wreckers.engine.weapon.DetachRequest;
 import ru.maklas.wreckers.engine.weapon.GrabZoneChangeRequest;
-import ru.maklas.wreckers.engine.weapon.HostPickUpSystem;
 import ru.maklas.wreckers.game.FixtureType;
 import ru.maklas.wreckers.game.entities.*;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.statics.EntityType;
-import ru.maklas.wreckers.statics.Game;
 import ru.maklas.wreckers.user_interface.GameUI;
+import ru.maklas.wreckers.utils.TimeSlower;
 import ru.maklas.wreckers.utils.Utils;
-import ru.maklas.wreckers.utils.physics.Builders;
 
 public class SinglePlayerState extends AbstractEngineState implements GameController {
 
 	private OrthographicCamera cam;
-	private GameModel model;
 	private GameUI ui;
+	private TimeSlower ts;
 
 	@Override
 	protected void loadAssets() {
@@ -50,15 +52,13 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 		cam = new OrthographicCamera(1280, 720);
 		engine = new Engine();
 		ui = new GameUI(this);
+		ts = new TimeSlower();
 
-		model = new GameModel();
-		model.setBuilder(new Builders(A.physics.world, Game.scale));
-		model.setWorld(A.physics.world);
 	}
 
 	@Override
 	protected void fillBundler(Bundler bundler) {
-		model.setEngine(engine);
+		bundler.set(B.timeSlower, ts);
 		bundler.set(B.world, A.physics.world);
 		bundler.set(B.batch, batch);
 		bundler.set(B.builders, A.physics.builders);
@@ -77,10 +77,12 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 		engine.add(new MotorSystem());
 		engine.add(new StatusEffectSystem());
 		engine.add(new CameraSystem());
-
 		engine.add(new HostCollisionSystem());
-		engine.add(new HostPickUpSystem());
+		engine.add(new UpdatableEntitySystem());
+
+		engine.add(new DefaultPickUpSystem());
 		engine.add(new HostDamageSystem());
+		engine.add(new EntityDebugSystem());
 	}
 
 	@Override
@@ -95,21 +97,21 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 								.bounciness(0.2f)
 								.mask(EntityType.OBSTACLE)
 								.build(), new FixtureData(FixtureType.OBSTACLE))
-				.pos(-360, 200)
+				.pos(-1000, 200)
 				.type(BodyDef.BodyType.StaticBody)
 				.linearDamp(0)
 				.build();
 
 		final Entity player = new EntityWrecker(1, EntityType.PLAYER,   0, 500, 10000);
-		final EntityWrecker opponent = new EntityWrecker(2, EntityType.OPPONENT, 200, 500, 10000);
-		final EntitySword sword = new EntitySword(3, -200, 700);
-		final EntitySword sword2 = new EntitySword(4, 0, 300);
-		final EntityHammer hammer = new EntityHammer(5, -200, 300);
+		final EntityWrecker opponent = new EntityWrecker(2, EntityType.OPPONENT, 200, 700, 10000);
+		final EntitySword sword = new EntitySword(3, 300, 700);
+		final EntitySword sword2 = new EntitySword(4, -300, 300);
+		final EntityHammer hammer = new EntityHammer(5, 0, 300);
 		final Entity scythe = new EntityScythe(6, 370, 300, 10);
 		final Entity platform = new GameEntity(-2, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
 
-		model.setPlayer(player);
-		model.setOpponent(opponent);
+		engine.getBundler().set(B.player, player);
+		engine.getBundler().set(B.opponent, opponent);
 
 		engine.add(player);
 		engine.add(opponent);
@@ -123,22 +125,26 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 
 	@Override
 	protected void start() {
+		engine.dispatch(new AttachRequest(engine.findById(2), engine.findById(3)));
+	}
 
+	private Entity getPlayer(){
+		return engine.getBundler().get(B.player);
 	}
 
 	@Override
 	public void onDropClicked() {
-		engine.dispatch(new DetachRequest(DetachRequest.Type.FIRST, model.getPlayer(), null));
+		engine.dispatch(new DetachRequest(DetachRequest.Type.FIRST, engine.getBundler().get(B.player), null));
 	}
 
 	@Override
 	public void onAttachDown() {
-		engine.dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
+		engine.dispatch(new GrabZoneChangeRequest(true, getPlayer()));
 	}
 
 	@Override
 	public void onAttachUp() {
-		engine.dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
+		engine.dispatch(new GrabZoneChangeRequest(false, getPlayer()));
 	}
 
 	@Override
@@ -164,9 +170,9 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 			@Override
 			public boolean keyDown(int keycode) {
 				if (Input.Keys.P == keycode) {
-					engine.dispatch(new GrabZoneChangeRequest(true, model.getPlayer()));
+					engine.dispatch(new GrabZoneChangeRequest(true, getPlayer()));
 				} else if (Input.Keys.O == keycode) {
-					engine.dispatch(new DetachRequest(DetachRequest.Type.FIRST, model.getPlayer(), null));
+					engine.dispatch(new DetachRequest(DetachRequest.Type.FIRST, getPlayer(), null));
 				}
 				return true;
 			}
@@ -174,7 +180,7 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 			@Override
 			public boolean keyUp(int keycode) {
 				if (Input.Keys.P == keycode) {
-					engine.dispatch(new GrabZoneChangeRequest(false, model.getPlayer()));
+					engine.dispatch(new GrabZoneChangeRequest(false, getPlayer()));
 				}
 				return true;
 			}
@@ -190,6 +196,7 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 
 	@Override
 	protected void update(float dt) {
+		dt = ts.convert(dt);
 		engine.update(dt);
 
 		Vector2 directionVec = Utils.vec2.set(0, 0);
@@ -213,15 +220,19 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 			}
 		}
 
-		model.getPlayer().get(M.motor).direction.set(directionVec);
+		getPlayer().get(M.motor).direction.set(directionVec);
 		ui.act(dt);
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+			setState(new SinglePlayerState());
+		}
 	}
 
 	@Override
 	protected void render(Batch batch) {
-		cam.update();
-		batch.setColor(Color.WHITE);
+		cam.update(true);
 		batch.setProjectionMatrix(cam.combined);
+		batch.setColor(Color.WHITE);
 		batch.begin();
 		engine.render();
 		batch.end();
@@ -234,6 +245,7 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 
 	@Override
 	protected void dispose() {
-
+		engine.dispose();
+		A.physics.dispose();
 	}
 }

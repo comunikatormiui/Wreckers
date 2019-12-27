@@ -20,6 +20,7 @@ import ru.maklas.wreckers.engine.rendering.CameraComponent;
 import ru.maklas.wreckers.engine.rendering.CameraSystem;
 import ru.maklas.wreckers.mnw.MNW;
 import ru.maklas.wreckers.utils.StringUtils;
+import ru.maklas.wreckers.utils.TimeSlower;
 import ru.maklas.wreckers.utils.Utils;
 
 /**
@@ -172,10 +173,23 @@ public class EntityDebugSystem extends RenderEntitySystem {
 			help = !help;
 		}
 	}
-
 	private void updateTimeline() {
 		if (Gdx.input.isKeyJustPressed(Input.Keys.P)){
 			pauseUnpause();
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.U)){
+			TimeSlower timeSlower = engine.getBundler().get(B.timeSlower);
+			if (timeSlower != null){
+				timeSlower.setTargetScale(timeSlower.getTargetScale() / 2f);
+			}
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.I)){
+			TimeSlower timeSlower = engine.getBundler().get(B.timeSlower);
+			if (timeSlower != null){
+				timeSlower.setTargetScale(1);
+			}
 		}
 	}
 

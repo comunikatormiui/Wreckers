@@ -12,7 +12,7 @@ public class Config {
 	public static final boolean DEBUG_ENGINE = true;			//Использовать ли движок который профайлит, EventDispatcher с логированием неправильных ивентов.
 	public static final boolean CHECK_STRINGS = true;		   //Проверять ли наличие перевода в Translation.java. Внимание. Если выключить, могут быть NPE
 	public static final boolean ENAIBLE_UI = false;			 //Включить контроллирующую часть UI
-	public static final boolean LOG_COLLISIONS = true;		//Логировать когда 2 Entity столкнулись дважды за тик.
+	public static final boolean LOG_COLLISIONS = false;		//Логировать когда 2 Entity столкнулись дважды за тик.
 
 	public static final String adMobAppId = "ca-app-pub-3610828690646342~6368058535";
 	public static final String adMobInterstitialId = "ca-app-pub-3610828690646342/9800747525";

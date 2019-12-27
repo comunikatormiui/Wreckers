@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.engine.other.Event;
 
-public class DamageEvent {
+public class DamageEvent implements Event {
 
 	Entity target;
 	float damage;

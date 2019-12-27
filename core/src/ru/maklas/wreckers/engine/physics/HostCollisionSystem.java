@@ -26,7 +26,7 @@ public class HostCollisionSystem extends CollisionSystem {
 
 	protected void handleWeaponToWeapon(final Entity weaponA, Entity weaponB, Vector2 point, float impulse) {
 		determineDisarm(weaponA, weaponB, point, impulse, (weapon, owner) -> {
-			getEngine().dispatchLater(new DetachRequest(DetachRequest.Type.TARGET_WEAPON, null, weapon));
+			getEngine().dispatchLater(new DetachRequest(DetachRequest.Type.TARGET_WEAPON, owner, weapon));
 			if (owner != null) {
 				StatusEffectComponent sec = owner.get(M.effect);
 				if (sec != null) {

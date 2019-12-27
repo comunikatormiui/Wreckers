@@ -189,11 +189,19 @@ public class Log {
 				builder.append(writer.toString().trim());
 			}
 
-			print(builder.toString());
+			if (level == LEVEL_ERROR) {
+				printError(builder.toString());
+			} else {
+				print(builder.toString());
+			}
 		}
 
 		protected void print(String message) {
 			System.out.println(message);
+		}
+
+		private void printError(String message) {
+			System.err.println(message);
 		}
 
 		@Override

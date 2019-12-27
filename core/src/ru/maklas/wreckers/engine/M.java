@@ -66,7 +66,6 @@ public class M {
 		//input
 		map.put(NetworkSystem.class, i++);
 		map.put(MotorSystem.class, i++);
-		map.put(HostCollisionSystem.class, i++);
 
 		//update
 		map.put(TTLSystem.class, i++);

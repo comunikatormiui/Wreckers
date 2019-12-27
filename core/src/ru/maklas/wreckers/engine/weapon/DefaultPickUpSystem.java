@@ -10,6 +10,7 @@ import ru.maklas.mengine.EntityListener;
 import ru.maklas.mengine.EntitySystem;
 import ru.maklas.wreckers.assets.A;
 import ru.maklas.wreckers.engine.M;
+import ru.maklas.wreckers.engine.physics.CollisionEvent;
 import ru.maklas.wreckers.engine.physics.PhysicsComponent;
 import ru.maklas.wreckers.engine.wrecker.WSocket;
 import ru.maklas.wreckers.engine.wrecker.WSocketComponent;
@@ -17,17 +18,38 @@ import ru.maklas.wreckers.game.FixtureType;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.statics.Game;
+import ru.maklas.wreckers.utils.NoCaseException;
 
 /** Набор методов для удачного удаления у прикрепления оружия к игроку, А так же смене GrabZone **/
-public abstract class DefaultPickUpSystem extends EntitySystem implements EntityListener {
+public class DefaultPickUpSystem extends EntitySystem implements EntityListener {
 
 	@Override
 	public void onAddedToEngine(final Engine engine) {
 		engine.addListener(this);
 
+		subscribe(CollisionEvent.class, this::onCollision);
 		subscribe(GrabZoneChangeRequest.class, this::onGrabZoneChangeRequest);
 		subscribe(AttachRequest.class, this::onAttachRequest);
 		subscribe(DetachRequest.class, this::onDetachRequest);
+	}
+
+	private void onCollision(CollisionEvent e) {
+		engine.executeLater(() -> {
+			if (!e.getFixA().isSensor() || !e.getFixB().isSensor()) return;
+			FixtureData aData = (FixtureData) e.getFixA().getUserData();
+			FixtureData bData = (FixtureData) e.getFixB().getUserData();
+			if (aData.getFixtureType() == FixtureType.GRABBER_SENSOR && bData.getFixtureType() == FixtureType.PICKUP_SENSOR) {
+				if (e.getB().get(M.pickUp).isAttached) {
+					return;
+				}
+				dispatch(new AttachRequest(e.getA(), e.getB()));
+			} else if (aData.getFixtureType() == FixtureType.PICKUP_SENSOR && bData.getFixtureType() == FixtureType.GRABBER_SENSOR) {
+				if (e.getA().get(M.pickUp).isAttached) {
+					return;
+				}
+				dispatch(new AttachRequest(e.getB(), e.getA()));
+			}
+		});
 	}
 
 	private void onDetachRequest(DetachRequest req) {
@@ -37,7 +59,6 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
 
 		switch (req.getType()){
 			case FIRST:
-
 				wielderDetachFrom = req.getWielder();
 				socketC = wielderDetachFrom.get(M.wSocket);
 				WSocket sock = socketC.firstAttached();
@@ -62,7 +83,7 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
 				socketC = wielderDetachFrom.get(M.wSocket);
 				break;
 			default:
-				throw new RuntimeException("Unknown type: " + req.getType().name());
+				throw new NoCaseException(req.getType());
 		}
 
 		PickUpComponent pickUpC = entityToDetach.get(M.pickUp);
@@ -78,12 +99,13 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
 	private void onAttachRequest(AttachRequest req) {
 		WSocketComponent sockC = req.getWielder().get(M.wSocket);
 		PhysicsComponent weaponPC = req.getWeapon().get(M.physics);
+		PickUpComponent weaponPickup = req.getWeapon().get(M.pickUp);
 
-		if (sockC == null && weaponPC == null){
+		if (sockC == null || weaponPC == null || weaponPickup == null){
 			return;
 		}
 
-		boolean attached = attachLogic(req.getWeapon(), weaponPC, req.getPickUp(), req.getWielder(), sockC);
+		boolean attached = attachLogic(req.getWeapon(), weaponPC, weaponPickup, req.getWielder(), sockC);
 		if (attached){
 			engine.dispatch(new AttachEvent(req.getWielder(), req.getWeapon(), true));
 		}
@@ -120,6 +142,11 @@ public abstract class DefaultPickUpSystem extends EntitySystem implements Entity
 		if (pickUpC != null && !pickUpC.isAttached && !pickUpC.pickUpZoneEnabled()){
 			createPickUpZone(entity, pickUpC);
 		}
+	}
+
+	@Override
+	public void update(float dt) {
+
 	}
 
 	@Override

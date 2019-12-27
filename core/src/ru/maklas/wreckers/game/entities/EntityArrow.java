@@ -34,10 +34,6 @@ public class EntityArrow extends Entity {
 		y = y1;
 	}
 
-	public EntityArrow(float x1, float y1, float x2, float y2, float ttl) {
-		this(Color.RED, x1, y1, x2, y2, ttl);
-	}
-
 	public EntityArrow(Vector2 start, Vector2 end, float ttl, Color color){
 		this(color, start.x, start.y, end.x, end.y, ttl);
 	}

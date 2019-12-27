@@ -10,6 +10,7 @@ import ru.maklas.mengine.Entity;
 import ru.maklas.mnet2.Socket;
 import ru.maklas.wreckers.statics.ID;
 import ru.maklas.wreckers.user_interface.GameUI;
+import ru.maklas.wreckers.utils.TimeSlower;
 import ru.maklas.wreckers.utils.gsm_lib.State;
 import ru.maklas.wreckers.utils.net_dispatcher.NetDispatcher;
 import ru.maklas.wreckers.utils.physics.Builders;
@@ -29,6 +30,7 @@ public class B {
 	public static final BundlerKey<Entity> opponent = BundlerKey.of("opponent");
 	public static final BundlerKey<Boolean> isClient = BundlerKey.of("isClient"); //Is this client or server engine.
 	public static final BundlerKey<Boolean> updateThisFrame = BundlerKey.of("urgentUpdate");
+	public static final BundlerKey<TimeSlower> timeSlower = BundlerKey.of("timeSlower");
 
 
 	public static final BundlerKey<GameUI> ui = BundlerKey.of("ui");
