@@ -1,5 +1,6 @@
 package ru.maklas.wreckers.game.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -13,6 +14,7 @@ import ru.maklas.wreckers.engine.health.HealthComponent;
 import ru.maklas.wreckers.engine.movemnet.AntiGravComponent;
 import ru.maklas.wreckers.engine.movemnet.MotorComponent;
 import ru.maklas.wreckers.engine.physics.PhysicsComponent;
+import ru.maklas.wreckers.engine.rendering.RenderComponent;
 import ru.maklas.wreckers.engine.status_effects.StatusEffectComponent;
 import ru.maklas.wreckers.engine.weapon.GrabZoneComponent;
 import ru.maklas.wreckers.engine.wrecker.WSocketComponent;
@@ -69,6 +71,7 @@ public class EntityWrecker extends GameEntity {
 				0,
 				10,
 				20));
+		add(new RenderComponent(A.images.whitePoint).color(type == EntityType.PLAYER ? Color.GREEN : Color.RED));
 	}
 
 	@Override

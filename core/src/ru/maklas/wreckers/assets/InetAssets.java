@@ -1,7 +1,7 @@
 package ru.maklas.wreckers.assets;
 
 import com.esotericsoftware.kryo.Kryo;
-import ru.maklas.mnet2.Supplier;
+import ru.maklas.mnet2.*;
 import ru.maklas.mnet2.serialization.KryoSerializer;
 import ru.maklas.mnet2.serialization.Serializer;
 import ru.maklas.wreckers.net_events.*;
@@ -56,4 +56,16 @@ public class InetAssets {
 		return provider;
 	}
 
+	/**
+	 * @param packetLossChance 0..100
+	 */
+	public static UDPSocket wrapSocket(UDPSocket sock, int ping, double packetLossChance) {
+		if (packetLossChance > 0) {
+			sock = new PacketLossUDPSocket(sock, packetLossChance);
+		}
+		if (ping > 0) {
+			sock = new HighPingUDPSocket(sock, ping);
+		}
+		return sock;
+	}
 }

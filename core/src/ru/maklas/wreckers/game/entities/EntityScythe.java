@@ -20,6 +20,7 @@ import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.game.fixtures.WeaponPiercingFD;
 import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.statics.Game;
+import ru.maklas.wreckers.statics.Layers;
 
 public class EntityScythe extends WeaponEntity implements AttachAction {
 
@@ -31,8 +32,8 @@ public class EntityScythe extends WeaponEntity implements AttachAction {
 	float handleX;
 	float handleY;
 
-	public EntityScythe(int id, float x, float y, int zOrder) {
-		super(id, x, y, zOrder);
+	public EntityScythe(int id, float x, float y) {
+		super(id, x, y, Layers.scytheZ);
 		this.world = A.physics.world;
 		final EntityType eType = EntityType.of(EntityType.NEUTRAL_WEAPON);
 

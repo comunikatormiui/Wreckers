@@ -38,7 +38,6 @@ public class HostState extends State implements ServerAuthenticator {
 						getGsm().setCommand(new GSMBackToFirst());
 					}
 				}
-				;
 			});
 		} else {
 			conn.reject(new NetConnectionResponse(false, "Busy"));

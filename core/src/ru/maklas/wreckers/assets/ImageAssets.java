@@ -18,6 +18,9 @@ public class ImageAssets extends Asset{
 	/** Green point */
 	public TextureRegion point;
 
+	/** white point */
+	public TextureRegion whitePoint;
+
 	/** Yellow line. Width = 100; Height = 6; */
 	public TextureRegion line;
 	public TextureRegion arrow;
@@ -48,6 +51,7 @@ public class ImageAssets extends Asset{
 		disposables.add(pointTexture);
 		point = new TextureRegion(pointTexture);
 		pixmap.dispose();
+		whitePoint = createCircleImage(10, Color.WHITE);
 
 
 		pixmap = new Pixmap(104, 10, Pixmap.Format.RGBA8888);

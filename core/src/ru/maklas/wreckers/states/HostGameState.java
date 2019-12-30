@@ -137,7 +137,7 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 		}
 
 		{ //Set up scythe
-			Entity scythe = new EntityScythe(engine.getBundler().get(B.idWeapons).next(), 400,   600, Layers.scytheZ);
+			Entity scythe = new EntityScythe(engine.getBundler().get(B.idWeapons).next(), 400,   600);
 			NetWeaponCreationEvent netEvent = new NetScytheCreationEvent(scythe.id, scythe.x, scythe.y, 0);
 			socket.send(netEvent);
 			engine.add(scythe);

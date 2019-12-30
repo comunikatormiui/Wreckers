@@ -5,14 +5,14 @@ import ru.maklas.wreckers.assets.A;
 import ru.maklas.wreckers.engine.other.TTLComponent;
 import ru.maklas.wreckers.engine.rendering.RenderComponent;
 
-public class TestEntity extends Entity {
+public class TestPointEntity extends Entity {
 
-	public TestEntity(float x, float y, float ttl) {
+	public TestPointEntity(float x, float y, float ttl) {
 		this(x, y, 1000000, ttl);
 	}
 
-	public TestEntity(float x, float y, int zOrder, float ttl) {
-		super(x, y, zOrder);
+	public TestPointEntity(float x, float y, int layer, float ttl) {
+		super(x, y, layer);
 		add(new RenderComponent(A.images.point));
 		add(new TTLComponent(ttl));
 	}

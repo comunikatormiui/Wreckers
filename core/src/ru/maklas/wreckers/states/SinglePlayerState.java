@@ -106,7 +106,7 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 		final EntitySword sword = new EntitySword(3, 300, 700);
 		final EntitySword sword2 = new EntitySword(4, -300, 300);
 		final EntityHammer hammer = new EntityHammer(5, 0, 300);
-		final Entity scythe = new EntityScythe(6, 370, 300, 10);
+		final Entity scythe = new EntityScythe(6, 370, 300);
 		final Entity platform = new GameEntity(-2, EntityType.OBSTACLE, 0, 0, 0).add(new PhysicsComponent(platformBody));
 
 		engine.getBundler().set(B.player, player);

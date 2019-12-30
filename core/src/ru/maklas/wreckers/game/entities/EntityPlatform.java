@@ -11,8 +11,8 @@ import ru.maklas.wreckers.statics.EntityType;
 public class EntityPlatform extends GameEntity {
 
 
-	public EntityPlatform(int id, float x, float y, int zOrder, float width, float height) {
-		super(id, EntityType.OBSTACLE, x, y, zOrder);
+	public EntityPlatform(int id, float x, float y, int layer, float width, float height) {
+		super(id, EntityType.OBSTACLE, x, y, layer);
 
 		Body platformBody = A.physics.builders
 				.newBody(BodyDef.BodyType.StaticBody)

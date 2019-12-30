@@ -21,7 +21,7 @@ public class JoinState extends State{
 	@Override
 	protected void onCreate() {
 		try {
-			UDPSocket sock = new JavaUDPSocket();
+			UDPSocket sock = InetAssets.wrapSocket(new JavaUDPSocket(), 0, 5);
 			InetAddress address = InetAddress.getLocalHost();
 			int port = InetAssets.defaultPort;
 
@@ -42,7 +42,6 @@ public class JoinState extends State{
 
 	@Override
 	protected void update(float dt) {
-
 	}
 
 	@Override

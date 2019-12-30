@@ -1,7 +1,6 @@
 package ru.maklas.wreckers.engine.networking;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import ru.maklas.mengine.Engine;
 import ru.maklas.mengine.Entity;
@@ -23,7 +22,6 @@ import ru.maklas.wreckers.statics.Game;
 import ru.maklas.wreckers.statics.Layers;
 import ru.maklas.wreckers.utils.Log;
 import ru.maklas.wreckers.utils.StringUtils;
-import ru.maklas.wreckers.utils.Utils;
 import ru.maklas.wreckers.utils.net_dispatcher.NetDispatcher;
 
 /**
@@ -86,7 +84,7 @@ public abstract class NetworkSystem extends EntitySystem {
 	final float radAngleThreshold = angleThreshold * MathUtils.degreesToRadians;
 
 	protected void smoothBodyUpdate(Body body, NetBodySyncEvent e){
-		e.smoothApply(body, 0.3f, SYNC_FRAME_FREQ / 60f, radAngleThreshold, maxDistanceSquared);
+		e.smoothApply(body, 0.4f, SYNC_FRAME_FREQ / 60f, radAngleThreshold, maxDistanceSquared);
 	}
 
 	/** Обрабатывает NetWreckerCreationEvent **/
@@ -140,7 +138,7 @@ public abstract class NetworkSystem extends EntitySystem {
 	}
 
 	protected void createScythe(Socket s, NetScytheCreationEvent e) {
-		getEngine().add(new EntityScythe(e.getId(), e.getX(), e.getY(), Layers.scytheZ));
+		getEngine().add(new EntityScythe(e.getId(), e.getX(), e.getY()));
 	}
 
 

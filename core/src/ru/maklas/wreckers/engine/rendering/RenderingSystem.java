@@ -52,6 +52,10 @@ public class RenderingSystem extends IterableZSortedRenderSystem<RenderComponent
 			//before rendering player
 		}
 
+		if (Layers.playerZ > oldLayer && Layers.playerZ <= newLayer){
+			//after rendering player
+		}
+
 		if (oldLayer == Layers.playerZ){
 			drawHealthBars();
 		}
