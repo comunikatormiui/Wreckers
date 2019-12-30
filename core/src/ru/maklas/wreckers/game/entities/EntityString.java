@@ -3,6 +3,7 @@ package ru.maklas.wreckers.game.entities;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.assets.A;
@@ -50,10 +51,6 @@ public class EntityString extends Entity {
 		add(new TTLComponent(ttl));
 	}
 
-
-
-
-
 	private static void init() {
 
 		BitmapFont font = A.images.font;
@@ -69,6 +66,29 @@ public class EntityString extends Entity {
 				TextureRegion region = new TextureRegion(font.getRegion(), glyph.srcX, glyph.srcY, glyph.width, glyph.height);
 				charMap.put(c, region);
 			}
+		}
+	}
+
+	public static Array<Entity> multiColor(float x, float y, float ttl, Section... sections) {
+		Array<Entity> strings = new Array<>();
+		float dx = 0;
+		for (Section section : sections) {
+			String s = section.s;
+			strings.add(new EntityString(s, ttl, x + dx, y, section.color));
+			for (int i = 0; i < s.length(); i++) {
+				dx += charMap.get(s.charAt(i)).getRegionWidth() * scale + spaceWidth * scale;
+			}
+		}
+		return strings;
+	}
+
+	public static class Section {
+		String s;
+		Color color;
+
+		public Section(String s, Color color) {
+			this.s = s;
+			this.color = color;
 		}
 	}
 

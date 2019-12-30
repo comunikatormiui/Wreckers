@@ -56,8 +56,17 @@ public class PhysicsSystem extends EntitySystem implements EntityListener, Conta
 	}
 
 	@Override
+	public void preSolve(Contact contact, Manifold oldManifold) {
+		dispatch(new PreSolveEvent(contact, oldManifold));
+	}
+
+	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
-		dispatch(new PostCollisionEvent().init(contact, impulse));
+		dispatch(new PostSolveEvent(contact, impulse));
+	}
+
+	@Override
+	public void endContact(Contact contact) {
 	}
 
 	@Override
@@ -144,14 +153,5 @@ public class PhysicsSystem extends EntitySystem implements EntityListener, Conta
 		getDebugRenderer().render();
 	}
 
-	@Override
-	public void endContact(Contact contact) {
-
-	}
-
-	@Override
-	public void preSolve(Contact contact, Manifold oldManifold) {
-
-	}
 
 }

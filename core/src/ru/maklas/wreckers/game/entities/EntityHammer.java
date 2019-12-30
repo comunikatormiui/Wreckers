@@ -81,8 +81,6 @@ public class EntityHammer extends WeaponEntity implements AttachAction {
 				.angularDamp(0.1f)
 				.build();
 
-		System.out.println(id + ": Hammer mass " + body.getMass());
-
 		RenderUnit unit = new TextureUnit(A.images.hammer);
 		unit.scaleX = unit.scaleY = scale;
 		unit.pivotX = unit.pivotY = 0;

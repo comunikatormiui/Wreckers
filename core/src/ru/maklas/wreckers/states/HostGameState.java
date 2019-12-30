@@ -20,9 +20,11 @@ import ru.maklas.wreckers.engine.health.HostDamageSystem;
 import ru.maklas.wreckers.engine.movemnet.AntiGravSystem;
 import ru.maklas.wreckers.engine.movemnet.MotorSystem;
 import ru.maklas.wreckers.engine.networking.HostNetworkSystem;
+import ru.maklas.wreckers.engine.other.FrameTrackSystem;
 import ru.maklas.wreckers.engine.other.TTLSystem;
 import ru.maklas.wreckers.engine.physics.HostCollisionSystem;
 import ru.maklas.wreckers.engine.physics.PhysicsSystem;
+import ru.maklas.wreckers.engine.rendering.CameraSystem;
 import ru.maklas.wreckers.engine.rendering.RenderingSystem;
 import ru.maklas.wreckers.engine.status_effects.StatusEffectSystem;
 import ru.maklas.wreckers.engine.weapon.HostPickUpSystem;
@@ -33,6 +35,7 @@ import ru.maklas.wreckers.net_events.creation.*;
 import ru.maklas.wreckers.net_events.sync.NetBodySyncEvent;
 import ru.maklas.wreckers.net_events.sync.NetWreckerSyncEvent;
 import ru.maklas.wreckers.statics.EntityType;
+import ru.maklas.wreckers.statics.ID;
 import ru.maklas.wreckers.statics.Layers;
 import ru.maklas.wreckers.utils.Log;
 import ru.maklas.wreckers.utils.Utils;
@@ -55,7 +58,6 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 		A.images.load();
 		A.physics.load();
 		cam = new OrthographicCamera(1280, 720);
-		input = new KeyboardGameInput(new HostInputController(engine));
 		netD = new NetDispatcher();
 	}
 
@@ -66,6 +68,7 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 		bundler.set(B.builders, A.physics.builders);
 		bundler.set(B.netD, netD);
 		bundler.set(B.gsmState, this);
+		bundler.set(B.socket, socket);
 		bundler.set(B.cam, cam);
 		bundler.set(B.dt, 1 / 60f);
 		bundler.set(B.isClient, false);
@@ -74,10 +77,12 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 
 	@Override
 	protected void addSystems(Engine engine) {
+		engine.add(new FrameTrackSystem());
 		engine.add(new RenderingSystem());
 		engine.add(new HostCollisionSystem());
 		engine.add(new HostDamageSystem());
 		engine.add(new HostPickUpSystem());
+		engine.add(new CameraSystem());
 
 		engine.add(new MotorSystem());
 		engine.add(new AntiGravSystem());
@@ -95,14 +100,14 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 			int y = 0;
 			int width = 2000;
 			int height = 100;
-			Entity floor = new EntityPlatform(0, x, y, Layers.floorZ, width, height);
+			Entity floor = new EntityPlatform(ID.floor, x, y, Layers.floorZ, width, height);
 			NetPlatformCreationEvent netEvent = new NetPlatformCreationEvent(3, x, y, width, height);
 			socket.send(netEvent);
 			engine.add(floor);
 		}
 
 		{ //setUp player
-			Entity player = new EntityWrecker(1, EntityType.PLAYER,   0, 500, 10000);
+			Entity player = new EntityWrecker(ID.multiplayerHost, EntityType.PLAYER,   0, 500, 10000);
 			engine.getBundler().set(B.player, player);
 			NetWreckerCreationEvent netEvent = NetWreckerCreationEvent.fromEntity(player, false);
 			socket.send(netEvent);
@@ -110,7 +115,7 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 		}
 
 		{ //Set up opponent
-			Entity opponent = new EntityWrecker(2, EntityType.OPPONENT,   250, 500, 10000);
+			Entity opponent = new EntityWrecker(ID.multiplayerJoin, EntityType.OPPONENT,   250, 500, 10000);
 			engine.getBundler().set(B.opponent, opponent);
 			NetWreckerCreationEvent netEvent = NetWreckerCreationEvent.fromEntity(opponent, true);
 			socket.send(netEvent);
@@ -118,34 +123,34 @@ public class HostGameState extends AbstractEngineState implements SocketProcesso
 		}
 
 		{ //Set up sword
-			Entity sword = new EntitySword(10, -200,   600);
+			Entity sword = new EntitySword(engine.getBundler().get(B.idWeapons).next(), -200,   600);
 			NetWeaponCreationEvent netEvent = new NetSwordCreationEvent(sword.id, sword.x, sword.y, 0);
 			socket.send(netEvent);
 			engine.add(sword);
 		}
 
 		{ //Set up Hammer
-			Entity hammer = new EntityHammer(11, 200,   600);
+			Entity hammer = new EntityHammer(engine.getBundler().get(B.idWeapons).next(), 200,   600);
 			NetWeaponCreationEvent netEvent = new NetHammerCreationEvent(hammer.id, hammer.x, hammer.y, 0);
 			socket.send(netEvent);
 			engine.add(hammer);
 		}
 
 		{ //Set up scythe
-			Entity scythe = new EntityScythe(12, 400,   600, Layers.scytheZ);
+			Entity scythe = new EntityScythe(engine.getBundler().get(B.idWeapons).next(), 400,   600, Layers.scytheZ);
 			NetWeaponCreationEvent netEvent = new NetScytheCreationEvent(scythe.id, scythe.x, scythe.y, 0);
 			socket.send(netEvent);
 			engine.add(scythe);
 		}
 
 		{ //Camera
-			EntityUtils.camera(cam, engine.getBundler().get(B.player).id);
+			engine.add(EntityUtils.camera(cam, engine.getBundler().get(B.player).id));
 		}
 	}
 
 	@Override
 	protected void start() {
-
+		input = new KeyboardGameInput(new HostInputController(engine));
 	}
 
 	@Override

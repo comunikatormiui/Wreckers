@@ -1,6 +1,7 @@
 package ru.maklas.wreckers.utils;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.utils.Sort;
 import org.jetbrains.annotations.NotNull;
 import ru.maklas.mengine.Component;

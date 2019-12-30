@@ -21,7 +21,7 @@ import ru.maklas.wreckers.utils.net_dispatcher.NetDispatcher;
  *	 При этом генерируется AttachEvent и через сокет уведомляет второго игрока
  * </p>
  */
-public class HostPickUpSystem extends DefaultPickUpSystem {
+public class HostPickUpSystem extends PickUpSystem {
 
 	private Socket socket;
 

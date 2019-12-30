@@ -70,6 +70,10 @@ public class CollisionEvent implements Event {
         return init(b, a, fixB, fixA, point, new Vector2(normal.x * -1, normal.y * -1));
     }
 
+    public CollisionEvent cpy() {
+        return new CollisionEvent(a, b, fixA, fixB, point, normal.cpy());
+    }
+
     /**
      * <p>
      *  <li>Если typeA и typeB соответствуют A и B, ничего не происходит и возвращается этот объект.</li>

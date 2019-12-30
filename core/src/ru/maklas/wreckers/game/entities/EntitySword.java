@@ -101,8 +101,6 @@ public class EntitySword extends WeaponEntity implements AttachAction {
 				.angularDamp(0.1f)
 				.build();
 
-		System.out.println(id + ": Sword mass " + body.getMass());
-
 		RenderUnit unit = new TextureUnit(A.images.sword);
 		unit.scaleX = unit.scaleY = scale;
 		unit.pivotX = unit.pivotY = 0;

@@ -34,10 +34,10 @@ public class B {
 
 
 	public static final BundlerKey<GameUI> ui = BundlerKey.of("ui");
-	public static final BundlerKey<Counter> idEnvironments = BundlerKey.of("idEnvironments");
+	public static final BundlerKey<Counter> idWeapons = BundlerKey.of("idWeapons");
 
 
 	public static void fillIds(Bundler bundler){
-		bundler.set(idEnvironments, ID.counterForEnvironment());
+		bundler.set(idWeapons, ID.counterForEnvironment());
 	}
 }

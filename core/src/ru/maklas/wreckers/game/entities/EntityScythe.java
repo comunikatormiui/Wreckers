@@ -112,8 +112,6 @@ public class EntityScythe extends WeaponEntity implements AttachAction {
 				.angularDamp(0.1f)
 				.build();
 
-		System.out.println(id + ": Scythe mass " + body.getMass());
-
 		add(new PhysicsComponent(body));
 		add(new RenderComponent(unit));
 		handleX = origin.x * Game.scale + 30 * scale;

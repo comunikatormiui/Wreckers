@@ -7,18 +7,16 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import ru.maklas.mengine.Bundler;
-import ru.maklas.mengine.Engine;
-import ru.maklas.mengine.Entity;
-import ru.maklas.mengine.UpdatableEntitySystem;
+import ru.maklas.mengine.*;
 import ru.maklas.wreckers.assets.A;
 import ru.maklas.wreckers.engine.B;
 import ru.maklas.wreckers.engine.EntityUtils;
 import ru.maklas.wreckers.engine.M;
-import ru.maklas.wreckers.engine.health.HostDamageSystem;
+import ru.maklas.wreckers.engine.health.DamageSystem;
 import ru.maklas.wreckers.engine.movemnet.AntiGravSystem;
 import ru.maklas.wreckers.engine.movemnet.MotorSystem;
 import ru.maklas.wreckers.engine.other.EntityDebugSystem;
+import ru.maklas.wreckers.engine.other.FrameTrackSystem;
 import ru.maklas.wreckers.engine.other.TTLSystem;
 import ru.maklas.wreckers.engine.physics.HostCollisionSystem;
 import ru.maklas.wreckers.engine.physics.PhysicsComponent;
@@ -27,7 +25,7 @@ import ru.maklas.wreckers.engine.rendering.CameraSystem;
 import ru.maklas.wreckers.engine.rendering.RenderingSystem;
 import ru.maklas.wreckers.engine.status_effects.StatusEffectSystem;
 import ru.maklas.wreckers.engine.weapon.AttachRequest;
-import ru.maklas.wreckers.engine.weapon.DefaultPickUpSystem;
+import ru.maklas.wreckers.engine.weapon.PickUpSystem;
 import ru.maklas.wreckers.engine.weapon.DetachRequest;
 import ru.maklas.wreckers.engine.weapon.GrabZoneChangeRequest;
 import ru.maklas.wreckers.game.FixtureType;
@@ -35,6 +33,7 @@ import ru.maklas.wreckers.game.entities.*;
 import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.user_interface.GameUI;
+import ru.maklas.wreckers.utils.Log;
 import ru.maklas.wreckers.utils.TimeSlower;
 import ru.maklas.wreckers.utils.Utils;
 
@@ -70,19 +69,19 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 
 	@Override
 	protected void addSystems(Engine engine) {
+		engine.add(new FrameTrackSystem());
 		engine.add(new PhysicsSystem());
 		engine.add(new RenderingSystem());
+		engine.add(new EntityDebugSystem());
 		engine.add(new TTLSystem());
 		engine.add(new AntiGravSystem());
 		engine.add(new MotorSystem());
 		engine.add(new StatusEffectSystem());
 		engine.add(new CameraSystem());
-		engine.add(new HostCollisionSystem());
 		engine.add(new UpdatableEntitySystem());
-
-		engine.add(new DefaultPickUpSystem());
-		engine.add(new HostDamageSystem());
-		engine.add(new EntityDebugSystem());
+		engine.add(new HostCollisionSystem());
+		engine.add(new DamageSystem());
+		engine.add(new PickUpSystem());
 	}
 
 	@Override
@@ -225,6 +224,10 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
 			setState(new SinglePlayerState());
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.E) && engine instanceof TestEngine) {
+			Log.debug(((TestEngine) engine).captureResults());
 		}
 	}
 

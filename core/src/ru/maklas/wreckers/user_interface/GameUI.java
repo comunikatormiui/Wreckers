@@ -1,5 +1,6 @@
 package ru.maklas.wreckers.user_interface;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,8 +23,8 @@ public class GameUI extends BaseStage {
 		this.controller = controller;
 		Table table = new Table();
 		addActor(table);
-		int screenWidth = (int) (640 * 1.5f);
-		int screenHeight = (int) (360 * 1.5f);
+		int screenWidth = Gdx.graphics.getWidth();
+		int screenHeight = Gdx.graphics.getHeight();
 		getViewport().update(screenWidth, screenHeight, true);
 
 		touchpad = new Touchpad(10, A.images.touchStyle);

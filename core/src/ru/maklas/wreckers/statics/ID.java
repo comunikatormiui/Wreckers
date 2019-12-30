@@ -8,6 +8,9 @@ public class ID {
 	//singleplayer
 	public static final int soloPlayer = 100;
 	public static final int soloOpponent = 200;
+	public static int floor = 1;
+	public static int multiplayerHost = 1000;
+	public static int multiplayerJoin = 2000;
 
 
 	public static Counter counterForEnvironment(){

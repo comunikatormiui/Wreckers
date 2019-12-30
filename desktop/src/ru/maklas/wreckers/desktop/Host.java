@@ -9,8 +9,8 @@ public class Host {
 
     public static void main (String[] arg) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width  = (int) (640 * 1.5f);
-        config.height = (int) (360 * 1.5f);
+        config.width  = (int) (640 * 1.0f);
+        config.height = (int) (360 * 1.0f);
         config.y = -1;
         config.x = 0;
         config.title = "Host";

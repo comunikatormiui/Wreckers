@@ -20,7 +20,7 @@ import java.util.Random;
  * Система принимает ивенты от сервера о нанесенном уроне.
  * Диспатчит внутри движка ивент о нанесенном уроне.
  */
-public class JoinDamageSystem extends SubscriptionSystem {
+public class JoinDamageSystem extends DamageSystem {
 
 	private Random rand = new Random();
 

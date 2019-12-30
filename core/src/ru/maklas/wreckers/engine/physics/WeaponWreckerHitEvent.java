@@ -1,7 +1,8 @@
-package ru.maklas.wreckers.engine.weapon;
+package ru.maklas.wreckers.engine.physics;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import org.jetbrains.annotations.Nullable;
 import ru.maklas.mengine.Entity;
 import ru.maklas.wreckers.engine.other.Event;
@@ -13,31 +14,30 @@ public class WeaponWreckerHitEvent implements Event {
 	Entity targetWrecker;
 	Vector2 point;
 	Vector2 normal;
-	private final Vector2 collisionVelocity;
-	private final Vector2 weaponStuckPoint;
+	Vector2 collisionVelocity;
 	float impulse;
 	float sliceness;
 	float dullness;
 	float sharpness;
-	private final Body weaponBody;
-	private final Body wreckerBody;
-	private Vector2 piercingDirection;
+	Fixture weaponFix;
+	Fixture wreckerFix;
 
-	public WeaponWreckerHitEvent(Entity weapon, @Nullable Entity weaponOwner, Entity targetWrecker, Vector2 point, Vector2 normal, Vector2 collisionVelocity, Vector2 piercingDirection, Vector2 weaponStuckPoint, float impulse, float sliceness, float dullness, float sharpness, Body weaponBody, Body wreckerBody) {
+	public WeaponWreckerHitEvent() {
+
+	}
+	public WeaponWreckerHitEvent(Entity weapon, @Nullable Entity weaponOwner, Entity targetWrecker, Vector2 point, Vector2 normal, Vector2 collisionVelocity, float impulse, float dullness, float sliceness, float sharpness, Fixture weaponFix, Fixture wreckerFix) {
 		this.weapon = weapon;
 		this.weaponOwner = weaponOwner;
 		this.targetWrecker = targetWrecker;
 		this.point = point;
 		this.collisionVelocity = collisionVelocity;
-		this.piercingDirection = piercingDirection;
-		this.weaponStuckPoint = weaponStuckPoint;
 		this.impulse = impulse;
 		this.normal = normal;
 		this.sliceness = sliceness;
 		this.dullness = dullness;
 		this.sharpness = sharpness;
-		this.weaponBody = weaponBody;
-		this.wreckerBody = wreckerBody;
+		this.weaponFix = weaponFix;
+		this.wreckerFix = wreckerFix;
 	}
 
 	public Entity getWeapon() {
@@ -83,19 +83,12 @@ public class WeaponWreckerHitEvent implements Event {
 		return dullness;
 	}
 
-	public Body getWeaponBody() {
-		return weaponBody;
+	public Fixture getWeaponFix() {
+		return weaponFix;
 	}
 
-	public Body getWreckerBody() {
-		return wreckerBody;
+	public Fixture getWreckerFix() {
+		return wreckerFix;
 	}
 
-	public Vector2 getPiercingDirection() {
-		return piercingDirection;
-	}
-
-	public Vector2 getWeaponStuckPoint() {
-		return weaponStuckPoint;
-	}
 }

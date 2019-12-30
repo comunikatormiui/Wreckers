@@ -21,7 +21,7 @@ import ru.maklas.wreckers.statics.Game;
 import ru.maklas.wreckers.utils.NoCaseException;
 
 /** Набор методов для удачного удаления у прикрепления оружия к игроку, А так же смене GrabZone **/
-public class DefaultPickUpSystem extends EntitySystem implements EntityListener {
+public class PickUpSystem extends EntitySystem implements EntityListener {
 
 	@Override
 	public void onAddedToEngine(final Engine engine) {

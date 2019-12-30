@@ -22,6 +22,7 @@ import ru.maklas.wreckers.game.fixtures.FixtureData;
 import ru.maklas.wreckers.statics.EntityType;
 import ru.maklas.wreckers.statics.Game;
 import ru.maklas.wreckers.statics.Layers;
+import ru.maklas.wreckers.utils.Log;
 
 public class EntityWrecker extends GameEntity {
 
@@ -54,7 +55,6 @@ public class EntityWrecker extends GameEntity {
 				.angularDamp(5)
 				.build();
 
-		System.out.println(id + ": Player mass " + body.getMassData().mass);
 
 		add(new PhysicsComponent(body));
 		add(new HealthComponent(health));
@@ -77,7 +77,7 @@ public class EntityWrecker extends GameEntity {
 		subscribe(DeathEvent.class, e -> {
 				if (e.getTarget() == EntityWrecker.this){
 					engine.remove(EntityWrecker.this);
-					System.out.println("Died");
+					Log.trace("Died");
 				}
 		});
 	}

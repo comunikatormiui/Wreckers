@@ -14,15 +14,15 @@ import ru.maklas.wreckers.engine.movemnet.MotorComponent;
 import ru.maklas.wreckers.engine.movemnet.MotorSystem;
 import ru.maklas.wreckers.engine.networking.NetworkSystem;
 import ru.maklas.wreckers.engine.other.EntityDebugSystem;
+import ru.maklas.wreckers.engine.other.FrameTrackSystem;
 import ru.maklas.wreckers.engine.other.TTLComponent;
 import ru.maklas.wreckers.engine.other.TTLSystem;
-import ru.maklas.wreckers.engine.physics.HostCollisionSystem;
 import ru.maklas.wreckers.engine.physics.PhysicsComponent;
 import ru.maklas.wreckers.engine.physics.PhysicsSystem;
 import ru.maklas.wreckers.engine.rendering.*;
 import ru.maklas.wreckers.engine.status_effects.StatusEffectComponent;
 import ru.maklas.wreckers.engine.status_effects.StatusEffectSystem;
-import ru.maklas.wreckers.engine.weapon.DefaultPickUpSystem;
+import ru.maklas.wreckers.engine.weapon.PickUpSystem;
 import ru.maklas.wreckers.engine.weapon.GrabZoneComponent;
 import ru.maklas.wreckers.engine.weapon.PickUpComponent;
 import ru.maklas.wreckers.engine.weapon.WeaponComponent;
@@ -64,14 +64,14 @@ public class M {
 		int i = 1;
 
 		//input
+		map.put(FrameTrackSystem.class, i++);
 		map.put(NetworkSystem.class, i++);
 		map.put(MotorSystem.class, i++);
 
 		//update
 		map.put(TTLSystem.class, i++);
 		map.put(AnimationSystem.class, i++);
-		map.put(DefaultPickUpSystem.class, i++);
-		map.put(HostDamageSystem.class, i++);
+		map.put(PickUpSystem.class, i++);
 		map.put(PhysicsSystem.class, i++);
 		map.put(AntiGravSystem.class, i++);
 		map.put(UpdatableEntitySystem.class, i++);

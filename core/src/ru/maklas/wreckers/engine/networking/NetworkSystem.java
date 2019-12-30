@@ -13,6 +13,7 @@ import ru.maklas.wreckers.engine.B;
 import ru.maklas.wreckers.engine.M;
 import ru.maklas.wreckers.engine.movemnet.MotorComponent;
 import ru.maklas.wreckers.engine.physics.PhysicsComponent;
+import ru.maklas.wreckers.engine.rendering.CameraComponent;
 import ru.maklas.wreckers.game.entities.*;
 import ru.maklas.wreckers.net_events.creation.*;
 import ru.maklas.wreckers.net_events.sync.NetBodySyncEvent;
@@ -46,7 +47,7 @@ import ru.maklas.wreckers.utils.net_dispatcher.NetDispatcher;
  */
 public abstract class NetworkSystem extends EntitySystem {
 
-	private static final int SYNC_FRAME_FREQ = 5;
+	private static final int SYNC_FRAME_FREQ = 4;
 	private int framesBeforeNextSync = SYNC_FRAME_FREQ;
 	protected final PingListener pl = (socket, ping) -> Log.trace("Ping: " + StringUtils.ff(ping) + " ms");
 	protected Socket socket;
@@ -85,29 +86,7 @@ public abstract class NetworkSystem extends EntitySystem {
 	final float radAngleThreshold = angleThreshold * MathUtils.degreesToRadians;
 
 	protected void smoothBodyUpdate(Body body, NetBodySyncEvent e){
-		Vector2 targetPos = Utils.vec1.set(e.getX(), e.getY());
-		Vector2 bodyPos = Utils.vec2.set(body.getPosition());
-		final float distanceOverMax = (targetPos.dst2(body.getPosition())) / maxDistanceSquared;
-
-		//Position
-		if (distanceOverMax < 1){ //0..1 - Норма. небольшие коррекции
-			final Vector2 directionToTarget = Utils.vec1.set(targetPos).sub(bodyPos); //Расстояние которое необходимо дополнительно пройти за 5 кадров.
-			final Vector2 velocityToTarget = directionToTarget.scl(12);
-
-			body.setLinearVelocity(e.getVelX() + velocityToTarget.x, e.getVelY() + velocityToTarget.y);
-		} else {
-			body.getTransform().setPosition(Utils.vec1.set(e.getX(), e.getY()));
-			body.setLinearVelocity(e.getVelX(), e.getVelY());
-		}
-
-
-		final float angleDt = e.getAngle() - body.getAngle();
-		if (Math.abs(angleDt) < radAngleThreshold){ //Угол отличается незначительно
-			body.setAngularVelocity(e.getAngVel() + (angleDt * 12));
-		} else {
-			body.setTransform(body.getPosition(), e.getAngle());
-			body.setAngularVelocity(e.getAngVel());
-		}
+		e.smoothApply(body, 0.3f, SYNC_FRAME_FREQ / 60f, radAngleThreshold, maxDistanceSquared);
 	}
 
 	/** Обрабатывает NetWreckerCreationEvent **/
@@ -127,7 +106,9 @@ public abstract class NetworkSystem extends EntitySystem {
 
 	@Override
 	public void update(float dt) {
-		if (engine.getBundler().get(B.updateThisFrame)){
+		Boolean updateThisFrame = engine.getBundler().get(B.updateThisFrame);
+		updateThisFrame = updateThisFrame != null ? updateThisFrame : false;
+		if (updateThisFrame){
 			engine.getBundler().set(B.updateThisFrame, false);
 			framesBeforeNextSync = 0;
 		}
@@ -144,6 +125,7 @@ public abstract class NetworkSystem extends EntitySystem {
 	protected void onWreckerAdded(Entity wrecker, boolean isPlayer){
 		if (isPlayer){
 			engine.getBundler().set(B.player, wrecker);
+			engine.entitiesFor(CameraComponent.class).get(0).get(M.camera).setFollowEntity(wrecker.id);
 		} else {
 			engine.getBundler().set(B.opponent, wrecker);
 		}

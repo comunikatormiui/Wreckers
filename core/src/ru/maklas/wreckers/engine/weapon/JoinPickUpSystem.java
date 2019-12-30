@@ -11,7 +11,7 @@ import ru.maklas.wreckers.net_events.NetAttachDetachEvent;
 import ru.maklas.wreckers.net_events.NetGrabZoneChange;
 import ru.maklas.wreckers.utils.net_dispatcher.NetDispatcher;
 
-public class JoinPickUpSystem extends DefaultPickUpSystem {
+public class JoinPickUpSystem extends PickUpSystem {
 
 	public JoinPickUpSystem() {
 		super();

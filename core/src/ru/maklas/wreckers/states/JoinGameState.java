@@ -20,8 +20,10 @@ import ru.maklas.wreckers.engine.health.JoinDamageSystem;
 import ru.maklas.wreckers.engine.movemnet.AntiGravSystem;
 import ru.maklas.wreckers.engine.movemnet.MotorSystem;
 import ru.maklas.wreckers.engine.networking.JoinNetworkSystem;
+import ru.maklas.wreckers.engine.other.FrameTrackSystem;
 import ru.maklas.wreckers.engine.other.TTLSystem;
 import ru.maklas.wreckers.engine.physics.PhysicsSystem;
+import ru.maklas.wreckers.engine.rendering.CameraSystem;
 import ru.maklas.wreckers.engine.rendering.RenderingSystem;
 import ru.maklas.wreckers.engine.status_effects.StatusEffectSystem;
 import ru.maklas.wreckers.engine.weapon.JoinPickUpSystem;
@@ -62,6 +64,7 @@ public class JoinGameState extends AbstractEngineState implements SocketProcesso
 		bundler.set(B.batch, batch);
 		bundler.set(B.builders, new Builders(A.physics.world, Game.scale));
 		bundler.set(B.gsmState, this);
+		bundler.set(B.socket, socket);
 		bundler.set(B.cam, cam);
 		bundler.set(B.dt, 1 / 60f);
 		bundler.set(B.isClient, true);
@@ -70,9 +73,11 @@ public class JoinGameState extends AbstractEngineState implements SocketProcesso
 
 	@Override
 	protected void addSystems(Engine engine) {
+		engine.add(new FrameTrackSystem());
 		engine.add(new RenderingSystem());
 		engine.add(new JoinDamageSystem());
 		engine.add(new JoinPickUpSystem());
+		engine.add(new CameraSystem());
 
 		engine.add(new MotorSystem());
 		engine.add(new AntiGravSystem());

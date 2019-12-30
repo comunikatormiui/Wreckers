@@ -3,6 +3,7 @@ package ru.maklas.wreckers.net_events.sync;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import org.jetbrains.annotations.NotNull;
+import ru.maklas.wreckers.utils.Utils;
 import ru.maklas.wreckers.utils.net_dispatcher.NetEvent;
 
 /**
@@ -104,6 +105,41 @@ public class NetBodySyncEvent implements NetEvent {
 		body.setTransform(x, y, angle);
 		body.setLinearVelocity(velX, velY);
 		body.setAngularVelocity(angVel);
+	}
+
+	/**
+	 * @param smoothness Отвечает за скорость с которой будет преодолеваться разница в соединении.
+	 *                   от 0 до 1. Чем лучше соединение и чем больше важна позиция Entity,
+	 *                   тем больше стоит выставлять данное значение.
+	 * @param updateRate Как часто приходят обновления в секундах
+	 * @param radAngleThreshold Максимальная разница в повороте (радиан) после которой Body просто будет телепортировано
+	 * @param maxDistanceSquared Квадрат максимального расстояния. После которого Body просто будет телепортировано.
+	 */
+	public void smoothApply(Body body, float smoothness, float updateRate, float radAngleThreshold, float maxDistanceSquared){
+		float futureScalar = smoothness / updateRate;
+		Vector2 targetPos = Utils.vec1.set(x, y);
+		Vector2 bodyPos = Utils.vec2.set(body.getPosition());
+		final float distanceOverMax = (targetPos.dst2(body.getPosition())) / maxDistanceSquared;
+
+		//Position
+		if (distanceOverMax < 1){ //0..1 - Норма. небольшие коррекции
+			final Vector2 directionToTarget = Utils.vec1.set(targetPos).sub(bodyPos); //Расстояние которое необходимо дополнительно пройти за 5 кадров.
+			final Vector2 velocityToTarget = directionToTarget.scl(futureScalar);
+
+			body.setLinearVelocity(velX + velocityToTarget.x, velY + velocityToTarget.y);
+		} else {
+			body.setTransform(Utils.vec1.set(x, y), angle);
+			body.setLinearVelocity(velX, velY);
+		}
+
+
+		final float angleDt = angle - body.getAngle();
+		if (Math.abs(angleDt) < radAngleThreshold){ //Угол отличается незначительно
+			body.setAngularVelocity(angVel + (angleDt * futureScalar * 0.1f));
+		} else {
+			body.setTransform(body.getPosition(), angle);
+			body.setAngularVelocity(angVel);
+		}
 	}
 
 	public void setAngle(float angle) {
