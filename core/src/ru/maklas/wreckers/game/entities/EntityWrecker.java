@@ -60,7 +60,7 @@ public class EntityWrecker extends GameEntity {
 
 		add(new PhysicsComponent(body));
 		add(new HealthComponent(health));
-		add(new MotorComponent(60));
+		add(new MotorComponent(40));
 		add(new AntiGravComponent(body.getMassData().mass,5, 5, 1.2f));
 		add(new WSocketComponent(1, EntityType.weaponTypeFor(type)));
 		add(new GrabZoneComponent(A.physics.builders.buildCircle(0, 0, pickUpRadius)));

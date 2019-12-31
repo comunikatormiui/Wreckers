@@ -26,22 +26,21 @@ import ru.maklas.wreckers.utils.net_dispatcher.NetDispatcher;
 
 /**
  * <p>
- *	 Subscribes and does actions for:
+ * Subscribes and does actions for:
  *
- *	 <li>NetBodySyncEvent</li>
- *	 <li>NetWreckerSyncEvent</li>
- *	 <li>NetWreckerCreationEvent</li>
- *	 <li>NetSwordCreationEvent</li>
- *	 <li>NetHammerCreationEvent</li>
- *	 <li>NetScytheCreationEvent</li>
- *	 <li>NetPlatformCreationEvent</li>
+ * <li>NetBodySyncEvent</li>
+ * <li>NetWreckerSyncEvent</li>
+ * <li>NetWreckerCreationEvent</li>
+ * <li>NetSwordCreationEvent</li>
+ * <li>NetHammerCreationEvent</li>
+ * <li>NetScytheCreationEvent</li>
+ * <li>NetPlatformCreationEvent</li>
  *
- *	 <p>
- *		 all methods can be overriden.
- *	 <p>
- *		 Some methods which start with 'sync' are left to be used in subclasses
+ * <p>
+ * all methods can be overriden.
+ * <p>
+ * Some methods which start with 'sync' are left to be used in subclasses
  * </p>
- *
  */
 public abstract class NetworkSystem extends EntitySystem {
 
@@ -69,11 +68,11 @@ public abstract class NetworkSystem extends EntitySystem {
 		socket.removePingListener(pl);
 	}
 
-	protected void bodyUpdate(Body body, NetBodySyncEvent e){
+	protected void bodyUpdate(Body body, NetBodySyncEvent e) {
 		smoothBodyUpdate(body, e);
 	}
 
-	protected void teleportBodyUpdate(Body body, NetBodySyncEvent e){
+	protected void teleportBodyUpdate(Body body, NetBodySyncEvent e) {
 		e.hardApply(body);
 	}
 
@@ -83,19 +82,19 @@ public abstract class NetworkSystem extends EntitySystem {
 	final float angleThreshold = 20;
 	final float radAngleThreshold = angleThreshold * MathUtils.degreesToRadians;
 
-	protected void smoothBodyUpdate(Body body, NetBodySyncEvent e){
-		e.smoothApply(body, 0.4f, SYNC_FRAME_FREQ / 60f, radAngleThreshold, maxDistanceSquared);
+	protected void smoothBodyUpdate(Body body, NetBodySyncEvent e) {
+		e.smoothApply(body, 0.05f, SYNC_FRAME_FREQ / 60f, radAngleThreshold, maxDistanceSquared);
 	}
 
 	/** Обрабатывает NetWreckerCreationEvent **/
-	protected void onWreckerEvent(Socket s, NetWreckerCreationEvent e){
+	protected void onWreckerEvent(Socket s, NetWreckerCreationEvent e) {
 		Entity wrecker = createWrecker(e);
 		getEngine().add(wrecker);
 		onWreckerAdded(wrecker, e.isPlayer());
 	}
 
 	/** Создаёт Wrecker **/
-	protected Entity createWrecker(NetWreckerCreationEvent e){
+	protected Entity createWrecker(NetWreckerCreationEvent e) {
 		int type = e.isPlayer() ? EntityType.PLAYER : EntityType.OPPONENT;
 		EntityWrecker wrecker = new EntityWrecker(e.getId(), type, e.getX(), e.getY(), e.getHealth());
 		wrecker.get(M.wrecker).set(e.getStats());
@@ -106,7 +105,7 @@ public abstract class NetworkSystem extends EntitySystem {
 	public void update(float dt) {
 		Boolean updateThisFrame = engine.getBundler().get(B.updateThisFrame);
 		updateThisFrame = updateThisFrame != null ? updateThisFrame : false;
-		if (updateThisFrame){
+		if (updateThisFrame) {
 			engine.getBundler().set(B.updateThisFrame, false);
 			framesBeforeNextSync = 0;
 		}
@@ -120,8 +119,8 @@ public abstract class NetworkSystem extends EntitySystem {
 	protected abstract void sync();
 
 	/** Ивент о создании и занесении в model Wrecker'a **/
-	protected void onWreckerAdded(Entity wrecker, boolean isPlayer){
-		if (isPlayer){
+	protected void onWreckerAdded(Entity wrecker, boolean isPlayer) {
+		if (isPlayer) {
 			engine.getBundler().set(B.player, wrecker);
 			engine.entitiesFor(CameraComponent.class).get(0).get(M.camera).setFollowEntity(wrecker.id);
 		} else {
@@ -141,16 +140,15 @@ public abstract class NetworkSystem extends EntitySystem {
 		getEngine().add(new EntityScythe(e.getId(), e.getX(), e.getY()));
 	}
 
-
 	protected void sendSynchWeapon(Entity weapon) {
 		sendSyncBody(weapon);
 	}
 
-	protected void sendSynchWeapon(NetBatch batch, Entity weapon){
+	protected void sendSynchWeapon(NetBatch batch, Entity weapon) {
 		sendSyncBody(batch, weapon);
 	}
 
-	protected void sendSynchWrecker(Entity wrecker){
+	protected void sendSynchWrecker(Entity wrecker) {
 		PhysicsComponent pc = wrecker.get(M.physics);
 		MotorComponent mc = wrecker.get(M.motor);
 
@@ -161,19 +159,19 @@ public abstract class NetworkSystem extends EntitySystem {
 		}
 	}
 
-	protected void sendSyncBody(Entity phycisEntity){
+	protected void sendSyncBody(Entity phycisEntity) {
 		PhysicsComponent pc = phycisEntity.get(M.physics);
 
-		if (pc != null && pc.body != null){
+		if (pc != null && pc.body != null) {
 			NetBodySyncEvent syncEvent = NetBodySyncEvent.fromBody(phycisEntity.id, pc.body);
 			socket.send(syncEvent);
 		}
 	}
 
-	protected void sendSyncBody(NetBatch batch, Entity phycisEntity){
+	protected void sendSyncBody(NetBatch batch, Entity phycisEntity) {
 		PhysicsComponent pc = phycisEntity.get(M.physics);
 
-		if (pc != null && pc.body != null){
+		if (pc != null && pc.body != null) {
 			NetBodySyncEvent syncEvent = NetBodySyncEvent.fromBody(phycisEntity.id, pc.body);
 			batch.add(syncEvent);
 		}

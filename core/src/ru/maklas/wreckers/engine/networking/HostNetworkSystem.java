@@ -51,7 +51,6 @@ public class HostNetworkSystem extends NetworkSystem {
 
 	private NetBatch batch = new NetBatch();
 	private void syncAllWeapons(){
-
 		for (Entity weapon : weapons) {
 			sendSynchWeapon(batch, weapon);
 		}

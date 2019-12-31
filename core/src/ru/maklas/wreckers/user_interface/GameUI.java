@@ -17,10 +17,8 @@ import ru.maklas.wreckers.states.GameController;
 public class GameUI extends BaseStage {
 
 	private final Touchpad touchpad;
-	private final GameController controller;
 
 	public GameUI(final GameController controller) {
-		this.controller = controller;
 		Table table = new Table();
 		addActor(table);
 		int screenWidth = Gdx.graphics.getWidth();
@@ -28,7 +26,7 @@ public class GameUI extends BaseStage {
 		getViewport().update(screenWidth, screenHeight, true);
 
 		touchpad = new Touchpad(10, A.images.touchStyle);
-		touchpad.setBounds(15, 15, 200, 200);
+		touchpad.setBounds(15, 15, 400, 400);
 		TextureRegionDrawable block = new TextureRegionDrawable(A.images.touchBlock);
 		TextButton.TextButtonStyle style = new TextButton.TextButtonStyle(block, block, block, A.images.font);
 		TextButton pickUpButton = new TextButton("Pick up", style);
@@ -37,13 +35,13 @@ public class GameUI extends BaseStage {
 		dropButton.setColor(Color.RED);
 
 
-		table.add(dropButton);
-		table.add().padRight(120);
-		table.add(pickUpButton);
-		table.add().padLeft(350);
-		table.add(touchpad);
+		table.add(dropButton).bottom();
+		table.add().bottom().padRight(120);
+		table.add(pickUpButton).bottom();
+		table.add().padLeft(800);
+		table.add(touchpad).padBottom(100).size(350);
 
-		table.setSize(screenWidth, screenHeight);
+		table.setSize(screenWidth, screenHeight * 0.8f);
 		table.align(Align.bottom);
 		table.setFillParent(true);
 

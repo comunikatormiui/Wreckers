@@ -14,7 +14,6 @@ public class JoinState extends State{
 
 	Socket socket;
 
-
 	public JoinState() {
 	}
 

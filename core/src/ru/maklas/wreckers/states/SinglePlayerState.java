@@ -241,7 +241,7 @@ public class SinglePlayerState extends AbstractEngineState implements GameContro
 		batch.end();
 		engine.getSystemManager().getSystem(PhysicsSystem.class).renderDebug();
 
-		if (Gdx.app.getType() == Application.ApplicationType.Android) {
+		if (true || Gdx.app.getType() == Application.ApplicationType.Android) {
 			ui.draw();
 		}
 	}
